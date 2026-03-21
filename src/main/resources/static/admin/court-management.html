@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản lý sân – Cầu Lông Vui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/header-footer.css" />
+  <link rel="stylesheet" href="/css/styles.css" />
+  <style>
+    /* ── Management Layout ── */
+    .mgmt-page { padding: 90px 0 60px; min-height: 100vh; }
+    .mgmt-container { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+
+    /* ── Page Title ── */
+    .mgmt-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
+    }
+    .mgmt-title { font-size: 26px; font-weight: 800; color: var(--dark); }
+    .mgmt-subtitle { font-size: 14px; color: var(--muted); margin-top: 2px; }
+    .mgmt-actions { display: flex; gap: 10px; align-items: center; }
+
+    /* ── Stats Row ── */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px; margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--r-md); padding: 20px 24px; text-align: center;
+      transition: var(--transition);
+    }
+    .stat-card:hover { box-shadow: var(--shadow-sm); transform: translateY(-2px); }
+    .stat-num { font-size: 32px; font-weight: 800; color: var(--dark); }
+    .stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; font-weight: 500; }
+    .stat-num.green { color: var(--green); }
+    .stat-num.yellow { color: var(--yellow); }
+    .stat-num.red { color: var(--red); }
+
+    /* ── Filter / Search bar ── */
+    .mgmt-search-bar {
+      display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .mgmt-search-bar input, .mgmt-search-bar select {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r-sm); padding: 9px 16px; font-size: 14px;
+      font-family: var(--font-main); color: var(--dark); outline: none;
+      transition: border-color 0.2s;
+    }
+    .mgmt-search-bar input { flex: 1; min-width: 200px; }
+    .mgmt-search-bar input:focus, .mgmt-search-bar select:focus {
+      border-color: var(--green);
+    }
+
+    /* ── Table ── */
+    .mgmt-table-wrap {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-sm);
+    }
+    .mgmt-table { width: 100%; border-collapse: collapse; }
+    .mgmt-table th {
+      background: var(--green-pale); color: var(--dark); font-size: 12px;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+      padding: 12px 20px; text-align: left; border-bottom: 1px solid var(--border);
+    }
+    .mgmt-table td {
+      padding: 14px 20px; font-size: 14px; border-bottom: 1px solid var(--border);
+      color: var(--text); vertical-align: middle;
+    }
+    .mgmt-table tr:last-child td { border-bottom: none; }
+    .mgmt-table tr:hover td { background: var(--bg); }
+    .mgmt-table .court-name { font-weight: 700; color: var(--dark); }
+    .mgmt-table .court-price { font-weight: 700; color: var(--green); }
+
+    /* Status badges */
+    .status-toggle {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 5px 14px; border-radius: var(--r-xl); font-size: 12px;
+      font-weight: 700; cursor: pointer; border: 1.5px solid transparent;
+      transition: all 0.2s;
+    }
+    .status-AVAILABLE { background: #dcfce7; color: #15803d; border-color: #bbf7d0; }
+    .status-BOOKED    { background: #fef9c3; color: #a16207; border-color: #fde68a; }
+    .status-MAINTENANCE { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+
+    /* Buttons */
+    .btn-sm-edit {
+      background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe;
+      border-radius: var(--r-sm); padding: 6px 14px; font-size: 13px;
+      font-weight: 600; cursor: pointer; font-family: var(--font-main);
+      transition: all 0.2s; text-decoration: none;
+    }
+    .btn-sm-edit:hover { background: #2563eb; color: #fff; }
+
+    .btn-sm-delete {
+      background: #fff1f1; color: var(--red); border: 1px solid #fca5a5;
+      border-radius: var(--r-sm); padding: 6px 14px; font-size: 13px;
+      font-weight: 600; cursor: pointer; font-family: var(--font-main);
+      transition: all 0.2s;
+    }
+    .btn-sm-delete:hover { background: var(--red); color: #fff; }
+
+    .btn-primary-mgmt {
+      background: var(--green); color: #fff; border: none;
+      border-radius: var(--r-sm); padding: 10px 22px; font-size: 14px;
+      font-weight: 700; cursor: pointer; font-family: var(--font-main);
+      box-shadow: 0 4px 14px var(--green-glow); transition: all 0.2s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-primary-mgmt:hover { background: var(--green-light); transform: translateY(-1px); }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45); backdrop-filter: blur(4px);
+      z-index: 2000; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--white); border-radius: var(--r-lg);
+      padding: 36px; max-width: 520px; width: 100%; margin: 20px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.15);
+      animation: modalIn 0.2s ease;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.95) translateY(10px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .modal-title { font-size: 20px; font-weight: 800; color: var(--dark); margin-bottom: 24px; }
+    .modal-form .form-group { margin-bottom: 16px; }
+    .modal-form label { display: block; font-size: 12px; font-weight: 700; color: var(--mid); margin-bottom: 6px; text-transform: uppercase; }
+    .modal-form input, .modal-form select, .modal-form textarea {
+      width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      font-size: 14px; font-family: var(--font-main); color: var(--dark); outline: none; box-sizing: border-box;
+    }
+    .modal-form input:focus, .modal-form select:focus, .modal-form textarea:focus {
+      border-color: var(--green); box-shadow: 0 0 0 3px var(--green-glow);
+    }
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
+    .btn-cancel {
+      background: var(--bg); border: 1px solid var(--border); border-radius: var(--r-sm);
+      padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font-main);
+    }
+    .btn-cancel:hover { background: var(--border); }
+    .btn-save {
+      background: var(--green); color: #fff; border: none; border-radius: var(--r-sm);
+      padding: 10px 24px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: var(--font-main);
+    }
+    .btn-save:hover { background: var(--green-light); }
+
+    /* Access denied */
+    .access-denied {
+      text-align: center; padding: 80px 20px;
+    }
+    .access-denied .icon { font-size: 64px; margin-bottom: 16px; }
+    .access-denied h2 { font-size: 24px; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
+    .access-denied p { color: var(--muted); margin-bottom: 24px; }
+
+    .empty-state-mgmt { text-align: center; padding: 48px 20px; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVBAR ── -->
+<div id="header-placeholder"></div>
+
+<!-- ── Main Content ── -->
+<div class="mgmt-page" id="mgmtPage" style="display:none;">
+  <div class="mgmt-container">
+
+    <!-- Header -->
+    <div class="mgmt-header">
+      <div>
+        <div class="mgmt-title">⚙️ Quản lý Sân Cầu Lông</div>
+        <div class="mgmt-subtitle">Thêm, sửa, xóa và cập nhật trạng thái sân</div>
+      </div>
+      <div class="mgmt-actions">
+        <a href="/courts.html" class="btn-cancel" style="text-decoration:none;">← Về trang sân</a>
+        <button class="btn-primary-mgmt" onclick="openAddModal()">
+          <span>＋</span> Thêm sân mới
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card"><div class="stat-num" id="totalCount">—</div><div class="stat-label">Tổng số sân</div></div>
+      <div class="stat-card"><div class="stat-num green" id="availableCount">—</div><div class="stat-label">Còn trống</div></div>
+      <div class="stat-card"><div class="stat-num yellow" id="bookedCount">—</div><div class="stat-label">Đã đặt</div></div>
+      <div class="stat-card"><div class="stat-num red" id="maintenanceCount">—</div><div class="stat-label">Bảo trì</div></div>
+    </div>
+
+    <!-- Search / Filter -->
+    <div class="mgmt-search-bar">
+      <input type="text" id="mgmtSearch" placeholder="🔍  Tìm tên sân..." oninput="filterCourts()" />
+      <select id="mgmtStatus" onchange="filterCourts()">
+        <option value="">Tất cả trạng thái</option>
+        <option value="AVAILABLE">🟢 Còn trống</option>
+        <option value="BOOKED">🟡 Đã đặt</option>
+        <option value="MAINTENANCE">🔴 Bảo trì</option>
+      </select>
+    </div>
+
+    <!-- Table -->
+    <div class="mgmt-table-wrap">
+      <table class="mgmt-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Tên sân</th>
+            <th>Mô tả</th>
+            <th>Giá / giờ</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+          </tr>
+        </thead>
+        <tbody id="courtsTableBody">
+          <tr><td colspan="6" class="empty-state-mgmt">Đang tải...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- Access Denied -->
+<div class="mgmt-page" id="accessDenied" style="display:none;">
+  <div class="mgmt-container">
+    <div class="access-denied">
+      <div class="icon">🚫</div>
+      <h2>Không có quyền truy cập</h2>
+      <p>Trang này chỉ dành cho Quản trị viên và Nhân viên. Vui lòng đăng nhập với tài khoản phù hợp.</p>
+      <a href="/auth/login.html" class="btn-primary-mgmt" style="display:inline-flex;text-decoration:none;">Đăng nhập</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── Footer ── -->
+<div id="footer-placeholder"></div>
+<div id="toast-container"></div>
+
+<!-- ── Modal Thêm/Sửa sân ── -->
+<div class="modal-overlay" id="courtModal">
+  <div class="modal-box">
+    <div class="modal-title" id="modalTitle">Thêm sân mới</div>
+    <form class="modal-form" id="courtForm" onsubmit="submitCourt(event)">
+      <input type="hidden" id="courtId" />
+
+      <div class="form-group">
+        <label>Tên sân *</label>
+        <input type="text" id="courtName" placeholder="Sân A1" required />
+      </div>
+      <div class="form-group">
+        <label>Mô tả</label>
+        <textarea id="courtDesc" rows="2" placeholder="Mô tả ngắn về sân..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Giá / giờ (VNĐ) *</label>
+        <input type="number" id="courtPrice" placeholder="80000" min="0" step="1000" required />
+      </div>
+      <div class="form-group">
+        <label>Trạng thái</label>
+        <select id="courtStatus">
+          <option value="AVAILABLE">🟢 Còn trống</option>
+          <option value="BOOKED">🟡 Đã đặt</option>
+          <option value="MAINTENANCE">🔴 Bảo trì</option>
+        </select>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" onclick="closeModal()">Hủy</button>
+        <button type="submit" class="btn-save" id="saveBtn">Lưu sân</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="/js/app.js"></script>
+<script>
+  let allCourts = [];
+
+  // ── Kiểm tra quyền truy cập
+  document.addEventListener('DOMContentLoaded', () => {
+    const user = getCurrentUser();
+    if (!user || (user.role !== 'ADMIN' && user.role !== 'STAFF')) {
+      document.getElementById('accessDenied').style.display = 'block';
+      return;
+    }
+    document.getElementById('mgmtPage').style.display = 'block';
+    loadCourts();
+  });
+
+  // ── Load danh sách sân
+  async function loadCourts() {
+    try {
+      const res  = await fetch('/api/courts');
+      const json = await res.json();
+      if (!json.success) throw new Error(json.message);
+      allCourts = json.data;
+      updateStats(allCourts);
+      renderTable(allCourts);
+    } catch (err) {
+      showToast('Lỗi tải danh sách sân: ' + err.message, 'error');
+    }
+  }
+
+  // ── Cập nhật stats
+  function updateStats(courts) {
+    document.getElementById('totalCount').textContent       = courts.length;
+    document.getElementById('availableCount').textContent   = courts.filter(c => c.status === 'AVAILABLE').length;
+    document.getElementById('bookedCount').textContent      = courts.filter(c => c.status === 'BOOKED').length;
+    document.getElementById('maintenanceCount').textContent = courts.filter(c => c.status === 'MAINTENANCE').length;
+  }
+
+  // ── Render bảng
+  function renderTable(courts) {
+    const tbody = document.getElementById('courtsTableBody');
+    const user  = getCurrentUser();
+    if (!courts.length) {
+      tbody.innerHTML = `<tr><td colspan="6" class="empty-state-mgmt">Không có sân nào phù hợp.</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = courts.map((c, idx) => {
+      const statusLabel = { AVAILABLE: '🟢 Còn trống', BOOKED: '🟡 Đã đặt', MAINTENANCE: '🔴 Bảo trì' };
+      const canDelete = user?.role === 'ADMIN';
+      return `
+        <tr>
+          <td>${idx + 1}</td>
+          <td class="court-name">${escHtml(c.name)}</td>
+          <td>${escHtml(c.description || '–')}</td>
+          <td class="court-price">${fmt(c.pricePerHour)}</td>
+          <td>
+            <span class="status-toggle status-${c.status}" title="Nhấn để đổi trạng thái"
+              onclick="cycleStatus(${c.id}, '${c.status}')">
+              ${statusLabel[c.status] || c.status}
+            </span>
+          </td>
+          <td style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-sm-edit" onclick="openEditModal(${c.id})">✏️ Sửa</button>
+            ${canDelete ? `<button class="btn-sm-delete" onclick="deleteCourt(${c.id}, '${escHtml(c.name)}')">🗑️ Xóa</button>` : ''}
+          </td>
+        </tr>`;
+    }).join('');
+  }
+
+  // ── Lọc
+  function filterCourts() {
+    const search = document.getElementById('mgmtSearch').value.toLowerCase();
+    const status = document.getElementById('mgmtStatus').value;
+    let filtered = allCourts;
+    if (status) filtered = filtered.filter(c => c.status === status);
+    if (search) filtered = filtered.filter(c => c.name.toLowerCase().includes(search) || (c.description || '').toLowerCase().includes(search));
+    renderTable(filtered);
+  }
+
+  // ── Đổi trạng thái nhanh (cycle)
+  async function cycleStatus(id, current) {
+    const next = { AVAILABLE: 'BOOKED', BOOKED: 'MAINTENANCE', MAINTENANCE: 'AVAILABLE' };
+    const newStatus = next[current];
+    try {
+      const res = await fetch(`/api/courts/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.message);
+      showToast(`Đã cập nhật trạng thái → ${newStatus}`, 'success');
+      await loadCourts();
+    } catch (err) {
+      showToast('Lỗi: ' + err.message, 'error');
+    }
+  }
+
+  // ── Xóa sân (ADMIN only)
+  async function deleteCourt(id, name) {
+    if (!confirm(`Bạn có chắc chắn muốn xóa sân "${name}"? Hành động này không thể hoàn tác.`)) return;
+    try {
+      const res = await fetch(`/api/courts/${id}`, { method: 'DELETE' });
+      const json = await res.json();
+      if (!json.success) throw new Error(json.message);
+      showToast(`Đã xóa sân "${name}"`, 'success');
+      await loadCourts();
+    } catch (err) {
+      showToast('Lỗi xóa sân: ' + err.message, 'error');
+    }
+  }
+
+  // ── Modal Thêm sân
+  function openAddModal() {
+    document.getElementById('modalTitle').textContent = '＋ Thêm sân mới';
+    document.getElementById('courtId').value      = '';
+    document.getElementById('courtName').value    = '';
+    document.getElementById('courtDesc').value    = '';
+    document.getElementById('courtPrice').value   = '';
+    document.getElementById('courtStatus').value  = 'AVAILABLE';
+    document.getElementById('saveBtn').textContent = 'Thêm sân';
+    document.getElementById('courtModal').classList.add('open');
+  }
+
+  // ── Modal Sửa sân
+  function openEditModal(id) {
+    const court = allCourts.find(c => c.id === id);
+    if (!court) return;
+    document.getElementById('modalTitle').textContent = '✏️ Sửa thông tin sân';
+    document.getElementById('courtId').value      = court.id;
+    document.getElementById('courtName').value    = court.name;
+    document.getElementById('courtDesc').value    = court.description || '';
+    document.getElementById('courtPrice').value   = court.pricePerHour;
+    document.getElementById('courtStatus').value  = court.status;
+    document.getElementById('saveBtn').textContent = 'Lưu thay đổi';
+    document.getElementById('courtModal').classList.add('open');
+  }
+
+  function closeModal() { document.getElementById('courtModal').classList.remove('open'); }
+
+  // ── Submit Form
+  async function submitCourt(e) {
+    e.preventDefault();
+    const id     = document.getElementById('courtId').value;
+    const payload = {
+      name:         document.getElementById('courtName').value.trim(),
+      description:  document.getElementById('courtDesc').value.trim(),
+      pricePerHour: parseFloat(document.getElementById('courtPrice').value),
+      status:       document.getElementById('courtStatus').value
+    };
+
+    const isEdit  = !!id;
+    const url     = isEdit ? `/api/courts/${id}` : '/api/courts';
+    const method  = isEdit ? 'PUT' : 'POST';
+    const saveBtn = document.getElementById('saveBtn');
+    saveBtn.disabled = true; saveBtn.textContent = 'Đang lưu...';
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.message || 'Lỗi lưu sân');
+      showToast(isEdit ? 'Đã cập nhật sân thành công!' : 'Đã thêm sân mới thành công!', 'success');
+      closeModal();
+      await loadCourts();
+    } catch (err) {
+      showToast('Lỗi: ' + err.message, 'error');
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = isEdit ? 'Lưu thay đổi' : 'Thêm sân';
+    }
+  }
+
+  // Click ngoài modal để đóng
+  document.getElementById('courtModal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('courtModal')) closeModal();
+  });
+
+  // Helpers
+  function escHtml(str) {
+    const d = document.createElement('div');
+    d.appendChild(document.createTextNode(str || ''));
+    return d.innerHTML;
+  }
+  function fmt(n) {
+    if (n == null) return '—';
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(n);
+  }
+</script>
+</body>
+</html>

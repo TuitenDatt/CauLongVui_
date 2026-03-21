@@ -8,6 +8,7 @@
 const courtsGrid      = document.getElementById('courts-grid');
 const filterStatus    = document.getElementById('filter-status');
 const searchInput     = document.getElementById('search-input');
+const searchDate      = document.getElementById('search-date');
 const bookingModal    = document.getElementById('booking-modal');
 const bookingForm     = document.getElementById('booking-form');
 const bookingCourtInfo = document.getElementById('booking-court-info');
@@ -45,23 +46,80 @@ function renderCourts(courts) {
       </div>`;
     return;
   }
-  courtsGrid.innerHTML = courts.map(court => `
+  courtsGrid.innerHTML = courts.map(court => {
+    const status = courtStatus(court.status);
+    const avatar = (court.name || 'S').substring(0, 2).toUpperCase();
+    const canBook = court.status === 'AVAILABLE';
+    
+    // Hình ảnh giả lập đa dạng (trong thực tế sẽ lấy từ API)
+    const imgs = [
+      'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1613918108466-292b78a8ef95?q=80&w=800&auto=format&fit=crop',
+      'https://images.unsplash.com/photo-1521537634581-0dced2fee2ef?q=80&w=800&auto=format&fit=crop'
+    ];
+    const courtImg = imgs[court.id % imgs.length];
+
+    return `
     <div class="card court-card" id="court-${court.id}">
-      <div class="court-img">🏸</div>
-      <div class="court-info">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-          <h3>${escapeHtml(court.name)}</h3>
-          ${courtStatusBadge(court.status)}
+      <div class="card-img-wrapper">
+        <img src="${courtImg}" alt="${escapeHtml(court.name)}">
+        <div class="card-badge">
+           ${status.label}
         </div>
-        <p class="desc">${escapeHtml(court.description || 'Sân cầu lông tiêu chuẩn')}</p>
-        <div class="price">${formatCurrency(court.pricePerHour)} <span>/ giờ</span></div>
-        <button class="btn btn-primary btn-block"
-          onclick="openBooking(${court.id},'${escapeHtml(court.name)}',${court.pricePerHour},'${court.status}')"
-          ${court.status !== 'AVAILABLE' ? 'disabled' : ''}>
-          ${court.status === 'AVAILABLE' ? '📅 Đặt sân ngay' : '🚫 Không khả dụng'}
-        </button>
+        <div class="card-fav">💜</div>
       </div>
-    </div>`).join('');
+      
+      <div class="card-content">
+        <h3>${escapeHtml(court.name)}</h3>
+        
+        <div class="card-meta-inline">
+          <div class="card-meta-item">
+            <span class="icon">⭐</span> 4.7
+          </div>
+          <div class="card-meta-item">
+            <span class="icon">🏛️</span> Sân cầu lông
+          </div>
+        </div>
+        
+        <div class="card-meta-item">
+          <span class="icon">📍</span> ${escapeHtml(court.description || 'Sân tiêu chuẩn tầng 1')}
+        </div>
+        
+        <div class="card-divider"></div>
+        
+        <div class="card-owner-row">
+          <div class="owner-avatar">${avatar}</div>
+          <div class="owner-info">
+            Chủ sân: <strong>${escapeHtml(court.name)}</strong>
+          </div>
+        </div>
+        
+        <div class="card-action-row">
+          <div class="price-box">
+            <span class="price-label">Giá từ</span>
+            <div class="price-value">
+              ${formatCurrency(court.pricePerHour).replace('₫', '')}<span class="price-unit">₫/giờ</span>
+            </div>
+          </div>
+          
+          <button class="btn-book-premium ${canBook ? '' : 'disabled'}"
+            onclick="openBooking(${court.id},'${escapeHtml(court.name)}',${court.pricePerHour},'${court.status}')"
+            ${!canBook ? 'disabled' : ''}>
+            Đặt sân &rarr;
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function courtStatus(status) {
+  const map = {
+    'AVAILABLE':   { label: '🟢 Còn trống' },
+    'BOOKED':      { label: '🟡 Đã đặt' },
+    'MAINTENANCE': { label: '🔴 Bảo trì' }
+  };
+  return map[status] || { label: status };
 }
 
 // ───────────────────────────────────────────────
@@ -70,28 +128,38 @@ function renderCourts(courts) {
 function applyFilters() {
   const status = filterStatus?.value || '';
   const search = searchInput?.value.trim().toLowerCase() || '';
+  const date   = searchDate?.value || '';
+
   let filtered = allCourts;
   if (status) filtered = filtered.filter(c => c.status === status);
   if (search) filtered = filtered.filter(c =>
     c.name.toLowerCase().includes(search) ||
     (c.description || '').toLowerCase().includes(search)
   );
-  renderCourts(filtered);
+  // (Lưu ý: Logic lọc theo ngày hiện tại là client-side, 
+  // trong thực tế có thể cần gọi API để kiểm tra slot trống theo ngày)
+  
+  renderSkeletons(courtsGrid, 3, '400px'); // Hiệu ứng chờ khi lọc
+  setTimeout(() => renderCourts(filtered), 300);
 }
 
 filterStatus?.addEventListener('change', applyFilters);
 searchInput?.addEventListener('input', applyFilters);
+searchDate?.addEventListener('change', applyFilters);
 
 // ───────────────────────────────────────────────
 // Booking Modal
 // ───────────────────────────────────────────────
 function openBooking(courtId, courtName, pricePerHour, status) {
+  // ── Kiểm tra quyền: GUEST phải đăng nhập
+  if (!requireAuth()) return;
+
   if (status !== 'AVAILABLE') { showToast('Sân này hiện không khả dụng', 'warning'); return; }
   bookingCourtId.value = courtId;
   bookingCourtInfo.innerHTML = `
-    <div style="background:rgba(0,212,170,0.06);border:1px solid rgba(0,212,170,0.2);border-radius:10px;padding:12px 16px;margin-bottom:1rem;">
+    <div style="background:var(--green-pale);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:1rem;">
       <strong>🏸 ${escapeHtml(courtName)}</strong>
-      <span style="color:var(--accent);font-weight:700;float:right">${formatCurrency(pricePerHour)}/giờ</span>
+      <span style="color:var(--green);font-weight:700;float:right">${formatCurrency(pricePerHour)}/giờ</span>
     </div>`;
   // Set min date = today
   const today = new Date().toISOString().split('T')[0];
@@ -152,4 +220,11 @@ function escapeHtml(str) {
 // ───────────────────────────────────────────────
 // Init
 // ───────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', loadCourts);
+document.addEventListener('DOMContentLoaded', () => {
+  loadCourts();
+  // Set default date
+  const dateInput = document.getElementById('search-date');
+  if (dateInput) {
+    dateInput.value = new Date().toISOString().split('T')[0];
+  }
+});

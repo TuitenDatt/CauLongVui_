@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+    <title>Đăng nhập - Cầu Lông Vui</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #5cb85c;
+            --primary-hover: #4cae4c;
+            --dark: #121212;
+            --light: #f5f5f5;
+            --text-main: #333333;
+            --border-color: #e0e0e0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 450px;
+            animation: slideUp 0.6s ease-out;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Decorative background elements */
+        .blob {
+            position: absolute;
+            background: var(--primary);
+            filter: blur(90px);
+            opacity: 0.15;
+            border-radius: 50%;
+            z-index: 0;
+        }
+
+        .blob-1 {
+            top: -10%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+        }
+
+        .blob-2 {
+            bottom: -10%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--dark);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h2 {
+            font-size: 24px;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(92, 184, 92, 0.1);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(92, 184, 92, 0.3);
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            background-color: var(--primary-hover);
+            box-shadow: 0 15px 25px rgba(92, 184, 92, 0.4);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .form-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .alert-error {
+            background-color: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #f87171;
+        }
+
+        .alert-success {
+            background-color: #dcfce7;
+            color: #16a34a;
+            border: 1px solid #86efac;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="login-container">
+        <div class="logo-container">
+            <a href="../index.html" class="logo">🏸 Cầu Lông <span>Vui</span></a>
+        </div>
+
+        <div class="login-header">
+            <h2>Chào mừng trở lại!</h2>
+            <p>Vui lòng đăng nhập để tiếp tục</p>
+        </div>
+
+        <div id="alertMessage" class="alert"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="textboxusername">Email</label>
+                <input type="email" id="textboxusername" class="form-control" placeholder="Nhập email của bạn" required>
+            </div>
+
+            <div class="form-group">
+                <label for="textboxmatkhau">Mật khẩu</label>
+                <input type="password" id="textboxmatkhau" class="form-control" placeholder="Nhập mật khẩu" required>
+            </div>
+
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 14px;">
+                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #666;">
+                    <input type="checkbox" style="accent-color: var(--primary);"> Nhớ mật khẩu
+                </label>
+                <a href="#" style="color: var(--primary); text-decoration: none; font-weight: 600;">Quên mật khẩu?</a>
+            </div>
+
+            <button type="submit" class="btn-submit">Login</button>
+        </form>
+
+        <div class="form-footer">
+            Chưa có tài khoản? <a href="register.html">Đăng ký ngay</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('textboxusername').value;
+            const password = document.getElementById('textboxmatkhau').value;
+            const submitBtn = document.querySelector('.btn-submit');
+            
+            try {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Đang xử lý...';
+                
+                const response = await fetch('http://localhost:8080/api/v1/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Lưu JWT token
+                    if (data.data && data.data.accessToken) {
+                        localStorage.setItem('jwtToken', data.data.accessToken);
+                    }
+                    
+                    // Lấy tên đầy đủ từ backend response để hiển thị
+                    const fullName = (data.data && data.data.user && data.data.user.fullName) ? data.data.user.fullName : email;
+                    localStorage.setItem('loggedInUser', fullName);
+                    
+                    showAlert('Đăng nhập thành công!', 'success');
+                    setTimeout(() => {
+                        window.location.href = '../index.html';
+                    }, 1000);
+                } else {
+                    showAlert(data.message || 'Sai tài khoản hoặc mật khẩu', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Login';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Không thể kết nối đến máy chủ', 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Login';
+            }
+        });
+
+        function showAlert(message, type) {
+            const alertEl = document.getElementById('alertMessage');
+            alertEl.textContent = message;
+            alertEl.style.display = 'block';
+            
+            if (type === 'error') {
+                alertEl.className = 'alert alert-error';
+            } else {
+                alertEl.className = 'alert alert-success';
+            }
+        }
+    </script>
+</body>
+
+</html>

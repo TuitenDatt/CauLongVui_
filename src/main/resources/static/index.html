@@ -8,90 +8,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/header-footer.css" />
   <style>
-    :root {
-      --green:       #2d8a4e;
-      --green-light: #3aad62;
-      --green-pale:  #e8f5ee;
-      --green-glow:  rgba(45,138,78,0.18);
-      --dark:        #0f1a14;
-      --dark-2:      #1a2e20;
-      --mid:         #3d5c47;
-      --text:        #1c2e22;
-      --muted:       #6b8a74;
-      --border:      #d4e8da;
-      --bg:          #f4faf6;
-      --white:       #ffffff;
-      --red:         #e03a3a;
-      --shadow-sm:   0 2px 12px rgba(15,26,20,0.07);
-      --shadow-md:   0 8px 32px rgba(15,26,20,0.10);
-      --shadow-lg:   0 20px 60px rgba(15,26,20,0.13);
-      --r-sm: 10px;
-      --r-md: 16px;
-      --r-lg: 24px;
-      --r-xl: 40px;
-    }
-
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      font-family: 'Be Vietnam Pro', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
-    }
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg); }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-    /* ═══ NAV ═══ */
-    nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 48px; height: 68px;
-      background: rgba(244,250,246,0.88);
-      backdrop-filter: blur(18px) saturate(1.4);
-      border-bottom: 1px solid rgba(212,232,218,0.6);
-      transition: box-shadow 0.3s;
-    }
-    nav.scrolled { box-shadow: var(--shadow-sm); }
-
-    .logo {
-      display: flex; align-items: center; gap: 10px;
-      text-decoration: none; font-weight: 800; font-size: 22px; color: var(--dark);
-      letter-spacing: -0.5px;
-    }
-    .logo-icon {
-      width: 36px; height: 36px; background: var(--green);
-      border-radius: 10px; display: flex; align-items: center; justify-content: center;
-      font-size: 18px; box-shadow: 0 4px 12px var(--green-glow);
-    }
-    .logo span { color: var(--green); }
-
-    .nav-links { display: flex; gap: 8px; list-style: none; }
-    .nav-links a {
-      text-decoration: none; color: var(--mid); font-weight: 500; font-size: 14.5px;
-      padding: 7px 14px; border-radius: var(--r-sm);
-      transition: color 0.2s, background 0.2s;
-    }
-    .nav-links a:hover, .nav-links a.active { color: var(--green); background: var(--green-pale); }
-
-    .nav-actions { display: flex; align-items: center; gap: 10px; }
-
-    .btn-login {
-      text-decoration: none; color: var(--mid); font-weight: 600; font-size: 14px;
-      padding: 8px 18px; border-radius: var(--r-xl);
-      border: 1.5px solid var(--border); transition: all 0.2s;
-    }
-    .btn-login:hover { border-color: var(--green); color: var(--green); background: var(--green-pale); }
-
-    .btn-nav-cta {
-      text-decoration: none; background: var(--green); color: #fff;
-      font-weight: 700; font-size: 14px; padding: 9px 22px;
-      border-radius: var(--r-xl); border: none; cursor: pointer;
-      box-shadow: 0 4px 18px var(--green-glow); transition: all 0.25s;
-    }
-    .btn-nav-cta:hover { background: var(--green-light); transform: translateY(-1px); }
 
     /* ═══ HERO ═══ */
     .hero {
@@ -430,19 +349,6 @@
     .cta-sub { font-size: 16px; color: var(--muted); line-height: 1.7; margin-bottom: 36px; }
     .cta-buttons { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 
-    /* ═══ FOOTER ═══ */
-    footer {
-      background: var(--dark-2); color: rgba(255,255,255,0.45);
-      padding: 36px 48px; font-size: 13px;
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 16px;
-    }
-    footer .logo { color: #fff; font-size: 18px; }
-    footer .logo span { color: var(--green-light); }
-    .footer-links { display: flex; gap: 20px; }
-    .footer-links a { text-decoration: none; color: rgba(255,255,255,0.4); font-size: 13px; transition: color 0.2s; }
-    .footer-links a:hover { color: rgba(255,255,255,0.8); }
-    .footer-copy { font-size: 12px; opacity: 0.5; }
 
     /* ═══ TOAST ═══ */
     #toast-container {
@@ -458,19 +364,6 @@
     .toast.success { border-left: 4px solid var(--green); }
     .toast.error   { border-left: 4px solid var(--red); }
 
-    /* ═══ ANIMATIONS ═══ */
-    @keyframes slideUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
-    @keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
-
-    .reveal {
-      opacity: 0; transform: translateY(20px);
-      transition: opacity 0.65s cubic-bezier(0.22,1,0.36,1), transform 0.65s cubic-bezier(0.22,1,0.36,1);
-    }
-    .reveal.visible { opacity: 1; transform: none; }
-    .reveal-delay-1 { transition-delay: 0.1s; }
-    .reveal-delay-2 { transition-delay: 0.2s; }
-    .reveal-delay-3 { transition-delay: 0.3s; }
 
     /* ═══ RESPONSIVE ═══ */
     @media (max-width: 900px) {
@@ -492,21 +385,7 @@
 <body>
 
   <!-- ── NAVIGATION ── -->
-  <nav id="mainNav">
-    <a href="/" class="logo">
-      <div class="logo-icon">🏸</div>
-      Cầu Lông <span>Vui</span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="/" class="active">Trang chủ</a></li>
-      <li><a href="/courts.html">Đặt sân</a></li>
-      <li><a href="/products.html">Cửa hàng</a></li>
-    </ul>
-    <div class="nav-actions">
-      <a href="#" class="btn-login" id="loginBtn">Đăng nhập</a>
-      <a href="/courts.html" class="btn-nav-cta">Đặt sân ngay</a>
-    </div>
-  </nav>
+  <div id="header-placeholder"></div>
 
   <!-- ── HERO ── -->
   <section class="hero">
@@ -692,28 +571,11 @@
   </section>
 
   <!-- ── FOOTER ── -->
-  <footer>
-    <a href="/" class="logo">
-      <div class="logo-icon" style="width:28px;height:28px;font-size:14px">🏸</div>
-      Cầu Lông <span>Vui</span>
-    </a>
-    <div class="footer-links">
-      <a href="/">Trang chủ</a>
-      <a href="/courts.html">Đặt sân</a>
-      <a href="/products.html">Cửa hàng</a>
-    </div>
-    <span class="footer-copy">© 2025 Cầu Lông Vui. Built with Spring Boot + Vanilla JS.</span>
-  </footer>
+  <div id="footer-placeholder"></div>
 
   <div id="toast-container"></div>
   <script src="/js/app.js"></script>
   <script>
-    // ── Nav scroll shadow
-    const nav = document.getElementById('mainNav');
-    window.addEventListener('scroll', () => {
-      nav.classList.toggle('scrolled', window.scrollY > 10);
-    });
-
     // ── Reveal on scroll
     const reveals = document.querySelectorAll('.reveal');
     const observer = new IntersectionObserver((entries) => {
@@ -865,27 +727,6 @@
       }
     }
 
-    // ── Auth state
-    const loggedInUser = localStorage.getItem('loggedInUser');
-    const loginBtn = document.getElementById('loginBtn');
-    if (loggedInUser && loginBtn) {
-      loginBtn.textContent = 'Xin chào, ' + loggedInUser;
-      loginBtn.href = '#';
-      const logoutBtn = document.createElement('a');
-      logoutBtn.href = '#';
-      logoutBtn.textContent = 'Đăng xuất';
-      logoutBtn.className = 'btn-login';
-      logoutBtn.style.color = '#e03a3a';
-      logoutBtn.style.borderColor = 'rgba(224,58,58,0.3)';
-      logoutBtn.onclick = (e) => {
-        e.preventDefault();
-        if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-          localStorage.removeItem('loggedInUser');
-          window.location.reload();
-        }
-      };
-      loginBtn.parentNode.insertBefore(logoutBtn, loginBtn.nextSibling);
-    }
 
     document.addEventListener('DOMContentLoaded', loadHomeCourts);
   </script>

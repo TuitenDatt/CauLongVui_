@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard – Cầu Lông Vui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/header-footer.css" />
+  <style>
+    .admin-page { padding: 90px 0 60px; min-height: 100vh; background: var(--bg); }
+    .admin-container { max-width: 1000px; margin: 0 auto; padding: 0 32px; }
+    .admin-header { margin-bottom: 40px; text-align: center; }
+    .admin-title { font-size: 32px; font-weight: 900; color: var(--dark); }
+    
+    .admin-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px; margin-top: 32px;
+    }
+    .admin-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--r-lg); padding: 32px; text-align: center;
+      transition: all 0.3s; text-decoration: none; color: inherit;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .admin-card:hover {
+      transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+      border-color: var(--green);
+    }
+    .admin-card .icon {
+      font-size: 48px; margin-bottom: 16px;
+      width: 80px; height: 80px; background: var(--green-pale);
+      border-radius: 20px; display: flex; align-items: center; justify-content: center;
+    }
+    .admin-card h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; color: var(--dark); }
+    .admin-card p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+    
+    .access-denied { text-align: center; padding: 100px 20px; }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <div class="admin-page" id="adminPage" style="display:none;">
+    <div class="admin-container">
+      <div class="admin-header">
+        <h1 class="admin-title">Quản trị hệ thống</h1>
+        <p style="color:var(--muted); margin-top:8px;">Chào mừng trở lại, Administrator.</p>
+      </div>
+
+      <div class="admin-grid">
+        <a href="/admin/court-management.html" class="admin-card">
+          <div class="icon">🏸</div>
+          <h3>Quản lý Sân</h3>
+          <p>Thêm sân mới, cập nhật giá và trạng thái hoạt động của các sân cầu lông.</p>
+        </a>
+        <a href="/admin/product-management.html" class="admin-card">
+          <div class="icon">🛍️</div>
+          <h3>Quản lý Sản phẩm</h3>
+          <p>Quản lý kho hàng, cập nhật giá và thông tin các dụng cụ cầu lông trong shop.</p>
+        </a>
+        <a href="/admin/user-management.html" class="admin-card">
+          <div class="icon">👥</div>
+          <h3>Quản lý Người dùng</h3>
+          <p>Xem danh sách khách hàng, nhân viên và phân quyền hệ thống (Chỉ ADMIN).</p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-page" id="accessDenied" style="display:none;">
+    <div class="access-denied">
+      <h1 style="font-size: 64px;">🚫</h1>
+      <h2>Không có quyền truy cập</h2>
+      <p>Trang này chỉ dành cho Quản trị viên.</p>
+      <a href="/" class="btn-nav-cta" style="display:inline-block; margin-top:20px; text-decoration:none;">Về trang chủ</a>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = getCurrentUser();
+      if (!user || user.role !== 'ADMIN') {
+        document.getElementById('accessDenied').style.display = 'block';
+        return;
+      }
+      document.getElementById('adminPage').style.display = 'block';
+    });
+  </script>
+</body>
+</html>

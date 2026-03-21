@@ -111,6 +111,9 @@ categoryFilter?.addEventListener('change', applyFilters);
 // Add to cart (simple toast demo — no backend cart yet)
 // ───────────────────────────────────────────────
 function addToCart(id, name, price) {
+  // ── Kiểm tra quyền: GUEST phải đăng nhập
+  if (!requireAuth()) return;
+
   showToast(`🛒 Đã thêm "<strong>${escapeHtml(name)}</strong>" vào giỏ hàng`, 'success');
 }
 

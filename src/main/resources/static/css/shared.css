@@ -1,0 +1,91 @@
+:root {
+  /* ═══ COLORS (Brand: Cầu Lông Vui) ═══ */
+  --green:       #2d8a4e;
+  --green-light: #3aad62;
+  --green-pale:  #e8f5ee;
+  --green-glow:  rgba(45,138,78,0.18);
+  
+  --dark:        #0f1a14;
+  --dark-2:      #1a2e20;
+  --mid:         #3d5c47;
+  --text:        #1c2e22;
+  --muted:       #6b8a74;
+  --border:      #d4e8da;
+  --bg:          #f4faf6;
+  --white:       #ffffff;
+  --red:         #e03a3a;
+  --red-light:   #ff6b6b;
+  --yellow:      #ffd93d;
+
+  /* ═══ SHADOWS ═══ */
+  --shadow-sm:   0 2px 12px rgba(15,26,20,0.07);
+  --shadow-md:   0 8px 32px rgba(15,26,20,0.10);
+  --shadow-lg:   0 20px 60px rgba(15,26,20,0.13);
+  --shadow-glow: 0 0 24px var(--green-glow);
+
+  /* ═══ RADIUS ═══ */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --r-xl: 40px;
+  
+  /* ═══ FONTS ═══ */
+  --font-main: 'Be Vietnam Pro', 'Inter', system-ui, sans-serif;
+  --font-display: 'Playfair Display', serif;
+  
+  /* ═══ TRANSITION ═══ */
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-main);
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* ── Custom Scrollbar ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes slideUp { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+@keyframes pulse-dot { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
+@keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+.reveal {
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 0.65s cubic-bezier(0.22,1,0.36,1), transform 0.65s cubic-bezier(0.22,1,0.36,1);
+}
+.reveal.visible { opacity: 1; transform: none; }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+
+/* ═══ SKELETON ═══ */
+.skeleton {
+  background: linear-gradient(90deg, #e8f5ee 25%, #d4e8da 50%, #e8f5ee 75%);
+  background-size: 400% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--r-lg);
+}
+
+/* ═══ TOAST ═══ */
+#toast-container {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.toast {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--dark); color: #fff; padding: 14px 18px;
+  border-radius: var(--r-md); box-shadow: var(--shadow-md);
+  font-size: 14px; font-weight: 500; min-width: 280px;
+  transition: all 0.3s ease;
+}
+.toast.success { border-left: 4px solid var(--green); }
+.toast.error   { border-left: 4px solid var(--red); }
