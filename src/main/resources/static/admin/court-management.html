@@ -258,6 +258,13 @@
         <textarea id="courtDesc" rows="2" placeholder="Mô tả ngắn về sân..."></textarea>
       </div>
       <div class="form-group">
+        <label>URL Hình ảnh sân</label>
+        <input type="url" id="courtImage" placeholder="https://... (để trống dùng ảnh mặc định)" />
+        <div id="imgPreview" style="margin-top:8px; display:none;">
+          <img id="imgPreviewEl" src="" style="width:100%; height:140px; object-fit:cover; border-radius:8px; border:1px solid #ccc;" />
+        </div>
+      </div>
+      <div class="form-group">
         <label>Giá / giờ (VNĐ) *</label>
         <input type="number" id="courtPrice" placeholder="80000" min="0" step="1000" required />
       </div>
@@ -395,9 +402,11 @@
     document.getElementById('courtId').value      = '';
     document.getElementById('courtName').value    = '';
     document.getElementById('courtDesc').value    = '';
+    document.getElementById('courtImage').value   = '';
     document.getElementById('courtPrice').value   = '';
     document.getElementById('courtStatus').value  = 'AVAILABLE';
     document.getElementById('saveBtn').textContent = 'Thêm sân';
+    document.getElementById('imgPreview').style.display = 'none';
     document.getElementById('courtModal').classList.add('open');
   }
 
@@ -409,9 +418,17 @@
     document.getElementById('courtId').value      = court.id;
     document.getElementById('courtName').value    = court.name;
     document.getElementById('courtDesc').value    = court.description || '';
+    document.getElementById('courtImage').value   = court.imageUrl || '';
     document.getElementById('courtPrice').value   = court.pricePerHour;
     document.getElementById('courtStatus').value  = court.status;
     document.getElementById('saveBtn').textContent = 'Lưu thay đổi';
+    // Show preview if image URL exists
+    if (court.imageUrl) {
+      document.getElementById('imgPreviewEl').src = court.imageUrl;
+      document.getElementById('imgPreview').style.display = 'block';
+    } else {
+      document.getElementById('imgPreview').style.display = 'none';
+    }
     document.getElementById('courtModal').classList.add('open');
   }
 
@@ -421,16 +438,18 @@
   async function submitCourt(e) {
     e.preventDefault();
     const id     = document.getElementById('courtId').value;
+    const isEdit  = !!id;
+    const url     = isEdit ? `/api/courts/${id}` : '/api/courts';
+    const method  = isEdit ? 'PUT' : 'POST';
+
     const payload = {
       name:         document.getElementById('courtName').value.trim(),
       description:  document.getElementById('courtDesc').value.trim(),
+      imageUrl:     document.getElementById('courtImage').value.trim() || null,
       pricePerHour: parseFloat(document.getElementById('courtPrice').value),
       status:       document.getElementById('courtStatus').value
     };
 
-    const isEdit  = !!id;
-    const url     = isEdit ? `/api/courts/${id}` : '/api/courts';
-    const method  = isEdit ? 'PUT' : 'POST';
     const saveBtn = document.getElementById('saveBtn');
     saveBtn.disabled = true; saveBtn.textContent = 'Đang lưu...';
 
@@ -468,6 +487,18 @@
     if (n == null) return '—';
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(n);
   }
+  // Preview anh khi nhap URL
+  document.getElementById('courtImage').addEventListener('input', function() {
+    const url = this.value.trim();
+    const preview = document.getElementById('imgPreview');
+    const previewEl = document.getElementById('imgPreviewEl');
+    if (url) {
+      previewEl.src = url;
+      preview.style.display = 'block';
+    } else {
+      preview.style.display = 'none';
+    }
+  });
 </script>
 </body>
 </html>

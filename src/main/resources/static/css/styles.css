@@ -35,14 +35,16 @@ body {
 .page-hero {
   background: linear-gradient(135deg, var(--white) 0%, var(--bg) 100%);
   border-bottom: 1px solid var(--border-color);
-  padding: 5rem 2rem 4rem;
+  padding: 2rem 2rem 1.5rem;
+  text-align: center;
 }
 .page-hero h1 {
   color: var(--dark);
   font-weight: 800;
   letter-spacing: -1px;
+  margin-bottom: 0.5rem;
 }
-.page-hero p { color: var(--muted); }
+.page-hero p { color: var(--muted); margin: 0; }
 
 /* =============================
    Filter Bar (Premium Style)
@@ -52,7 +54,7 @@ body {
   border: 1px solid var(--border-color);
   border-radius: var(--r-xl);
   padding: 8px 12px;
-  margin: -2.5rem auto 0;
+  margin: 1.5rem auto;
   box-shadow: var(--shadow-md);
   position: relative;
   z-index: 10;

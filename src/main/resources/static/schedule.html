@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đặt lịch ngày trực quan</title>
+  <link rel="stylesheet" href="/css/momo-booking.css" />
+  <style>
+    .date-picker-bar {
+      background: #fff;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 14px;
+    }
+    .date-picker-bar label { font-weight: 600; color: #444; }
+    .date-picker-bar input[type=date] {
+      border: 1.5px solid #ccc; border-radius: 8px;
+      padding: 6px 12px; font-size: 14px; font-family: inherit;
+      outline: none; cursor: pointer;
+    }
+    .date-picker-bar input[type=date]:focus { border-color: #2d8a4e; }
+  </style>
+</head>
+<body>
+  <div class="momo-header">
+    <a href="courts.html" class="btn-back">❮</a>
+    <h2>ĐẶT LỊCH TRỰC QUAN</h2>
+    <div style="width:30px;"></div>
+  </div>
+
+  <!-- Chọn ngày -->
+  <div class="date-picker-bar">
+    <label>📅 Ngày đặt:</label>
+    <input type="date" id="datePicker" />
+    <span id="dateLabel" style="color:#2d8a4e; font-weight:700;"></span>
+  </div>
+
+  <div class="status-bar">
+    <div><span class="status-dot s-empty"></span> Trống</div>
+    <div><span class="status-dot s-booked"></span> Đã đặt</div>
+    <div><span class="status-dot s-selected"></span> Đang chọn</div>
+  </div>
+
+  <div class="schedule-container">
+    <table class="schedule-table" id="grid">
+      <thead>
+        <tr id="time-header">
+          <th class="court-name" style="min-width:60px;">Sân</th>
+        </tr>
+      </thead>
+      <tbody id="grid-body"></tbody>
+    </table>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="summary">
+      <span id="total-hours">Tổng giờ: 0h00</span>
+      <span id="total-price">Tổng tiền: 0 đ</span>
+    </div>
+    <button class="btn-next" onclick="goToNext()">TIẾP THEO</button>
+  </div>
+
+  <script>
+    // Lấy thông tin sân từ URL hoặc localStorage
+    const params      = new URLSearchParams(window.location.search);
+    const courtId     = params.get('courtId')   || localStorage.getItem('bk_courtId')   || '1';
+    const courtName   = params.get('courtName') || localStorage.getItem('bk_courtName') || 'San cau long';
+    const priceHour   = parseFloat(params.get('price') || localStorage.getItem('bk_pricePerHour') || '90000');
+
+    localStorage.setItem('bk_courtId',      courtId);
+    localStorage.setItem('bk_courtName',    courtName);
+    localStorage.setItem('bk_pricePerHour', priceHour);
+
+    // Ngày mặc định = hôm nay
+    const today = new Date();
+    const dp = document.getElementById('datePicker');
+    dp.min   = today.toISOString().split('T')[0];
+    dp.value = today.toISOString().split('T')[0];
+    updateDateLabel();
+
+    dp.addEventListener('change', () => { updateDateLabel(); buildGrid(); });
+
+    function updateDateLabel() {
+      const [y, m, d] = dp.value.split('-');
+      document.getElementById('dateLabel').textContent = d + '/' + m + '/' + y;
+    }
+
+    const times = [
+      "5:00","5:30","6:00","6:30","7:00","7:30","8:00","8:30",
+      "9:00","9:30","10:00","10:30","11:00","11:30","12:00","12:30",
+      "13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30",
+      "17:00","17:30","18:00","18:30","19:00","19:30","20:00","20:30",
+      "21:00","21:30"
+    ];
+
+    // Tên sân từ param (chỉ 1 sân hoặc nhiều tùy)
+    const courtRows = [courtName];
+
+    // Build header
+    const thRow = document.getElementById('time-header');
+    times.forEach(t => {
+      const th = document.createElement('th');
+      th.textContent = t;
+      thRow.appendChild(th);
+    });
+
+    function buildGrid() {
+      const tbody = document.getElementById('grid-body');
+      tbody.innerHTML = '';
+      courtRows.forEach(c => {
+        const tr = document.createElement('tr');
+        const tdName = document.createElement('td');
+        tdName.className = 'court-name';
+        tdName.textContent = c;
+        tr.appendChild(tdName);
+        times.forEach((t, idx) => {
+          const td = document.createElement('td');
+          const rand = Math.random();
+          if (rand < 0.25) {
+            td.className = 'slot booked';
+          } else {
+            td.className = 'slot empty';
+            td.dataset.time = t;
+            td.dataset.idx  = idx;
+            td.onclick = function() {
+              this.classList.toggle('selected');
+              calcTotal();
+            };
+          }
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      });
+      // Reset lựa chọn
+      localStorage.removeItem('bk_price');
+      calcTotal();
+    }
+
+    buildGrid();
+
+    function calcTotal() {
+      const selectedSlots = Array.from(document.querySelectorAll('.slot.selected'));
+      const count = selectedSlots.length;
+      const m  = count * 30;
+      const h  = Math.floor(m / 60);
+      const mm = m % 60;
+      const timeStr = h + 'h' + (mm > 0 ? mm : '00');
+      const total   = Math.round((count * 0.5) * priceHour); // 0.5h per slot
+
+      document.getElementById('total-hours').innerText = 'Tong gio: ' + timeStr;
+      document.getElementById('total-price').innerText = 'Tong tien: ' + total.toLocaleString('vi-VN') + ' d';
+
+      if (count > 0) {
+        // Lấy slot đầu và cuối để tính startTime / endTime
+        const idxArr   = selectedSlots.map(s => parseInt(s.dataset.idx)).sort((a,b) => a-b);
+        const startIdx = idxArr[0];
+        const endIdx   = idxArr[idxArr.length - 1] + 1; // +1 slot = +30min
+
+        function idxToTime(i) {
+          const totalMin = 5 * 60 + i * 30;
+          const hh = Math.floor(totalMin / 60);
+          const mm2 = totalMin % 60;
+          return String(hh).padStart(2,'0') + ':' + String(mm2).padStart(2,'0');
+        }
+
+        const [y, mo, d] = dp.value.split('-');
+
+        localStorage.setItem('bk_price',     total);
+        localStorage.setItem('bk_time',      timeStr);
+        localStorage.setItem('bk_dateRaw',   dp.value);
+        localStorage.setItem('bk_date',      d + '/' + mo + '/' + y);
+        localStorage.setItem('bk_startTime', idxToTime(startIdx));
+        localStorage.setItem('bk_endTime',   idxToTime(endIdx));
+      } else {
+        localStorage.removeItem('bk_price');
+      }
+    }
+
+    function goToNext() {
+      if (!localStorage.getItem('bk_price')) {
+        alert('Vui long chon khung gio trong!');
+        return;
+      }
+      window.location.href = 'booking-info.html';
+    }
+  </script>
+</body>
+</html>

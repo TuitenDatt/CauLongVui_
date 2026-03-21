@@ -50,52 +50,13 @@
 </div>
 
 <!-- ── COURTS GRID ── -->
-<div class="section" style="padding-top:2rem;">
+<div class="section">
   <div class="grid-3" id="courts-grid">
     <!-- Rendered by courts.js -->
   </div>
 </div>
 
-<!-- ── BOOKING MODAL ── -->
-<div class="modal-overlay" id="booking-modal">
-  <div class="modal">
-    <div class="modal-header">
-      <h3>📅 Đặt sân cầu lông</h3>
-      <button class="modal-close" id="close-modal">✕</button>
-    </div>
-    <div id="booking-court-info"></div>
-    <form id="booking-form" novalidate>
-      <input type="hidden" id="booking-court-id" />
-      <div class="form-row">
-        <div class="form-group">
-          <label for="customer-name">Họ và tên *</label>
-          <input id="customer-name" type="text" class="form-control" placeholder="Nguyễn Văn A" required />
-        </div>
-        <div class="form-group">
-          <label for="customer-phone">Số điện thoại *</label>
-          <input id="customer-phone" type="tel" class="form-control" placeholder="0901 234 567" required />
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="booking-date">Ngày đặt *</label>
-        <input id="booking-date" type="date" class="form-control" required />
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="start-time">Giờ bắt đầu *</label>
-          <input id="start-time" type="time" class="form-control" value="07:00" required />
-        </div>
-        <div class="form-group">
-          <label for="end-time">Giờ kết thúc *</label>
-          <input id="end-time" type="time" class="form-control" value="08:00" required />
-        </div>
-      </div>
-      <button type="submit" class="btn btn-primary btn-block" style="margin-top:0.5rem;">
-        📅 Xác nhận đặt sân
-      </button>
-    </form>
-  </div>
-</div>
+<!-- Booking modal đã được chuyển sang trang schedule.html (Chọn giờ trực quan) -->
 
 <!-- ── FOOTER ── -->
 <div id="footer-placeholder"></div>

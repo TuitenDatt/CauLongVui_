@@ -51,13 +51,12 @@ function renderCourts(courts) {
     const avatar = (court.name || 'S').substring(0, 2).toUpperCase();
     const canBook = court.status === 'AVAILABLE';
     
-    // Hình ảnh giả lập đa dạng (trong thực tế sẽ lấy từ API)
     const imgs = [
       'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?q=80&w=800&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1613918108466-292b78a8ef95?q=80&w=800&auto=format&fit=crop',
       'https://images.unsplash.com/photo-1521537634581-0dced2fee2ef?q=80&w=800&auto=format&fit=crop'
     ];
-    const courtImg = imgs[court.id % imgs.length];
+    const courtImg = court.imageUrl || imgs[court.id % imgs.length];
 
     return `
     <div class="card court-card" id="court-${court.id}">
@@ -75,9 +74,6 @@ function renderCourts(courts) {
         <div class="card-meta-inline">
           <div class="card-meta-item">
             <span class="icon">⭐</span> 4.7
-          </div>
-          <div class="card-meta-item">
-            <span class="icon">🏛️</span> Sân cầu lông
           </div>
         </div>
         
@@ -103,7 +99,7 @@ function renderCourts(courts) {
           </div>
           
           <button class="btn-book-premium ${canBook ? '' : 'disabled'}"
-            onclick="openBooking(${court.id},'${escapeHtml(court.name)}',${court.pricePerHour},'${court.status}')"
+            onclick="goToSchedule(${court.id},'${escapeHtml(court.name)}',${court.pricePerHour},'${court.status}')"
             ${!canBook ? 'disabled' : ''}>
             Đặt sân &rarr;
           </button>
@@ -148,24 +144,21 @@ searchInput?.addEventListener('input', applyFilters);
 searchDate?.addEventListener('change', applyFilters);
 
 // ───────────────────────────────────────────────
-// Booking Modal
+// Navigate to schedule page
+// ───────────────────────────────────────────────
+function goToSchedule(courtId, courtName, pricePerHour, status) {
+  if (status !== 'AVAILABLE') { showToast('Sân này hiện không khả dụng', 'warning'); return; }
+  localStorage.setItem('bk_courtId', courtId);
+  localStorage.setItem('bk_courtName', courtName);
+  localStorage.setItem('bk_pricePerHour', pricePerHour);
+  window.location.href = '/schedule.html?courtId=' + courtId + '&courtName=' + encodeURIComponent(courtName) + '&price=' + pricePerHour;
+}
+
+// ───────────────────────────────────────────────
+// Booking Modal (legacy - kept for compatibility)
 // ───────────────────────────────────────────────
 function openBooking(courtId, courtName, pricePerHour, status) {
-  // ── Kiểm tra quyền: GUEST phải đăng nhập
-  if (!requireAuth()) return;
-
-  if (status !== 'AVAILABLE') { showToast('Sân này hiện không khả dụng', 'warning'); return; }
-  bookingCourtId.value = courtId;
-  bookingCourtInfo.innerHTML = `
-    <div style="background:var(--green-pale);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:1rem;">
-      <strong>🏸 ${escapeHtml(courtName)}</strong>
-      <span style="color:var(--green);font-weight:700;float:right">${formatCurrency(pricePerHour)}/giờ</span>
-    </div>`;
-  // Set min date = today
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('booking-date').min = today;
-  document.getElementById('booking-date').value = today;
-  bookingModal.classList.add('open');
+  goToSchedule(courtId, courtName, pricePerHour, status);
 }
 
 closeModalBtn?.addEventListener('click', () => bookingModal.classList.remove('open'));

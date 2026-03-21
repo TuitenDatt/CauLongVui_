@@ -45,6 +45,7 @@ body {
   color: var(--text);
   overflow-x: hidden;
   line-height: 1.6;
+  padding-top: 68px; /* offset for fixed navbar */
 }
 
 /* ── Custom Scrollbar ── */

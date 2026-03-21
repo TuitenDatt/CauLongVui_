@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Thông tin & Thanh toán</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/momo-booking.css" />
+</head>
+<body>
+  <div class="momo-header">
+    <a href="schedule.html" class="btn-back">❮</a>
+    <h2>THÔNG TIN & THANH TOÁN</h2>
+    <div style="width: 30px;"></div>
+  </div>
+
+  <div class="info-section">
+    <div class="info-title">🏢 Thông tin sân</div>
+    <div class="info-row"><span>Tên CLB: <b>Câu Lạc Bộ Cầu Lông CauLongVui</b></span></div>
+    <div class="info-row"><span>Địa chỉ: 123 Lê Duẩn, phường Hải Châu, quận Hải Châu, Đà Nẵng</span></div>
+  </div>
+
+  <div class="info-section light">
+    <div class="info-title">📅 Thông tin lịch đặt</div>
+    <div class="info-row"><span>Sân: <b id="t-court">—</b></span></div>
+    <div class="info-row"><span>Ngày: <b id="t-date">—</b></span></div>
+    <div class="info-row"><span>Tổng giờ: <b id="t-hour">0h30</b></span></div>
+    <div class="info-row"><span>Tổng tiền: <b id="t-price">—</b></span></div>
+  </div>
+
+  <div class="info-section">
+    <div class="info-row" style="font-weight:bold; font-size:16px; margin: 15px 0;">
+      <span>Số tiền cần thanh toán</span>
+      <span id="t-pay" style="color:#f39c12">—</span>
+    </div>
+  </div>
+
+  <div class="info-section light">
+    <div class="input-group">
+      <label>Tên của bạn *</label>
+      <input type="text" id="cus-name" class="form-control form-input" placeholder="Ví dụ: Nguyễn Văn A" />
+    </div>
+    <div class="input-group">
+      <label>Số điện thoại *</label>
+      <input type="tel" id="cus-phone" class="form-control form-input" placeholder="Ví dụ: 0987654321" />
+    </div>
+    <div class="input-group">
+      <label>Ghi chú cho chủ sân</label>
+      <input type="text" id="cus-note" class="form-control form-input" placeholder="Nhập ghi chú (Không bắt buộc)..." />
+    </div>
+  </div>
+
+  <div style="padding: 15px; color:#666; font-size:13px; margin-bottom: 70px;">
+    <i>⚠️ Thanh toán qua Ví MoMo — bạn sẽ được chuyển đến trang MoMo để quét QR và hoàn tất.</i>
+  </div>
+
+  <div class="bottom-bar">
+    <button class="btn-next" id="payBtn" onclick="goToPay()">XÁC NHẬN & THANH TOÁN MOMO</button>
+    <button class="btn-next" style="background:#ff9800; margin-top:10px;" onclick="goToPay(true)">🛠 (DEV) BỎ QUA APP - TEST THÀNH CÔNG</button>
+  </div>
+
+  <script>
+    // Đọc thông tin từ localStorage (lưu từ schedule.html)
+    const price     = parseInt(localStorage.getItem('bk_price') || '0');
+    const time      = localStorage.getItem('bk_time')      || '0h00';
+    const courtName = localStorage.getItem('bk_courtName') || 'San cau long';
+    const courtId   = localStorage.getItem('bk_courtId')   || '';
+    const dateStr   = localStorage.getItem('bk_date')      || new Date().toLocaleDateString('vi-VN');
+
+    document.getElementById('t-court').innerText = courtName;
+    document.getElementById('t-date').innerText  = dateStr;
+    document.getElementById('t-hour').innerText  = time;
+    document.getElementById('t-price').innerText = price.toLocaleString('vi-VN') + ' đ';
+    document.getElementById('t-pay').innerText   = price.toLocaleString('vi-VN') + ' đ';
+
+    async function goToPay(devBypass = false) {
+      const name  = document.getElementById('cus-name').value.trim();
+      const phone = document.getElementById('cus-phone').value.trim();
+      if (!name || !phone) { alert('Vui lòng nhập Tên và Số điện thoại!'); return; }
+
+      const payBtn = document.getElementById('payBtn');
+      payBtn.disabled = true;
+      payBtn.textContent = 'Đang tạo thanh toán...';
+
+      // Lưu thông tin khách hàng
+      localStorage.setItem('bk_name',  name);
+      localStorage.setItem('bk_phone', phone);
+
+      try {
+        // 1. Tạo booking trước
+        const bookingRes = await fetch('/api/bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            courtId:      parseInt(courtId),
+            customerName: name,
+            customerPhone: phone,
+            bookingDate:   localStorage.getItem('bk_dateRaw') || new Date().toISOString().split('T')[0],
+            startTime:     localStorage.getItem('bk_startTime') || '07:00',
+            endTime:       localStorage.getItem('bk_endTime')   || '09:00',
+            totalPrice:    price,
+            status:        'PENDING'
+          })
+        });
+        const bookingJson = await bookingRes.json();
+
+        let bookingId = 0;
+        if (bookingJson.success && bookingJson.data) {
+          bookingId = bookingJson.data.id;
+          localStorage.setItem('bk_bookingId', bookingId);
+        }
+
+        if (devBypass) {
+          // Bỏ qua gọi lên MoMo, tự giả lập MoMo trả kết quả thành công về hệ thống
+          window.location.href = `/api/payment/momo-return?orderId=CLV-${bookingId}-DEVTEST&amount=${price}&resultCode=0&message=Success_Dev_Test&transId=9999999999`;
+          return;
+        }
+
+        // 2. Gọi API tạo MoMo payment
+        const momoRes = await fetch('/api/payment/momo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bookingId:    bookingId,
+            amount:       price,
+            courtName:    courtName,
+            customerName: name
+          })
+        });
+        const momoJson = await momoRes.json();
+
+        if (momoJson.success && momoJson.data && momoJson.data.payUrl) {
+          // Redirect tới trang thanh toán MoMo thật
+          window.location.href = momoJson.data.payUrl;
+        } else {
+          alert('Lỗi tạo thanh toán MoMo: ' + (momoJson.message || 'Không xác định'));
+          payBtn.disabled = false;
+          payBtn.textContent = 'XÁC NHẬN & THANH TOÁN MOMO';
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Lỗi kết nối: ' + err.message);
+        payBtn.disabled = false;
+        payBtn.textContent = 'XÁC NHẬN & THANH TOÁN MOMO';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -44,6 +44,13 @@ public class BookingService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public List<BookingDTO> getBookingsByPhone(String phone) {
+        return bookingRepository.findByCustomerPhoneOrderByBookingDateDesc(phone).stream()
+                .map(BookingDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
     public BookingDTO createBooking(BookingDTO bookingDTO) {
         // Validate court exists
         Court court = courtRepository.findById(bookingDTO.getCourtId())
@@ -54,14 +61,13 @@ public class BookingService {
             throw new BadRequestException("Giờ bắt đầu phải trước giờ kết thúc");
         }
 
-        // Check for overlapping bookings
-        List<Booking> overlapping = bookingRepository.findOverlappingBookings(
-                bookingDTO.getCourtId(),
-                bookingDTO.getBookingDate(),
-                bookingDTO.getStartTime(),
-                bookingDTO.getEndTime()
-        );
-        if (!overlapping.isEmpty()) {
+        // Check for overlapping bookings in Java to avoid SQL Server type conversion issues with LocalTime
+        List<Booking> dayBookings = bookingRepository.findByCourtIdAndBookingDate(bookingDTO.getCourtId(), bookingDTO.getBookingDate());
+        boolean hasOverlap = dayBookings.stream()
+                .filter(b -> b.getStatus() != Booking.BookingStatus.CANCELLED)
+                .anyMatch(b -> bookingDTO.getStartTime().isBefore(b.getEndTime()) && bookingDTO.getEndTime().isAfter(b.getStartTime()));
+
+        if (hasOverlap) {
             throw new BadRequestException("Sân đã được đặt trong khung giờ này. Vui lòng chọn khung giờ khác.");
         }
 

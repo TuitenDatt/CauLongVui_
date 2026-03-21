@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lịch đặt sân của tôi – CauLongVui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/header-footer.css" />
+  <style>
+    .my-bookings-page { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    .page-title { font-size: 26px; font-weight: 800; color: var(--dark); margin-bottom: 4px; }
+    .page-sub   { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
+
+    /* Search by phone */
+    .phone-search {
+      display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap;
+    }
+    .phone-search input {
+      flex: 1; min-width: 220px; padding: 12px 18px;
+      border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      font-size: 15px; font-family: var(--font-main); color: var(--dark); outline: none;
+      background: var(--white);
+    }
+    .phone-search input:focus { border-color: var(--green); box-shadow: 0 0 0 3px var(--green-glow); }
+    .phone-search button {
+      background: var(--green); color: #fff; border: none;
+      border-radius: var(--r-sm); padding: 12px 28px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      font-family: var(--font-main); transition: all 0.2s;
+    }
+    .phone-search button:hover { background: var(--green-light); }
+
+    /* Booking card */
+    .booking-list { display: flex; flex-direction: column; gap: 16px; }
+
+    .booking-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--r-md); padding: 20px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px; transition: all 0.2s;
+      box-shadow: var(--shadow-sm);
+    }
+    .booking-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .booking-card.confirmed { border-left: 5px solid var(--green); }
+    .booking-card.pending   { border-left: 5px solid var(--yellow); }
+    .booking-card.cancelled { border-left: 5px solid var(--red); opacity: 0.7; }
+    .booking-card.completed { border-left: 5px solid #94a3b8; }
+
+    .booking-main { flex: 1; }
+    .booking-court-name { font-size: 18px; font-weight: 800; color: var(--dark); margin-bottom: 6px; }
+    .booking-detail { font-size: 13px; color: var(--muted); display: flex; gap: 16px; flex-wrap: wrap; }
+    .booking-detail span { display: flex; align-items: center; gap: 4px; }
+
+    .booking-right { text-align: right; }
+    .booking-price { font-size: 20px; font-weight: 800; color: var(--green); }
+    .booking-status {
+      display: inline-block; margin-top: 6px; padding: 4px 14px;
+      border-radius: var(--r-xl); font-size: 12px; font-weight: 700;
+    }
+    .status-CONFIRMED { background: #dcfce7; color: #15803d; }
+    .status-PENDING   { background: #fef9c3; color: #a16207; }
+    .status-CANCELLED { background: #fee2e2; color: #b91c1c; }
+    .status-COMPLETED { background: #f1f5f9; color: #64748b; }
+
+    /* Empty / loading state */
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: var(--muted);
+    }
+    .empty-state .icon { font-size: 64px; margin-bottom: 12px; }
+    .empty-state h3 { font-size: 18px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+    .empty-state p { font-size: 14px; }
+
+    .btn-book-now {
+      display: inline-block; margin-top: 20px; padding: 12px 28px;
+      background: var(--green); color: #fff; border-radius: var(--r-md);
+      font-weight: 700; font-size: 14px; text-decoration: none;
+      box-shadow: 0 4px 16px var(--green-glow); transition: all 0.2s;
+    }
+    .btn-book-now:hover { background: var(--green-light); transform: translateY(-1px); }
+  </style>
+</head>
+<body>
+<div id="header-placeholder"></div>
+
+<div class="my-bookings-page">
+  <div class="page-title">📋 Lịch đặt sân của tôi</div>
+  <div class="page-sub">Nhập số điện thoại để kiểm tra lịch đặt</div>
+
+  <div class="phone-search">
+    <input type="tel" id="phoneInput" placeholder="Nhập số điện thoại của bạn (VD: 0987654321)"
+           onkeydown="if(event.key==='Enter') searchBookings()" />
+    <button onclick="searchBookings()">🔍 Tìm lịch</button>
+  </div>
+
+  <div class="booking-list" id="bookingList">
+    <div class="empty-state">
+      <div class="icon">📅</div>
+      <h3>Nhập số điện thoại để xem lịch đặt</h3>
+      <p>Hệ thống sẽ tìm kiếm tất cả các lịch đặt sân liên kết với số điện thoại của bạn.</p>
+    </div>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<div id="toast-container"></div>
+<script src="/js/app.js"></script>
+<script>
+  // Tự điền SĐT nếu đã có trong localStorage
+  const savedPhone = localStorage.getItem('bk_phone');
+  if (savedPhone) {
+    document.getElementById('phoneInput').value = savedPhone;
+    searchBookings();
+  }
+
+  async function searchBookings() {
+    const phone = document.getElementById('phoneInput').value.trim();
+    if (!phone) { alert('Vui lòng nhập số điện thoại!'); return; }
+
+    const list = document.getElementById('bookingList');
+    list.innerHTML = `<div class="empty-state"><div class="icon">⏳</div><h3>Đang tìm kiếm...</h3></div>`;
+
+    try {
+      const res  = await fetch('/api/bookings?phone=' + encodeURIComponent(phone));
+      const json = await res.json();
+
+      if (!json.success || !json.data || json.data.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">🎾</div>
+            <h3>Chưa có lịch đặt nào</h3>
+            <p>Số điện thoại <b>${phone}</b> chưa có lịch đặt sân nào.</p>
+            <a href="/courts.html" class="btn-book-now">🏸 Đặt sân ngay</a>
+          </div>`;
+        return;
+      }
+
+      const statusLabel = {
+        CONFIRMED: '✅ Đã xác nhận',
+        PENDING:   '⏳ Chờ xác nhận',
+        CANCELLED: '❌ Đã hủy',
+        COMPLETED: '🏆 Hoàn thành'
+      };
+
+      list.innerHTML = json.data.map(b => {
+        const statusCls = 'booking-card ' + b.status.toLowerCase();
+        const pill      = 'booking-status status-' + b.status;
+        return `
+          <div class="${statusCls}">
+            <div class="booking-main">
+              <div class="booking-court-name">🏸 ${b.courtName || 'San cau long'}</div>
+              <div class="booking-detail">
+                <span>📅 ${b.bookingDate || '—'}</span>
+                <span>🕐 ${b.startTime || '—'} – ${b.endTime || '—'}</span>
+                <span>👤 ${b.customerName}</span>
+                <span>📞 ${b.customerPhone}</span>
+              </div>
+            </div>
+            <div class="booking-right">
+              <div class="booking-price">${b.totalPrice ? b.totalPrice.toLocaleString('vi-VN') + ' đ' : '—'}</div>
+              <div class="${pill}">${statusLabel[b.status] || b.status}</div>
+            </div>
+          </div>`;
+      }).join('');
+
+    } catch (err) {
+      list.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>Lỗi tải dữ liệu</h3><p>${err.message}</p></div>`;
+    }
+  }
+</script>
+</body>
+</html>
