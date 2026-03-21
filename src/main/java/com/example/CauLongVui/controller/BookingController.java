@@ -18,13 +18,19 @@ public class BookingController {
 
     private final BookingService bookingService;
 
-    // GET /api/bookings — lấy tất cả đặt sân
+    // GET /api/bookings — lấy tất cả đặt sân (có thể filter theo courtId hoặc phone)
     @GetMapping
     public ResponseEntity<ApiResponse<List<BookingDTO>>> getAllBookings(
-            @RequestParam(required = false) Long courtId) {
-        List<BookingDTO> bookings = (courtId != null)
-                ? bookingService.getBookingsByCourtId(courtId)
-                : bookingService.getAllBookings();
+            @RequestParam(required = false) Long courtId,
+            @RequestParam(required = false) String phone) {
+        List<BookingDTO> bookings;
+        if (courtId != null) {
+            bookings = bookingService.getBookingsByCourtId(courtId);
+        } else if (phone != null && !phone.isBlank()) {
+            bookings = bookingService.getBookingsByPhone(phone);
+        } else {
+            bookings = bookingService.getAllBookings();
+        }
         return ResponseEntity.ok(ApiResponse.success(bookings));
     }
 

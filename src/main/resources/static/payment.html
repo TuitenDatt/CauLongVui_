@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kết quả thanh toán – CauLongVui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .result-card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      max-width: 480px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .result-header {
+      padding: 40px 24px 32px;
+      text-align: center;
+    }
+    .result-header.success { background: linear-gradient(135deg, #00a046, #00c853); }
+    .result-header.failed  { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+
+    .result-icon { font-size: 72px; margin-bottom: 12px; }
+    .result-title { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+    .result-sub   { font-size: 14px; color: rgba(255,255,255,0.85); }
+
+    /* ── Body ── */
+    .result-body { padding: 28px 32px; }
+
+    .momo-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #ae2070; color: #fff;
+      padding: 6px 18px; border-radius: 20px;
+      font-size: 13px; font-weight: 700;
+      margin: 0 auto 24px; width: fit-content;
+      display: flex; justify-content: center;
+    }
+
+    .info-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 0; border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+    }
+    .info-row:last-of-type { border-bottom: none; }
+    .info-label { color: #888; }
+    .info-value { font-weight: 700; color: #333; }
+    .info-value.green { color: #27ae60; }
+    .info-value.pink  { color: #ae2070; font-size: 18px; }
+    .info-value.muted { color: #999; font-weight: 400; font-size: 13px; }
+
+    /* ── Buttons ── */
+    .btn-home {
+      display: block; width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #2d8a4e, #3aad62);
+      color: #fff; border: none; border-radius: 10px;
+      font-size: 15px; font-weight: 800; text-align: center;
+      text-decoration: none; margin-top: 20px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-home:hover { filter: brightness(1.08); transform: translateY(-1px); }
+
+    .btn-retry {
+      display: block; width: 100%; padding: 12px;
+      background: transparent; color: #c0392b;
+      border: 1.5px solid #c0392b; border-radius: 10px;
+      font-size: 14px; font-weight: 600; text-align: center;
+      text-decoration: none; margin-top: 10px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-retry:hover { background: #fff5f5; }
+
+    /* Pending (loading) */
+    .pending-wrap { text-align: center; padding: 40px; }
+    .spinner {
+      width: 56px; height: 56px; border: 5px solid #e0e0e0;
+      border-top-color: #ae2070; border-radius: 50%;
+      animation: spin 0.9s linear infinite; margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="result-card" id="resultCard">
+  <!-- Pending: hiển thị khi chưa có kết quả từ MoMo -->
+  <div class="pending-wrap" id="pendingView">
+    <div class="spinner"></div>
+    <p style="color:#555; font-size:15px; font-weight:600;">Đang kiểm tra kết quả thanh toán...</p>
+  </div>
+</div>
+
+<script>
+  const params   = new URLSearchParams(window.location.search);
+  const result   = params.get('result');
+  const orderId  = params.get('orderId')  || '';
+  const amount   = parseInt(params.get('amount')  || '0');
+  const transId  = params.get('transId') || '';
+  const message  = params.get('message') || '';
+
+  // Thông tin lưu từ booking-info.html
+  const courtName = localStorage.getItem('bk_courtName') || 'San cau long';
+  const custName  = localStorage.getItem('bk_name')      || '';
+  const custPhone = localStorage.getItem('bk_phone')     || '';
+
+  function fmt(n) {
+    return n > 0 ? n.toLocaleString('vi-VN') + ' đ' : '—';
+  }
+
+  function renderSuccess() {
+    document.getElementById('resultCard').innerHTML = `
+      <div class="result-header success">
+        <div class="result-icon">✅</div>
+        <div class="result-title">Thanh toán thành công!</div>
+        <div class="result-sub">Đặt sân của bạn đã được xác nhận</div>
+      </div>
+      <div class="result-body">
+        <div class="momo-badge">💜 Thanh toán qua Ví MoMo</div>
+
+        <div class="info-row"><span class="info-label">Mã đơn hàng</span><span class="info-value">${orderId}</span></div>
+        ${transId ? `<div class="info-row"><span class="info-label">Mã GD MoMo</span><span class="info-value green">${transId}</span></div>` : ''}
+        <div class="info-row"><span class="info-label">Sân đặt</span><span class="info-value">${courtName}</span></div>
+        <div class="info-row"><span class="info-label">Khách hàng</span><span class="info-value">${custName} – ${custPhone}</span></div>
+        <div class="info-row"><span class="info-label">Số tiền</span><span class="info-value pink">${fmt(amount)}</span></div>
+        <div class="info-row"><span class="info-label">Trạng thái</span><span class="info-value green">✅ Thành công</span></div>
+
+        <a href="/courts.html" class="btn-home">🏸 Đặt sân khác</a>
+        <a href="/my-bookings.html" class="btn-retry" style="color: var(--green, #2d8a4e); border-color: var(--green, #2d8a4e);">📋 Xem lịch đặt của tôi</a>
+      </div>`;
+  }
+
+  function renderFailed() {
+    document.getElementById('resultCard').innerHTML = `
+      <div class="result-header failed">
+        <div class="result-icon">❌</div>
+        <div class="result-title">Thanh toán thất bại</div>
+        <div class="result-sub">${message || 'Giao dịch không thành công'}</div>
+      </div>
+      <div class="result-body">
+        <div class="momo-badge">💜 Thanh toán qua Ví MoMo</div>
+
+        <div class="info-row"><span class="info-label">Mã đơn hàng</span><span class="info-value">${orderId || '—'}</span></div>
+        <div class="info-row"><span class="info-label">Sân đặt</span><span class="info-value">${courtName}</span></div>
+        <div class="info-row"><span class="info-label">Số tiền</span><span class="info-value pink">${fmt(amount)}</span></div>
+        <div class="info-row"><span class="info-label">Trạng thái</span><span style="color:#c0392b;font-weight:700;">❌ Thất bại</span></div>
+
+        <a href="/courts.html" class="btn-home">🏠 Về trang chủ</a>
+        <a href="/booking-info.html" class="btn-retry">🔄 Thử lại</a>
+      </div>`;
+  }
+
+  // Quyết định hiển thị dựa vào query param ?result=
+  if (result === 'success') {
+    renderSuccess();
+  } else if (result === 'failed') {
+    renderFailed();
+  }
+  // Nếu không có ?result thì hiển thị spinner (trường hợp vào thẳng URL)
+</script>
+</body>
+</html>
