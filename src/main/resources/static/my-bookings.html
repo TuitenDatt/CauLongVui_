@@ -108,11 +108,17 @@
 <div id="toast-container"></div>
 <script src="/js/app.js"></script>
 <script>
-  // Tự điền SĐT nếu đã có trong localStorage
+  // Tự điền SĐT nếu đã có trong localStorage hoặc SĐT từ thông tin tài khoản
   const savedPhone = localStorage.getItem('bk_phone');
   if (savedPhone) {
     document.getElementById('phoneInput').value = savedPhone;
     searchBookings();
+  } else {
+    const user = getCurrentUser();
+    if (user && user.phone) {
+      document.getElementById('phoneInput').value = user.phone;
+      searchBookings();
+    }
   }
 
   async function searchBookings() {

@@ -123,3 +123,21 @@ footer .logo span { color: var(--green-light); }
 
 .dropdown-logout { border-top: 1px solid var(--border); color: var(--red) !important; }
 .dropdown-logout:hover { background: #fff1f1 !important; }
+
+/* ═══ CART ICON IN NAV ═══ */
+.nav-cart-btn {
+  position: relative; text-decoration: none; font-size: 20px;
+  display: flex; align-items: center; padding: 6px 10px;
+  border-radius: var(--r-sm); transition: background .2s;
+  color: var(--dark);
+}
+.nav-cart-btn:hover { background: var(--green-pale); }
+.cart-badge {
+  position: absolute; top: 0; right: 0;
+  background: var(--red); color: #fff;
+  font-size: 10px; font-weight: 800;
+  min-width: 17px; height: 17px;
+  border-radius: 9px; padding: 0 4px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 2px solid var(--white);
+}

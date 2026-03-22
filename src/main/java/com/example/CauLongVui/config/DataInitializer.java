@@ -47,37 +47,36 @@ public class DataInitializer implements CommandLineRunner {
             log.info("No courts found. Seeding sample courts...");
 
             List<Court> courts = List.of(
-                Court.builder()
-                    .name("San A1")
-                    .description("San tieu chuan tang 1 - Anh sang tot, thong thoang")
-                    .pricePerHour(90000.0)
-                    .status(CourtStatus.AVAILABLE)
-                    .build(),
-                Court.builder()
-                    .name("San A2")
-                    .description("San tieu chuan tang 1 - Gan cua ra vao")
-                    .pricePerHour(90000.0)
-                    .status(CourtStatus.AVAILABLE)
-                    .build(),
-                Court.builder()
-                    .name("San A3")
-                    .description("San tieu chuan tang 1 - San goc yen tinh")
-                    .pricePerHour(90000.0)
-                    .status(CourtStatus.AVAILABLE)
-                    .build(),
-                Court.builder()
-                    .name("San B1")
-                    .description("San VIP tang 2 - Dieu hoa, ghe ngoi thoai mai")
-                    .pricePerHour(150000.0)
-                    .status(CourtStatus.AVAILABLE)
-                    .build(),
-                Court.builder()
-                    .name("San B2")
-                    .description("San VIP tang 2 - View dep nhin ra san ngoai")
-                    .pricePerHour(150000.0)
-                    .status(CourtStatus.AVAILABLE)
-                    .build()
-            );
+                    Court.builder()
+                            .name("San A1")
+                            .description("San tieu chuan tang 1 - Anh sang tot, thong thoang")
+                            .pricePerHour(90000.0)
+                            .status(CourtStatus.AVAILABLE)
+                            .build(),
+                    Court.builder()
+                            .name("San A2")
+                            .description("San tieu chuan tang 1 - Gan cua ra vao")
+                            .pricePerHour(90000.0)
+                            .status(CourtStatus.AVAILABLE)
+                            .build(),
+                    Court.builder()
+                            .name("San A3")
+                            .description("San tieu chuan tang 1 - San goc yen tinh")
+                            .pricePerHour(90000.0)
+                            .status(CourtStatus.AVAILABLE)
+                            .build(),
+                    Court.builder()
+                            .name("San B1")
+                            .description("San VIP tang 2 - Dieu hoa, ghe ngoi thoai mai")
+                            .pricePerHour(150000.0)
+                            .status(CourtStatus.AVAILABLE)
+                            .build(),
+                    Court.builder()
+                            .name("San B2")
+                            .description("San VIP tang 2 - View dep nhin ra san ngoai")
+                            .pricePerHour(150000.0)
+                            .status(CourtStatus.AVAILABLE)
+                            .build());
 
             courtRepository.saveAll(courts);
             log.info("Seeded {} courts successfully.", courts.size());

@@ -162,7 +162,12 @@ function initHeaderEvents() {
 
   if (user) {
     // Đã đăng nhập — hiển thị avatar + tên + dropdown
+    const cartCount = getCartCount();
     navActions.innerHTML = `
+      <a href="/cart.html" class="nav-cart-btn" id="navCartBtn" title="Giỏ hàng">
+        🛒
+        <span class="cart-badge" id="cartBadge" style="${cartCount > 0 ? '' : 'display:none'}"> ${cartCount}</span>
+      </a>
       <div class="nav-user-menu" id="navUserMenu">
         <button class="nav-user-btn" onclick="toggleUserMenu()" id="navUserBtn">
           <div class="nav-user-avatar">${(user.fullName || 'U').charAt(0).toUpperCase()}</div>
@@ -175,8 +180,14 @@ function initHeaderEvents() {
             <div class="dropdown-role">${roleLabel(user.role)}</div>
           </div>
           <a href="/profile.html" class="dropdown-item">👤 Tài khoản của tôi</a>
+          ${user.role !== 'ADMIN' ? `
+          <a href="/my-bookings.html" class="dropdown-item">🏸 Sân đã đặt</a>
+          <a href="/cart.html" class="dropdown-item">🛒 Giỏ hàng của tôi</a>
+          <a href="/my-orders.html" class="dropdown-item">📋 Mặt hàng đã đặt</a>
+          ` : ''}
           ${user.role === 'ADMIN' ? '<a href="/admin/admin.html" class="dropdown-item">⚙️ Quản trị hệ thống</a>' : ''}
           ${(user.role === 'ADMIN' || user.role === 'STAFF') ? '<a href="/admin/court-management.html" class="dropdown-item">📋 Quản lý sân</a>' : ''}
+          ${user.role === 'ADMIN' ? '<a href="/admin/product-management.html" class="dropdown-item">🛍️ Quản lý sản phẩm</a>' : ''}
           <a href="#" class="dropdown-item dropdown-logout" id="logoutBtn">🚪 Đăng xuất</a>
         </div>
       </div>
@@ -242,6 +253,22 @@ function requireAuth(redirectUrl = null) {
 function logout() {
   localStorage.removeItem('currentUser');
   window.location.href = '/auth/login.html';
+}
+
+// ── Cart helpers
+function getCartCount() {
+  try {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    return cart.reduce((sum, item) => sum + (item.qty || 1), 0);
+  } catch { return 0; }
+}
+
+function updateCartBadge() {
+  const badge = document.getElementById('cartBadge');
+  if (!badge) return;
+  const count = getCartCount();
+  badge.textContent = count;
+  badge.style.display = count > 0 ? 'inline-flex' : 'none';
 }
 
 function roleLabel(role) {

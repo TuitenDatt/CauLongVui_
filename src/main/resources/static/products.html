@@ -4,47 +4,327 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cửa hàng – CauLongVui</title>
-  <meta name="description" content="Mua sắm dụng cụ cầu lông chính hãng tại CauLongVui: vợt, cầu, giày, túi và phụ kiện." />
+  <meta name="description" content="Mua sắm dụng cụ cầu lông, nước uống và đồ ăn tại CauLongVui." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/css/shared.css" />
   <link rel="stylesheet" href="/css/header-footer.css" />
   <link rel="stylesheet" href="/css/styles.css" />
+  <style>
+    body { font-family: 'Be Vietnam Pro', sans-serif; }
+    /* ── Admin add bar ── */
+    #admin-add-bar {
+      display: none;
+      align-items: center; justify-content: space-between;
+      background: #fff8e6; border: 1.5px dashed #f59e0b;
+      border-radius: 12px; padding: 12px 20px;
+      margin: 0 auto 0; max-width: 1100px;
+      gap: 12px;
+    }
+    #admin-add-bar span { font-size: 14px; font-weight: 600; color: #92400e; }
+    #admin-add-bar button {
+      background: var(--green); color: #fff; border: none;
+      border-radius: 9px; padding: 9px 18px; font-size: 14px;
+      font-weight: 700; cursor: pointer; transition: all .2s;
+      font-family: inherit; display: flex; align-items: center; gap: 6px;
+    }
+    #admin-add-bar button:hover { background: #14532d; }
+
+    /* ── Admin badge on card ── */
+    .product-card { position: relative; }
+    .admin-badge-overlay {
+      position: absolute; top: 8px; right: 8px; z-index: 5;
+      background: rgba(234,179,8,.9); color: #78350f;
+      font-size: 10px; font-weight: 800; padding: 3px 8px;
+      border-radius: 20px; letter-spacing: .3px;
+    }
+
+    /* ── Product card footer with multiple buttons ── */
+    .product-card-footer {
+      display: flex; gap: 6px; padding: 12px 14px !important;
+      align-items: stretch;
+    }
+
+    /* ── "Xem chi tiết" button ── */
+    .btn-detail {
+      background: #f1f5f9; color: var(--dark); border: 1.5px solid var(--border);
+      border-radius: 8px; padding: 6px 11px; font-size: 12px;
+      font-weight: 600; cursor: pointer; white-space: nowrap;
+      transition: all .2s; font-family: inherit;
+    }
+    .btn-detail:hover { background: #e2e8f0; border-color: #94a3b8; }
+
+    /* ── Admin Sửa button ── */
+    .btn-outline-admin {
+      background: #e8f5f0; color: var(--green); border: 1.5px solid var(--green);
+      border-radius: 8px; padding: 6px 11px; font-size: 12px;
+      font-weight: 700; cursor: pointer; white-space: nowrap;
+      transition: all .2s; font-family: inherit;
+    }
+    .btn-outline-admin:hover { background: var(--green); color: #fff; }
+
+    /* ── Admin Xóa button ── */
+    .btn-danger-sm {
+      background: #fee2e2; color: #dc2626; border: none;
+      border-radius: 8px; padding: 6px 10px; font-size: 13px;
+      font-weight: 700; cursor: pointer; white-space: nowrap;
+      transition: all .2s; font-family: inherit;
+    }
+    .btn-danger-sm:hover { background: #dc2626; color: #fff; }
+
+    /* ════════════════════════════
+       MODAL STYLES (shared)
+       ════════════════════════════ */
+    .products-modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,.45);
+      z-index: 1000; display: none; align-items: center;
+      justify-content: center; padding: 20px;
+    }
+    .products-modal-backdrop.open { display: flex; }
+    .products-modal {
+      background: #fff; border-radius: 18px; width: 100%;
+      max-width: 520px; max-height: 92vh; overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18);
+      animation: pModalIn .25s ease;
+    }
+    @keyframes pModalIn {
+      from { opacity:0; transform:translateY(16px) scale(.97); }
+      to   { opacity:1; transform:none; }
+    }
+    .p-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 24px 16px; border-bottom: 1px solid var(--border);
+    }
+    .p-modal-title { font-size: 17px; font-weight: 800; color: var(--dark); }
+    .p-modal-close {
+      background: none; border: none; font-size: 18px; cursor: pointer;
+      color: var(--muted); padding: 4px; transition: color .2s; line-height: 1;
+    }
+    .p-modal-close:hover { color: var(--dark); }
+    .p-modal-body { padding: 20px 24px; }
+    .p-modal-footer {
+      display: flex; gap: 10px; justify-content: flex-end;
+      padding: 14px 24px; border-top: 1px solid var(--border);
+    }
+
+    /* Form inside modal */
+    .pf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .pf-group { margin-bottom: 14px; }
+    .pf-group label {
+      display: block; font-size: 12px; font-weight: 700; color: var(--dark);
+      margin-bottom: 6px; text-transform: uppercase; letter-spacing: .3px;
+    }
+    .pf-group label .req { color: #ef4444; }
+    .pf-group input, .pf-group select, .pf-group textarea {
+      width: 100%; padding: 9px 12px; border: 1.5px solid var(--border);
+      border-radius: 9px; font-size: 14px; font-family: inherit;
+      outline: none; transition: border-color .2s; box-sizing: border-box;
+    }
+    .pf-group input:focus, .pf-group select:focus, .pf-group textarea:focus {
+      border-color: var(--green);
+    }
+    .pf-group textarea { resize: vertical; min-height: 70px; }
+    #shopImgPreview {
+      margin-top: 8px; border: 1.5px dashed var(--border);
+      border-radius: 9px; overflow: hidden; background: #f8f9fa;
+      min-height: 60px; display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Buttons in modal */
+    .pbtn {
+      padding: 9px 20px; border-radius: 9px; font-size: 14px;
+      font-weight: 700; cursor: pointer; border: none;
+      transition: all .2s; font-family: inherit;
+    }
+    .pbtn-primary  { background: var(--green); color: #fff; }
+    .pbtn-primary:hover  { background: #14532d; }
+    .pbtn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
+    .pbtn-secondary { background: #f1f5f9; color: var(--dark); }
+    .pbtn-secondary:hover { background: #e2e8f0; }
+    .pbtn-danger   { background: #dc2626; color: #fff; }
+    .pbtn-danger:hover   { background: #b91c1c; }
+    .pbtn-cart {
+      background: var(--green); color: #fff;
+      padding: 11px 24px; border-radius: 10px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      border: none; width: 100%; transition: all .2s; font-family: inherit;
+    }
+    .pbtn-cart:hover:not(:disabled) { background: #14532d; }
+    .pbtn-cart:disabled { background: #9ca3af; cursor: not-allowed; }
+
+    /* Confirm modal */
+    .confirm-center { text-align: center; padding: 10px 0 4px; }
+    .confirm-center .ci { font-size: 52px; margin-bottom: 12px; }
+    .confirm-center h3  { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+    .confirm-center p   { color: var(--muted); font-size: 14px; }
+    .confirm-name-box {
+      background: #fee2e2; color: #dc2626; border-radius: 8px;
+      padding: 8px 14px; font-weight: 700; font-size: 14px;
+      margin-top: 12px; display: inline-block; max-width: 100%;
+      word-break: break-word;
+    }
+  </style>
 </head>
 <body>
 
 <!-- ── NAVBAR ── -->
 <div id="header-placeholder"></div>
 
+<!-- ── ADMIN BAR ── -->
+<div id="admin-add-bar">
+  <span>⚙️ Chế độ Admin — Bạn có thể thêm, sửa, xóa sản phẩm trực tiếp.</span>
+  <button onclick="openShopAddModal()">➕ Thêm sản phẩm mới</button>
+</div>
+
 <!-- ── PAGE HERO ── -->
 <div class="page-hero">
-  <h1>🛒 Cửa hàng Dụng cụ Cầu lông</h1>
-  <p>Vợt, cầu, giày và phụ kiện từ các thương hiệu uy tín. Hàng chính hãng, giá tốt nhất.</p>
+  <h1>🛒 Cửa hàng Cầu Lông Vui</h1>
+  <p>Cầu lông, nước uống, đồ ăn và dụng cụ thi đấu. Phục vụ tận nơi, giá tốt nhất.</p>
 </div>
 
 <!-- ── FILTER BAR ── -->
 <div class="filter-bar">
-  <div class="search-input-wrap">
-    <span class="search-icon">🔍</span>
-    <input id="search-input" type="text" class="form-control" placeholder="Tìm sản phẩm..." autocomplete="off" />
+  <div class="filter-group">
+    <label>🔍 Tìm sản phẩm</label>
+    <input id="search-input" type="text" class="form-control" placeholder="Nhập tên sản phẩm..." autocomplete="off" />
   </div>
-  <select id="filter-category" class="form-control" style="max-width:200px;">
-    <option value="">Tất cả danh mục</option>
-  </select>
-  <button class="btn btn-secondary btn-sm" onclick="loadProducts()">🔄 Làm mới</button>
+  
+  <div class="filter-group">
+    <label>🏷️ Danh mục</label>
+    <select id="filter-category" class="form-control">
+      <option value="">Tất cả danh mục</option>
+    </select>
+  </div>
+
+  <button class="btn-search-main" onclick="loadProducts()" style="background:var(--green); color:#fff; border:none;">
+    <span class="icon" style="color:#fff;">🔄</span> Làm mới
+  </button>
 </div>
 
 <!-- ── PRODUCTS GRID ── -->
 <div class="section" style="padding-top:2rem;">
-  <div class="grid-4" id="products-grid">
+  <div class="grid-3" id="products-grid">
     <!-- Rendered by products.js -->
   </div>
 </div>
 
 <!-- ── FOOTER ── -->
 <div id="footer-placeholder"></div>
-
 <div id="toast-container"></div>
+
+<!-- ══════════════════════════════════
+     MODAL 1: Xem chi tiết (User)
+══════════════════════════════════ -->
+<div class="products-modal-backdrop" id="detailModal">
+  <div class="products-modal" style="max-width:480px;">
+    <div class="p-modal-header">
+      <span class="p-modal-title">📦 Chi tiết sản phẩm</span>
+      <button class="p-modal-close" onclick="closeModal('detailModal')">✕</button>
+    </div>
+    <div class="p-modal-body">
+      <div id="detailBody"></div>
+    </div>
+    <div class="p-modal-footer" style="display:block;padding:14px 24px;">
+      <button class="pbtn-cart" id="detailCartBtn">🛒 Thêm vào giỏ hàng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL 2: Thêm / Sửa sản phẩm (Admin)
+══════════════════════════════════ -->
+<div class="products-modal-backdrop" id="shopEditModal">
+  <div class="products-modal">
+    <div class="p-modal-header">
+      <span class="p-modal-title" id="shopEditModalTitle">➕ Thêm sản phẩm mới</span>
+      <button class="p-modal-close" onclick="closeModal('shopEditModal')">✕</button>
+    </div>
+    <div class="p-modal-body">
+      <input type="hidden" id="shopEditId" />
+
+      <div class="pf-group">
+        <label for="shopFName">Tên sản phẩm <span class="req">*</span></label>
+        <input type="text" id="shopFName" placeholder="VD: Cầu lông nguyên ống (12 quả)" maxlength="150" />
+      </div>
+
+      <div class="pf-row">
+        <div class="pf-group">
+          <label for="shopFPrice">Giá bán (VNĐ) <span class="req">*</span></label>
+          <input type="number" id="shopFPrice" placeholder="VD: 55000" min="0" step="500" />
+        </div>
+        <div class="pf-group">
+          <label for="shopFStock">Số lượng tồn <span class="req">*</span></label>
+          <input type="number" id="shopFStock" placeholder="VD: 50" min="0" />
+        </div>
+      </div>
+
+      <div class="pf-group">
+        <label for="shopFCategory">Danh mục <span class="req">*</span></label>
+        <select id="shopFCategory">
+          <option value="">— Chọn danh mục —</option>
+          <option value="Cầu lông">🪶 Cầu lông</option>
+          <option value="Vợt">🏸 Vợt</option>
+          <option value="Giày">👟 Giày</option>
+          <option value="Túi">🎒 Túi</option>
+          <option value="Quần áo">👕 Quần áo</option>
+          <option value="Phụ kiện">🔧 Phụ kiện</option>
+          <option value="Nước uống">🧋 Nước uống</option>
+          <option value="Đồ ăn">🍜 Đồ ăn</option>
+        </select>
+      </div>
+
+      <div class="pf-group">
+        <label for="shopFDesc">Mô tả</label>
+        <textarea id="shopFDesc" placeholder="Mô tả ngắn về sản phẩm..."></textarea>
+      </div>
+
+      <div class="pf-group">
+        <label for="shopFImageUrl">Hình ảnh sản phẩm</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="url" id="shopFImageUrl" placeholder="https://... hoặc dùng nút Chọn ảnh"
+                 oninput="shopPreviewImage(this.value)" style="flex:1;" />
+          <button id="shopUploadBtn" type="button" class="pbtn pbtn-secondary"
+                  onclick="document.getElementById('shopFileInput').click()"
+                  style="white-space:nowrap;flex-shrink:0;">📷 Chọn ảnh</button>
+          <input type="file" id="shopFileInput" accept="image/*" style="display:none;"
+                 onchange="shopUploadProductImage()" />
+        </div>
+        <div id="shopImgPreview">
+          <p style="color:var(--muted);font-size:12px;text-align:center;padding:20px 0;">🖼️ Nhập URL hoặc upload ảnh để xem trước</p>
+        </div>
+      </div>
+    </div>
+    <div class="p-modal-footer">
+      <button class="pbtn pbtn-secondary" onclick="closeModal('shopEditModal')">Hủy</button>
+      <button class="pbtn pbtn-primary" id="shopSaveBtn" onclick="saveShopProduct()">💾 Lưu sản phẩm</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODAL 3: Xác nhận xóa (Admin)
+══════════════════════════════════ -->
+<div class="products-modal-backdrop" id="shopConfirmModal">
+  <div class="products-modal" style="max-width:400px;">
+    <div class="p-modal-header">
+      <span class="p-modal-title">Xác nhận xóa</span>
+      <button class="p-modal-close" onclick="closeModal('shopConfirmModal')">✕</button>
+    </div>
+    <div class="p-modal-body">
+      <div class="confirm-center">
+        <div class="ci">🗑️</div>
+        <h3>Xóa sản phẩm này?</h3>
+        <p>Hành động này không thể hoàn tác.</p>
+        <div class="confirm-name-box" id="shopConfirmName"></div>
+      </div>
+    </div>
+    <div class="p-modal-footer">
+      <button class="pbtn pbtn-secondary" onclick="closeModal('shopConfirmModal')">Hủy</button>
+      <button class="pbtn pbtn-danger" id="shopConfirmDeleteBtn" onclick="executeShopDelete()">🗑️ Xóa vĩnh viễn</button>
+    </div>
+  </div>
+</div>
+
 <script src="/js/app.js"></script>
 <script src="/js/products.js"></script>
 </body>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tài khoản của tôi – Cầu Lông Vui</title>
+  <meta name="description" content="Thông tin tài khoản cá nhân tại Cầu Lông Vui." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/header-footer.css" />
+  <style>
+    body { font-family: 'Be Vietnam Pro', sans-serif; }
+    .profile-page {
+      max-width: 720px; margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+
+    /* ── Avatar block ── */
+    .profile-hero {
+      display: flex; align-items: center; gap: 28px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 20px; padding: 32px; margin-bottom: 28px;
+      box-shadow: var(--shadow-sm);
+    }
+    .profile-avatar {
+      width: 88px; height: 88px; border-radius: 50%;
+      background: var(--green); color: #fff;
+      font-size: 36px; font-weight: 900;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; box-shadow: 0 6px 20px var(--green-glow);
+    }
+    .profile-hero-info h1 {
+      font-size: 24px; font-weight: 900; color: var(--dark); margin-bottom: 4px;
+    }
+    .profile-role-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--green-pale); color: var(--green);
+      font-size: 12px; font-weight: 700; padding: 4px 12px;
+      border-radius: 20px; margin-top: 4px;
+    }
+
+    /* ── Info card ── */
+    .info-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px; margin-bottom: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .info-card h2 {
+      font-size: 15px; font-weight: 800; color: var(--dark);
+      margin-bottom: 20px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .info-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0; border-bottom: 1px solid #f1f5f9;
+    }
+    .info-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .info-label {
+      font-size: 13px; font-weight: 600; color: var(--muted);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .info-value {
+      font-size: 14px; font-weight: 700; color: var(--dark);
+      text-align: right;
+    }
+
+    /* ── Quick links ── */
+    .quick-links { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .quick-link {
+      display: flex; align-items: center; gap: 14px;
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 14px; padding: 18px 20px;
+      text-decoration: none; color: var(--dark);
+      transition: all .25s; box-shadow: var(--shadow-sm);
+    }
+    .quick-link:hover {
+      border-color: var(--green); transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+    .quick-link .ql-icon {
+      font-size: 28px; width: 52px; height: 52px;
+      background: var(--green-pale); border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .quick-link .ql-text strong {
+      display: block; font-size: 14px; font-weight: 800; margin-bottom: 2px;
+    }
+    .quick-link .ql-text span { font-size: 12px; color: var(--muted); }
+
+    /* ── Logout button ── */
+    .logout-btn {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; background: #fee2e2; color: #dc2626;
+      border: none; border-radius: 12px; padding: 14px 20px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      transition: all .2s; font-family: inherit; margin-top: 20px;
+    }
+    .logout-btn:hover { background: #dc2626; color: #fff; }
+
+    /* ── Access denied ── */
+    .access-denied {
+      text-align: center; padding: 100px 24px;
+    }
+
+    @media (max-width: 600px) {
+      .quick-links { grid-template-columns: 1fr; }
+      .profile-hero { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+<div id="header-placeholder"></div>
+
+<div id="accessDenied" style="display:none;">
+  <div class="access-denied">
+    <div style="font-size:64px">🔒</div>
+    <h2 style="margin:16px 0 8px;font-size:22px;">Vui lòng đăng nhập</h2>
+    <p style="color:var(--muted);margin-bottom:24px;">Bạn cần đăng nhập để xem trang này.</p>
+    <a href="/auth/login.html?redirect=/profile.html"
+       style="background:var(--green);color:#fff;padding:12px 28px;border-radius:12px;text-decoration:none;font-weight:700;">
+      Đăng nhập ngay
+    </a>
+  </div>
+</div>
+
+<div id="profilePage" style="display:none;">
+  <div class="profile-page">
+
+    <!-- Hero -->
+    <div class="profile-hero">
+      <div class="profile-avatar" id="avatarEl"></div>
+      <div class="profile-hero-info">
+        <h1 id="fullNameEl">—</h1>
+        <div class="profile-role-badge" id="roleBadgeEl"></div>
+      </div>
+    </div>
+
+    <!-- Thông tin tài khoản -->
+    <div class="info-card">
+      <h2>👤 Thông tin tài khoản</h2>
+
+      <div class="info-row">
+        <span class="info-label">📛 Họ và tên</span>
+        <span class="info-value" id="infoName">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">📧 Email</span>
+        <span class="info-value" id="infoEmail">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">📞 Số điện thoại</span>
+        <span class="info-value" id="infoPhone">—</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">🔐 Vai trò</span>
+        <span class="info-value" id="infoRole">—</span>
+      </div>
+    </div>
+
+    <!-- Truy cập nhanh -->
+    <div class="info-card">
+      <h2>⚡ Truy cập nhanh</h2>
+      <div class="quick-links">
+        <a href="/my-bookings.html" class="quick-link">
+          <div class="ql-icon">🏸</div>
+          <div class="ql-text">
+            <strong>Sân đã đặt</strong>
+            <span>Xem lịch sử đặt sân</span>
+          </div>
+        </a>
+        <a href="/cart.html" class="quick-link">
+          <div class="ql-icon">🛒</div>
+          <div class="ql-text">
+            <strong>Giỏ hàng</strong>
+            <span>Xem sản phẩm đã chọn</span>
+          </div>
+        </a>
+        <a href="/my-orders.html" class="quick-link">
+          <div class="ql-icon">📋</div>
+          <div class="ql-text">
+            <strong>Mặt hàng đã đặt</strong>
+            <span>Lịch sử đặt hàng cửa hàng</span>
+          </div>
+        </a>
+        <a href="/courts.html" class="quick-link">
+          <div class="ql-icon">🏟️</div>
+          <div class="ql-text">
+            <strong>Đặt sân</strong>
+            <span>Chọn sân và khung giờ</span>
+          </div>
+        </a>
+        <a href="/products.html" class="quick-link">
+          <div class="ql-icon">🛍️</div>
+          <div class="ql-text">
+            <strong>Cửa hàng</strong>
+            <span>Mua cầu, nước, đồ ăn</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Đăng xuất -->
+    <button class="logout-btn" onclick="confirmLogout()">
+      🚪 Đăng xuất khỏi tài khoản
+    </button>
+
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<div id="toast-container"></div>
+
+<script src="/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const user = getCurrentUser();
+
+  if (!user) {
+    document.getElementById('accessDenied').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('profilePage').style.display = 'block';
+
+  // Avatar
+  const initial = (user.fullName || user.email || 'U').charAt(0).toUpperCase();
+  document.getElementById('avatarEl').textContent = initial;
+
+  // Hero
+  document.getElementById('fullNameEl').textContent = user.fullName || 'Người dùng';
+
+  const roleMap = {
+    ADMIN:    '👑 Quản trị viên',
+    STAFF:    '🛠️ Nhân viên',
+    CUSTOMER: '🧍 Khách hàng',
+  };
+  document.getElementById('roleBadgeEl').textContent = roleMap[user.role] || user.role;
+
+  // Info rows
+  document.getElementById('infoName').textContent  = user.fullName  || '—';
+  document.getElementById('infoEmail').textContent = user.email     || '—';
+  document.getElementById('infoPhone').textContent = user.phone     || '—';
+  document.getElementById('infoRole').textContent  = roleMap[user.role] || user.role || '—';
+});
+
+function confirmLogout() {
+  if (confirm('Bạn có chắc muốn đăng xuất không?')) logout();
+}
+</script>
+</body>
+</html>

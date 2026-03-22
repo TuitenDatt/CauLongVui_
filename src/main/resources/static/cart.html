@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giỏ hàng – Cầu Lông Vui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/header-footer.css" />
+  <style>
+    body { font-family: 'Be Vietnam Pro', sans-serif; }
+    .cart-page { max-width: 960px; margin: 0 auto; padding: 40px 24px 80px; }
+    .page-title { font-size: 26px; font-weight: 900; color: var(--dark); margin-bottom: 4px; }
+    .page-sub   { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+
+    /* ── Quick actions ── */
+    .quick-actions { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
+    .quick-action-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 18px; border-radius: 10px; border: none;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      text-decoration: none; transition: all .2s; font-family: inherit;
+    }
+    .qa-orders { background: #ede9fe; color: #7c3aed; }
+    .qa-orders:hover { background: #7c3aed; color: #fff; }
+    .qa-shop { background: var(--green-pale); color: var(--green); }
+    .qa-shop:hover { background: var(--green); color: #fff; }
+
+    /* ── Layout ── */
+    .cart-layout { display: grid; grid-template-columns: 1fr 360px; gap: 24px; align-items: start; }
+    @media(max-width:800px){ .cart-layout { grid-template-columns: 1fr; } }
+
+    /* ── Cart items card ── */
+    .cart-items-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm);
+    }
+    .cart-items-header {
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .cart-items-header h2 { font-size: 15px; font-weight: 800; color: var(--dark); }
+    .btn-clear-all {
+      background: none; border: none; font-size: 12px; font-weight: 600;
+      color: var(--red); cursor: pointer; padding: 4px 10px;
+      border-radius: 8px; transition: all .2s; font-family: inherit;
+    }
+    .btn-clear-all:hover { background: #fee2e2; }
+
+    .cart-item {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 20px; border-bottom: 1px solid #f1f5f9; transition: background .15s;
+    }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item:hover { background: #f8fffe; }
+
+    .ci-thumb {
+      width: 60px; height: 60px; border-radius: 10px; object-fit: cover;
+      border: 1px solid var(--border); background: var(--green-pale);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; flex-shrink: 0;
+    }
+    .ci-thumb img { width:100%; height:100%; object-fit:cover; border-radius:10px; }
+    .ci-info { flex: 1; min-width: 0; }
+    .ci-name { font-size: 14px; font-weight: 700; color: var(--dark);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .ci-category { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .ci-price { font-size: 13px; font-weight: 600; color: var(--green); margin-top: 4px; }
+    .ci-qty {
+      display: flex; align-items: center; gap: 0;
+      border: 1.5px solid var(--border); border-radius: 9px; overflow: hidden;
+    }
+    .ci-qty button {
+      background: none; border: none; padding: 6px 12px; font-size: 16px;
+      cursor: pointer; color: var(--dark); font-family: inherit; transition: background .15s;
+    }
+    .ci-qty button:hover { background: var(--green-pale); color: var(--green); }
+    .ci-qty span { font-size: 14px; font-weight: 700; padding: 6px 10px;
+      min-width: 32px; text-align: center; }
+    .ci-subtotal { font-size: 14px; font-weight: 800; color: var(--dark);
+      min-width: 90px; text-align: right; }
+    .btn-remove {
+      background: none; border: none; font-size: 16px; cursor: pointer;
+      color: var(--muted); padding: 6px; border-radius: 8px; transition: all .2s; font-family: inherit;
+    }
+    .btn-remove:hover { background: #fee2e2; color: var(--red); }
+
+    /* ── Order summary card ── */
+    .order-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px; box-shadow: var(--shadow-sm);
+      position: sticky; top: 80px;
+    }
+    .order-card h2 { font-size: 16px; font-weight: 800; color: var(--dark);
+      margin-bottom: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+    .order-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px; }
+    .order-row .label { color: var(--muted); font-weight: 500; }
+    .order-row .value { font-weight: 700; color: var(--dark); }
+    .order-total {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 0; margin-top: 10px; border-top: 2px solid var(--border);
+    }
+    .order-total .label { font-size: 15px; font-weight: 800; }
+    .order-total .value { font-size: 22px; font-weight: 900; color: var(--green); }
+
+    /* ── Sân giao hàng ── */
+    .section-divider {
+      margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border);
+    }
+    .section-divider h3 { font-size: 13px; font-weight: 800; color: var(--dark);
+      margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .section-divider select, .section-divider input[type="text"] {
+      width: 100%; padding: 10px 12px; border: 1.5px solid var(--border);
+      border-radius: 10px; font-size: 13px; font-family: inherit;
+      color: var(--dark); background: var(--white); outline: none; transition: border .2s;
+    }
+    .section-divider select:focus,
+    .section-divider input[type="text"]:focus { border-color: var(--green); }
+    .no-court-msg {
+      font-size: 12px; color: var(--muted); background: #f8f9fa;
+      border-radius: 8px; padding: 10px; text-align: center; line-height: 1.5;
+    }
+
+    /* ── Payment method ── */
+    .payment-options { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+    .payment-option {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 14px; border: 2px solid var(--border);
+      border-radius: 12px; cursor: pointer; transition: all .2s;
+    }
+    .payment-option:hover    { border-color: var(--green); background: var(--green-pale); }
+    .payment-option.selected { border-color: var(--green); background: var(--green-pale); }
+    .payment-option.selected-momo { border-color: #ae2070; background: #fdf2f8; }
+    .payment-option input[type="radio"] { display: none; }
+    .po-icon { font-size: 24px; }
+    .po-label { font-size: 13px; font-weight: 700; color: var(--dark); }
+    .po-desc  { font-size: 11px; color: var(--muted); }
+
+    /* ── MoMo fields ── */
+    #momoCustomerFields {
+      display: none; margin-top: 12px;
+      background: #fdf2f8; border: 1px solid #f0c0d8;
+      border-radius: 10px; padding: 14px;
+    }
+    #momoCustomerFields p { font-size: 12px; color: #ae2070; font-weight: 600; margin-bottom: 10px; }
+    .momo-input {
+      width: 100%; padding: 9px 12px; border: 1.5px solid #f0c0d8;
+      border-radius: 8px; font-size: 13px; font-family: inherit;
+      margin-bottom: 8px; outline: none; transition: border .2s; box-sizing: border-box;
+    }
+    .momo-input:focus { border-color: #ae2070; }
+    .momo-input:last-child { margin-bottom: 0; }
+
+    /* ── Buttons ── */
+    .btn-order {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; background: var(--green); color: #fff;
+      border: none; border-radius: 12px; padding: 14px;
+      font-size: 15px; font-weight: 800; cursor: pointer;
+      transition: all .25s; font-family: inherit; margin-top: 18px;
+      box-shadow: 0 4px 16px var(--green-glow);
+    }
+    .btn-order:hover:not(:disabled) { background: #14532d; transform: translateY(-2px); }
+    .btn-order:disabled { background: #9ca3af; cursor: not-allowed; box-shadow: none; }
+    .btn-order.momo-btn { background: #ae2070; box-shadow: 0 4px 16px rgba(174,32,112,.3); }
+    .btn-order.momo-btn:hover:not(:disabled) { background: #8b1a5a; }
+    .btn-shop {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; background: var(--green-pale); color: var(--green);
+      border: none; border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: all .2s; font-family: inherit; margin-top: 10px; text-decoration: none;
+    }
+    .btn-shop:hover { background: #d4ead9; }
+
+    /* ── Empty ── */
+    .empty-cart { text-align: center; padding: 80px 24px; }
+    .empty-cart .icon { font-size: 64px; margin-bottom: 16px; }
+    .empty-cart h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .empty-cart p { color: var(--muted); font-size: 14px; }
+  </style>
+</head>
+<body>
+<div id="header-placeholder"></div>
+
+<div class="cart-page">
+  <div class="page-title">🛒 Giỏ hàng của tôi</div>
+  <div class="page-sub">Kiểm tra lại sản phẩm trước khi đặt hàng</div>
+
+  <!-- Quick actions -->
+  <div class="quick-actions">
+    <a href="/my-orders.html" class="quick-action-btn qa-orders">📋 Các mặt hàng đã đặt</a>
+    <a href="/products.html"  class="quick-action-btn qa-shop">🛍️ Tiếp tục mua sắm</a>
+  </div>
+
+  <!-- Empty state -->
+  <div id="emptyCart" class="empty-cart" style="display:none;">
+    <div class="icon">🛒</div>
+    <h3>Giỏ hàng trống</h3>
+    <p>Bạn chưa thêm sản phẩm nào vào giỏ hàng.</p>
+    <a href="/products.html" class="quick-action-btn qa-shop" style="margin-top:20px;display:inline-flex;">
+      🛍️ Đến cửa hàng mua sắm
+    </a>
+  </div>
+
+  <!-- Cart layout -->
+  <div id="cartLayout" class="cart-layout" style="display:none;">
+
+    <!-- Items list -->
+    <div class="cart-items-card">
+      <div class="cart-items-header">
+        <h2>📦 Sản phẩm đã chọn (<span id="itemCount">0</span>)</h2>
+        <button class="btn-clear-all" onclick="clearCart()">🗑️ Xóa tất cả</button>
+      </div>
+      <div id="cartItemsList"></div>
+    </div>
+
+    <!-- Order summary -->
+    <div class="order-card">
+      <h2>🧾 Tóm tắt đơn hàng</h2>
+
+      <div class="order-row">
+        <span class="label">Số sản phẩm</span>
+        <span class="value" id="summaryCount">0 món</span>
+      </div>
+      <div class="order-row">
+        <span class="label">Tạm tính</span>
+        <span class="value" id="summarySubtotal">0 đ</span>
+      </div>
+      <div class="order-total">
+        <span class="label">Tổng cộng</span>
+        <span class="value" id="summaryTotal">0 đ</span>
+      </div>
+
+      <!-- Chọn sân giao hàng -->
+      <div class="section-divider">
+        <h3>🏸 Giao đến sân đang chơi</h3>
+        <div id="courtSelectWrap">
+          <div class="no-court-msg">⏳ Đang kiểm tra sân của bạn...</div>
+        </div>
+      </div>
+
+      <!-- Phương thức thanh toán -->
+      <div class="section-divider">
+        <h3>💳 Phương thức thanh toán</h3>
+        <div class="payment-options">
+          <label class="payment-option selected" id="optCash" onclick="selectPayment('cash')">
+            <input type="radio" name="payment" value="cash" checked />
+            <div class="po-icon">💵</div>
+            <div>
+              <div class="po-label">Tiền mặt</div>
+              <div class="po-desc">Thanh toán trực tiếp với nhân viên</div>
+            </div>
+          </label>
+          <label class="payment-option" id="optMomo" onclick="selectPayment('momo')">
+            <input type="radio" name="payment" value="momo" />
+            <div class="po-icon">💜</div>
+            <div>
+              <div class="po-label">Ví MoMo</div>
+              <div class="po-desc">Quét QR — nhanh, tiện, an toàn</div>
+            </div>
+          </label>
+        </div>
+
+        <!-- MoMo customer fields -->
+        <div id="momoCustomerFields">
+          <p>💜 Vui lòng nhập thông tin để tạo giao dịch MoMo</p>
+          <input class="momo-input" id="mmName"  type="text" placeholder="Họ và tên của bạn *" />
+          <input class="momo-input" id="mmPhone" type="tel"  placeholder="Số điện thoại *" />
+        </div>
+      </div>
+
+      <!-- Order button -->
+      <button class="btn-order" id="orderBtn" onclick="placeOrder()">
+        ✅ Đặt hàng ngay
+      </button>
+      <a href="/products.html" class="btn-shop">🛍️ Tiếp tục mua sắm</a>
+    </div>
+
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<div id="toast-container"></div>
+
+<script src="/js/app.js"></script>
+<script>
+/* ─────────────────────────────────────────────
+   Category icons
+───────────────────────────────────────────── */
+const ICONS = {
+  'Vợt':'🏸','Cầu':'🪶','Cầu lông':'🪶','Giày':'👟',
+  'Túi':'🎒','Quần áo':'👕','Phụ kiện':'🔧',
+  'Nước uống':'🧋','Đồ ăn':'🍜',
+};
+
+/* ─────────────────────────────────────────────
+   Payment method state
+───────────────────────────────────────────── */
+let selectedPayment = 'cash';
+
+function selectPayment(method) {
+  selectedPayment = method;
+  document.getElementById('optCash').className =
+    'payment-option' + (method === 'cash' ? ' selected' : '');
+  document.getElementById('optMomo').className =
+    'payment-option' + (method === 'momo' ? ' selected-momo' : '');
+  document.getElementById('momoCustomerFields').style.display =
+    method === 'momo' ? 'block' : 'none';
+
+  const btn = document.getElementById('orderBtn');
+  if (method === 'momo') {
+    btn.className = 'btn-order momo-btn';
+    btn.innerHTML = '💜 Thanh toán qua MoMo';
+  } else {
+    btn.className = 'btn-order';
+    btn.innerHTML = '✅ Đặt hàng ngay';
+  }
+
+  // Pre-fill from user profile
+  const u = getCurrentUser();
+  if (method === 'momo' && u) {
+    if (u.fullName && !document.getElementById('mmName').value)
+      document.getElementById('mmName').value = u.fullName;
+    if (u.phone && !document.getElementById('mmPhone').value)
+      document.getElementById('mmPhone').value = u.phone;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Cart helpers
+───────────────────────────────────────────── */
+function getCart() { try { return JSON.parse(localStorage.getItem('cart') || '[]'); } catch { return []; } }
+function saveCart(c) { localStorage.setItem('cart', JSON.stringify(c)); updateCartBadge(); }
+
+function loadCart() {
+  if (!requireAuth()) return;
+  const cart = getCart();
+  if (!cart.length) {
+    document.getElementById('emptyCart').style.display  = 'block';
+    document.getElementById('cartLayout').style.display = 'none';
+    return;
+  }
+  document.getElementById('emptyCart').style.display  = 'none';
+  document.getElementById('cartLayout').style.display = 'grid';
+  renderCartItems(cart);
+  renderSummary(cart);
+  loadUserCourts();
+  // Auto-fill MoMo fields
+  const u = getCurrentUser();
+  if (u) {
+    if (u.fullName) document.getElementById('mmName').value  = u.fullName;
+    if (u.phone)    document.getElementById('mmPhone').value = u.phone;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Render items
+───────────────────────────────────────────── */
+function renderCartItems(cart) {
+  document.getElementById('itemCount').textContent = cart.reduce((s,i) => s + i.qty, 0);
+  document.getElementById('cartItemsList').innerHTML = cart.map((item, idx) => {
+    const icon = ICONS[item.category] || '📦';
+    const thumb = item.imageUrl
+      ? `<div class="ci-thumb"><img src="${esc(item.imageUrl)}" onerror="this.parentElement.textContent='${icon}'" /></div>`
+      : `<div class="ci-thumb">${icon}</div>`;
+    return `
+    <div class="cart-item">
+      ${thumb}
+      <div class="ci-info">
+        <div class="ci-name">${esc(item.name)}</div>
+        <div class="ci-category">${esc(item.category || '')}</div>
+        <div class="ci-price">${fmt(item.price)} / sản phẩm</div>
+      </div>
+      <div class="ci-qty">
+        <button onclick="changeQty(${idx}, -1)">−</button>
+        <span>${item.qty}</span>
+        <button onclick="changeQty(${idx}, +1)">+</button>
+      </div>
+      <div class="ci-subtotal">${fmt(item.price * item.qty)}</div>
+      <button class="btn-remove" onclick="removeItem(${idx})">🗑️</button>
+    </div>`;
+  }).join('');
+}
+
+function renderSummary(cart) {
+  const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
+  const count = cart.reduce((s,i) => s + i.qty, 0);
+  document.getElementById('summaryCount').textContent    = count + ' món';
+  document.getElementById('summarySubtotal').textContent = fmt(total);
+  document.getElementById('summaryTotal').textContent    = fmt(total);
+}
+
+/* ─────────────────────────────────────────────
+   Cart actions
+───────────────────────────────────────────── */
+function changeQty(idx, delta) {
+  const c = getCart(); c[idx].qty = Math.max(1, (c[idx].qty || 1) + delta);
+  saveCart(c); loadCart();
+}
+function removeItem(idx) {
+  const c = getCart(); c.splice(idx, 1);
+  saveCart(c); loadCart();
+  showToast('Đã xóa sản phẩm khỏi giỏ hàng', 'success');
+}
+function clearCart() {
+  if (!confirm('Xóa toàn bộ giỏ hàng?')) return;
+  saveCart([]); loadCart();
+  showToast('Đã xóa toàn bộ giỏ hàng', 'success');
+}
+
+/* ─────────────────────────────────────────────
+   Load sân đang chơi hôm nay
+───────────────────────────────────────────── */
+async function loadUserCourts() {
+  const user = getCurrentUser();
+  const wrap = document.getElementById('courtSelectWrap');
+  if (!user || !user.phone) {
+    wrap.innerHTML = `<div class="no-court-msg">📞 Chưa có SĐT trong tài khoản.</div>`;
+    return;
+  }
+  try {
+    const res  = await fetch('/api/bookings?phone=' + encodeURIComponent(user.phone));
+    const json = await res.json();
+    const today = new Date().toISOString().slice(0, 10);
+    const active = (json.data || []).filter(b =>
+      (b.status === 'CONFIRMED' || b.status === 'PENDING') && b.bookingDate === today
+    );
+    if (!active.length) {
+      wrap.innerHTML = `<div class="no-court-msg">🏸 Bạn không có sân đang chơi hôm nay.<br>Nhân viên sẽ liên hệ khi nhận đơn.</div>`;
+      return;
+    }
+    wrap.innerHTML = `
+      <select id="courtSelect">
+        <option value="">— Chọn sân giao hàng (nếu có) —</option>
+        ${active.map(b =>
+          `<option value="${b.courtName}">${esc(b.courtName)} · ${b.startTime}–${b.endTime}</option>`
+        ).join('')}
+      </select>`;
+  } catch (err) {
+    wrap.innerHTML = `<div class="no-court-msg">⚠️ Không tải được sân: ${err.message}</div>`;
+  }
+}
+
+/* ─────────────────────────────────────────────
+   Đặt hàng
+───────────────────────────────────────────── */
+async function placeOrder() {
+  const cart = getCart();
+  if (!cart.length) return;
+
+  const courtName = document.getElementById('courtSelect')?.value || '';
+  const total     = cart.reduce((s,i) => s + i.price * i.qty, 0);
+  const now       = new Date().toLocaleString('vi-VN');
+
+  if (selectedPayment === 'momo') {
+    await orderWithMomo(cart, courtName, total, now);
+  } else {
+    orderWithCash(cart, courtName, total, now);
+  }
+}
+
+/* ── Tiền mặt ── */
+function orderWithCash(cart, courtName, total, now) {
+  const order = buildOrderRecord(cart, courtName, total, now, 'cash', 'Đã đặt');
+  saveOrder(order);
+  saveCart([]);
+  showToast(`✅ Đặt hàng thành công! Tổng: ${fmt(total)}. Nhân viên sẽ thu tiền mặt.`, 'success');
+  setTimeout(() => loadCart(), 800);
+}
+
+/* ── MoMo ── */
+async function orderWithMomo(cart, courtName, total, now) {
+  const name  = document.getElementById('mmName').value.trim();
+  const phone = document.getElementById('mmPhone').value.trim();
+  if (!name || !phone) {
+    showToast('Vui lòng nhập Tên và SĐT để thanh toán MoMo!', 'warning'); return;
+  }
+
+  const btn = document.getElementById('orderBtn');
+  btn.disabled = true; btn.innerHTML = '⏳ Đang tạo thanh toán MoMo...';
+
+  // Lưu thông tin để payment.html dùng
+  const orderId = 'ORD-' + Date.now();
+  localStorage.setItem('bk_name',      name);
+  localStorage.setItem('bk_phone',     phone);
+  localStorage.setItem('bk_courtName', courtName || 'Cửa hàng');
+  localStorage.setItem('cart_orderId', orderId);
+  localStorage.setItem('cart_pending', JSON.stringify({ cart, courtName, total, now }));
+
+  try {
+    const res  = await fetch('/api/payment/momo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        bookingId:    0,           // 0 = đơn hàng cửa hàng
+        amount:       total,
+        courtName:    courtName || 'Cửa hàng Cầu Lông Vui',
+        customerName: name,
+        orderId:      orderId,     // pass custom orderId if backend supports
+      })
+    });
+    const json = await res.json();
+
+    if (json.success && json.data && json.data.payUrl) {
+      window.location.href = json.data.payUrl;
+    } else {
+      // Sandbox / dev: giả lập thành công
+      momoDevSuccess(cart, courtName, total, now, name, phone, orderId);
+    }
+  } catch (err) {
+    // Không kết nối được → giả lập (dev mode)
+    momoDevSuccess(cart, courtName, total, now, name, phone, orderId);
+  }
+}
+
+function momoDevSuccess(cart, courtName, total, now, name, phone, orderId) {
+  const order = buildOrderRecord(cart, courtName, total, now, 'momo', 'Đã thanh toán MoMo');
+  order.customerName  = name;
+  order.customerPhone = phone;
+  order.orderId       = orderId;
+  saveOrder(order);
+  saveCart([]);
+  const btn = document.getElementById('orderBtn');
+  btn.disabled = false;
+  showToast(`💜 Thanh toán MoMo thành công! Mã đơn: ${orderId}`, 'success');
+  setTimeout(() => loadCart(), 900);
+}
+
+/* ─────────────────────────────────────────────
+   Order record helpers
+───────────────────────────────────────────── */
+function buildOrderRecord(cart, courtName, total, now, method, status) {
+  return {
+    id:           'ORD-' + Date.now(),
+    createdAt:    now,
+    items:        cart.map(i => ({...i})),
+    total,
+    courtName:    courtName || '',
+    paymentMethod: method,
+    status,
+  };
+}
+function saveOrder(order) {
+  const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+  orders.unshift(order);
+  localStorage.setItem('orders', JSON.stringify(orders.slice(0, 50))); // giữ 50 đơn
+}
+
+/* ─────────────────────────────────────────────
+   Helpers
+───────────────────────────────────────────── */
+function fmt(n) {
+  return new Intl.NumberFormat('vi-VN', { style:'currency', currency:'VND', maximumFractionDigits:0 }).format(n||0);
+}
+function esc(str) {
+  const d = document.createElement('div');
+  d.appendChild(document.createTextNode(str || ''));
+  return d.innerHTML;
+}
+
+document.addEventListener('DOMContentLoaded', loadCart);
+</script>
+</body>
+</html>

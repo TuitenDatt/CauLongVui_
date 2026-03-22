@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lịch sử đặt hàng – Cầu Lông Vui</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/header-footer.css" />
+  <style>
+    body { font-family: 'Be Vietnam Pro', sans-serif; }
+    .orders-page { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+    .page-title { font-size: 26px; font-weight: 900; color: var(--dark); margin-bottom: 4px; }
+    .page-sub   { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+
+    /* ── Back link ── */
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 600; color: var(--green);
+      text-decoration: none; margin-bottom: 24px;
+      padding: 8px 16px; background: var(--green-pale);
+      border-radius: 10px; transition: all .2s;
+    }
+    .back-link:hover { background: #d4ead9; }
+
+    /* ── Clear ── */
+    .toolbar { display: flex; justify-content: flex-end; margin-bottom: 16px; }
+    .btn-clear-history {
+      background: none; border: 1.5px solid var(--border); font-size: 12px;
+      font-weight: 600; color: var(--red); cursor: pointer; padding: 7px 14px;
+      border-radius: 8px; transition: all .2s; font-family: inherit;
+    }
+    .btn-clear-history:hover { background: #fee2e2; border-color: var(--red); }
+
+    /* ── Order card ── */
+    .order-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 16px; margin-bottom: 20px;
+      box-shadow: var(--shadow-sm); overflow: hidden;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .order-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+    .order-header {
+      padding: 16px 20px; background: #f8f9fa;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px;
+    }
+    .order-id { font-size: 13px; font-weight: 700; color: var(--dark); }
+    .order-date { font-size: 12px; color: var(--muted); }
+    .order-status-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;
+    }
+    .status-cash { background: #dcfce7; color: #15803d; }
+    .status-momo { background: #fdf2f8; color: #ae2070; }
+
+    .order-meta {
+      padding: 12px 20px; display: flex; gap: 20px; flex-wrap: wrap;
+      border-bottom: 1px solid #f1f5f9; background: #fafbfc;
+    }
+    .order-meta-item { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+    .order-meta-item strong { color: var(--dark); }
+
+    /* ── Items in order ── */
+    .order-items { padding: 0; }
+    .order-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 20px; border-bottom: 1px solid #f1f5f9;
+    }
+    .order-item:last-child { border-bottom: none; }
+
+    .oi-thumb {
+      width: 48px; height: 48px; border-radius: 10px; flex-shrink: 0;
+      background: var(--green-pale); display: flex; align-items: center;
+      justify-content: center; font-size: 22px;
+      border: 1px solid var(--border); overflow: hidden;
+    }
+    .oi-thumb img { width:100%; height:100%; object-fit:cover; }
+    .oi-info { flex: 1; min-width: 0; }
+    .oi-name { font-size: 14px; font-weight: 700; color: var(--dark); }
+    .oi-desc { font-size: 12px; color: var(--muted); margin-top: 1px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 400px; }
+    .oi-meta { font-size: 12px; color: var(--muted); margin-top: 3px; }
+    .oi-subtotal { font-size: 14px; font-weight: 800; color: var(--green);
+      white-space: nowrap; text-align: right; }
+
+    /* ── Order footer ── */
+    .order-footer {
+      padding: 14px 20px; background: #f8f9fa;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .order-total-label { font-size: 14px; font-weight: 600; color: var(--muted); }
+    .order-total-value { font-size: 20px; font-weight: 900; color: var(--green); }
+
+    /* ── Empty ── */
+    .empty-state { text-align: center; padding: 80px 24px; }
+    .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .empty-state p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+<div id="header-placeholder"></div>
+
+<div class="orders-page">
+  <a href="/cart.html" class="back-link">← Quay lại giỏ hàng</a>
+
+  <div class="page-title">📋 Các mặt hàng đã đặt</div>
+  <div class="page-sub">Lịch sử đặt hàng trong cửa hàng Cầu Lông Vui</div>
+
+  <!-- Toolbar -->
+  <div class="toolbar" id="toolbar" style="display:none;">
+    <button class="btn-clear-history" onclick="clearHistory()">🗑️ Xóa lịch sử</button>
+  </div>
+
+  <!-- Orders list -->
+  <div id="ordersList"></div>
+</div>
+
+<div id="footer-placeholder"></div>
+<div id="toast-container"></div>
+
+<script src="/js/app.js"></script>
+<script>
+const ICONS = {
+  'Vợt':'🏸','Cầu':'🪶','Cầu lông':'🪶','Giày':'👟',
+  'Túi':'🎒','Quần áo':'👕','Phụ kiện':'🔧',
+  'Nước uống':'🧋','Đồ ăn':'🍜',
+};
+
+function getOrders() {
+  try { return JSON.parse(localStorage.getItem('orders') || '[]'); } catch { return []; }
+}
+
+function fmt(n) {
+  return new Intl.NumberFormat('vi-VN', { style:'currency', currency:'VND', maximumFractionDigits:0 }).format(n||0);
+}
+function esc(str) {
+  const d = document.createElement('div');
+  d.appendChild(document.createTextNode(str || ''));
+  return d.innerHTML;
+}
+
+function clearHistory() {
+  if (!confirm('Xóa toàn bộ lịch sử đặt hàng?')) return;
+  localStorage.removeItem('orders');
+  renderOrders();
+  showToast('Đã xóa lịch sử đặt hàng', 'success');
+}
+
+function renderOrders() {
+  const orders = getOrders();
+  const list   = document.getElementById('ordersList');
+  const toolbar = document.getElementById('toolbar');
+
+  if (!orders.length) {
+    toolbar.style.display = 'none';
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">🛒</div>
+        <h3>Chưa có đơn hàng nào</h3>
+        <p>Bạn chưa đặt hàng nào từ cửa hàng.</p>
+        <a href="/products.html"
+           style="display:inline-flex;align-items:center;gap:8px;background:var(--green);
+                  color:#fff;padding:12px 24px;border-radius:12px;text-decoration:none;
+                  font-weight:700;font-size:14px;">
+          🛍️ Mua sắm ngay
+        </a>
+      </div>`;
+    return;
+  }
+
+  toolbar.style.display = 'flex';
+
+  list.innerHTML = orders.map(order => {
+    const isMomo = order.paymentMethod === 'momo';
+    const statusClass = isMomo ? 'status-momo' : 'status-cash';
+    const statusLabel = isMomo ? '💜 MoMo' : '💵 Tiền mặt';
+
+    const itemsHtml = (order.items || []).map(item => {
+      const icon = ICONS[item.category] || '📦';
+      const thumb = item.imageUrl
+        ? `<div class="oi-thumb"><img src="${esc(item.imageUrl)}" onerror="this.parentElement.textContent='${icon}'" /></div>`
+        : `<div class="oi-thumb">${icon}</div>`;
+      return `
+        <div class="order-item">
+          ${thumb}
+          <div class="oi-info">
+            <div class="oi-name">${esc(item.name)}</div>
+            <div class="oi-desc">${esc(item.description || item.category || '—')}</div>
+            <div class="oi-meta">${fmt(item.price)} × ${item.qty} ${item.category ? `· ${esc(item.category)}` : ''}</div>
+          </div>
+          <div class="oi-subtotal">${fmt(item.price * item.qty)}</div>
+        </div>`;
+    }).join('');
+
+    const courtInfo = order.courtName
+      ? `<div class="order-meta-item">🏸 Giao tới sân: <strong>${esc(order.courtName)}</strong></div>`
+      : `<div class="order-meta-item">🏪 Nhân viên sẽ liên hệ xác nhận</div>`;
+
+    const customerInfo = order.customerName
+      ? `<div class="order-meta-item">👤 ${esc(order.customerName)} · 📞 ${esc(order.customerPhone || '')}</div>`
+      : '';
+
+    return `
+      <div class="order-card">
+        <div class="order-header">
+          <div>
+            <div class="order-id">🧾 Mã đơn: ${esc(order.id)}</div>
+            <div class="order-date">🕐 ${esc(order.createdAt)}</div>
+          </div>
+          <span class="order-status-badge ${statusClass}">${statusLabel} · ${esc(order.status)}</span>
+        </div>
+        <div class="order-meta">
+          ${courtInfo}
+          ${customerInfo}
+          <div class="order-meta-item">📦 ${(order.items||[]).reduce((s,i)=>s+i.qty,0)} món</div>
+        </div>
+        <div class="order-items">${itemsHtml}</div>
+        <div class="order-footer">
+          <span class="order-total-label">Tổng đơn hàng</span>
+          <span class="order-total-value">${fmt(order.total)}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  requireAuth();
+  renderOrders();
+});
+</script>
+</body>
+</html>
