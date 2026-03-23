@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vợt đã thuê – Cầu Lông Vui</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/header-footer.css" />
+  <style>
+    body { font-family: 'Be Vietnam Pro', sans-serif; background: #f8fafc; }
+    .orders-page { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+    .page-title { font-size: 26px; font-weight: 900; color: var(--dark); margin-bottom: 4px; }
+    .page-sub   { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 600; color: var(--green);
+      text-decoration: none; margin-bottom: 24px;
+      padding: 8px 16px; background: var(--green-pale);
+      border-radius: 10px; transition: all .2s;
+    }
+    .back-link:hover { background: #d4ead9; }
+
+    .order-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 16px; margin-bottom: 20px;
+      box-shadow: var(--shadow-sm); overflow: hidden;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .order-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+    .order-header {
+      padding: 16px 20px; background: #f8f9fa;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px;
+    }
+    .order-id { font-size: 13px; font-weight: 700; color: var(--dark); }
+    .order-date { font-size: 12px; color: var(--muted); }
+    .order-status-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700;
+    }
+    .status-CASH { background: #dcfce7; color: #15803d; }
+    .status-MOMO { background: #fdf2f8; color: #ae2070; }
+    
+    .status-label { font-size: 12px; font-weight: 800; padding: 4px 10px; border-radius: 6px; }
+    .label-PENDING { background: #fef9c3; color: #ca8a04; }
+    .label-PAID { background: #dcfce7; color: #16a34a; }
+    .label-RETURNED { background: #f1f5f9; color: #64748b; }
+
+    .order-meta {
+      padding: 12px 20px; display: flex; gap: 20px; flex-wrap: wrap;
+      border-bottom: 1px solid #f1f5f9; background: #fafbfc;
+    }
+    .order-meta-item { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+    .order-meta-item strong { color: var(--dark); }
+
+    .order-items { padding: 0; }
+    .order-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 20px; border-bottom: 1px solid #f1f5f9;
+    }
+    .order-item:last-child { border-bottom: none; }
+
+    .oi-thumb {
+      width: 48px; height: 48px; border-radius: 10px; flex-shrink: 0;
+      background: var(--green-pale); display: flex; align-items: center;
+      justify-content: center; font-size: 22px;
+      border: 1px solid var(--border); overflow: hidden;
+    }
+    .oi-info { flex: 1; min-width: 0; }
+    .oi-name { font-size: 14px; font-weight: 700; color: var(--dark); }
+    .oi-meta { font-size: 13px; color: var(--muted); margin-top: 3px; }
+    .oi-subtotal { font-size: 15px; font-weight: 800; color: var(--green); white-space: nowrap; text-align: right; }
+
+    .order-footer {
+      padding: 14px 20px; background: #f8f9fa; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .order-total-label { font-size: 14px; font-weight: 600; color: var(--muted); }
+    .order-total-value { font-size: 20px; font-weight: 900; color: var(--green); }
+
+    .orders-list-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; align-items: start;
+    }
+    @media (max-width: 768px) { .orders-list-grid { grid-template-columns: 1fr; } }
+    
+    .empty-state { text-align: center; padding: 80px 24px; grid-column: 1 / -1; }
+    .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .empty-state p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+<div id="header-placeholder"></div>
+
+<div class="orders-page">
+  <div class="page-title">🎾 Vợt đã thuê</div>
+  <div class="page-sub">Lịch sử thuê vợt của bạn, nhân viên sẽ kiểm tra dựa trên thông tin này.</div>
+
+  <!-- Toolbar -->
+  <div class="toolbar" id="toolbar" style="display:none; justify-content:flex-end; margin-bottom:16px;">
+    <button class="btn-clear-history" onclick="clearHistory()" style="background:none; border: 1.5px solid var(--border); font-size: 12px; font-weight: 600; color: var(--red); cursor: pointer; padding: 7px 14px; border-radius: 8px; transition: all .2s; font-family: inherit;">Xóa lịch sử</button>
+  </div>
+
+  <div id="ordersList" class="orders-list-grid">
+    <div style="text-align: center; padding: 40px; color: var(--muted);">Đang tải dữ liệu...</div>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<div id="toast-container"></div>
+
+<script src="/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  if(!requireAuth('/my-racket-rentals.html')) return;
+  await fetchAndRenderOrders();
+});
+
+function clearHistory() {
+  if (!confirm('Khách hàng có chắc chắn muốn xóa toàn bộ lịch sử thuê vợt trên thiết bị này?')) return;
+  localStorage.setItem('hideAllRacketRentalsBefore', new Date().toISOString());
+  fetchAndRenderOrders();
+  if (typeof showToast === 'function') showToast('Đã xóa lịch sử thuê vợt', 'success');
+}
+
+async function fetchAndRenderOrders() {
+  const user = getCurrentUser();
+  const list = document.getElementById('ordersList');
+  const toolbar = document.getElementById('toolbar');
+
+  try {
+    const allOrders = await fetchAPI('/v1/racket-rentals');
+    const hideBefore = localStorage.getItem('hideAllRacketRentalsBefore');
+    let myOrders = allOrders.filter(o => 
+      (o.customerPhone && o.customerPhone === user.phone) || 
+      (o.customerName && o.customerName === user.fullName)
+    );
+    
+    if (hideBefore) {
+      const hideDate = new Date(hideBefore);
+      myOrders = myOrders.filter(o => new Date(o.orderDate) > hideDate);
+    }
+    
+    // Sắp xếp mới nhất lên đầu
+    myOrders.sort((a,b) => new Date(b.orderDate) - new Date(a.orderDate));
+    
+    if (!myOrders.length) {
+      toolbar.style.display = 'none';
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="icon">🎾</div>
+          <h3>Chưa có dữ liệu thuê vợt</h3>
+          <p>Bạn chưa thuê cây vợt nào trong hệ thống, hoặc lịch sử của bạn đã được xóa.</p>
+          <a href="/rackets.html"
+             style="display:inline-flex;align-items:center;gap:8px;background:var(--green);
+                    color:#fff;padding:12px 24px;border-radius:12px;text-decoration:none;
+                    font-weight:700;font-size:14px;">
+            🎾 Xem danh sách vợt
+          </a>
+        </div>`;
+      return;
+    }
+
+    toolbar.style.display = 'flex';
+    list.innerHTML = myOrders.map(order => {
+      const isMomo = order.paymentMethod === 'MOMO';
+      const pClass = isMomo ? 'status-MOMO' : 'status-CASH';
+      const pLabel = isMomo ? 'MoMo' : 'Tiền mặt';
+      
+      const sLabel = order.status === 'PENDING' ? 'Đang thuê' : (order.status === 'PAID' ? 'Đã Thanh toán' : 'Trả hàng');
+      const sClass = `label-${order.status}`;
+
+      const itemsHtml = (order.items || []).map(item => {
+        const thumbHtml = item.imageUrl 
+            ? `<div class="oi-thumb" style="padding:0;"><img src="${esc(item.imageUrl)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.outerHTML='<div class=\\'oi-thumb\\'>🎾</div>'" /></div>`
+            : `<div class="oi-thumb">🎾</div>`;
+        return `
+          <div class="order-item">
+            ${thumbHtml}
+            <div class="oi-info">
+              <div class="oi-name">${esc(item.racketName)}</div>
+              <div class="oi-meta">${fmt(item.unitPrice)} × ${item.quantity} cái</div>
+            </div>
+            <div class="oi-subtotal">${fmt(item.unitPrice * item.quantity)}</div>
+          </div>`;
+      }).join('');
+
+      const courtInfo = order.courtName
+        ? `<div class="order-meta-item">Giao tới: <strong>${esc(order.courtName)}</strong></div>`
+        : `<div class="order-meta-item"><strong>Khách tự lấy/mang về</strong></div>`;
+
+      return `
+        <div class="order-card">
+          <div class="order-header">
+            <div>
+              <div class="order-id">Mã đơn: #${order.id}</div>
+              <div class="order-date">${new Date(order.orderDate).toLocaleString('vi-VN')}</div>
+            </div>
+            <div style="text-align: right;">
+              <span class="status-label ${sClass}" style="display:block;margin-bottom:6px;">${sLabel}</span>
+              <span class="order-status-badge ${pClass}">${pLabel}</span>
+            </div>
+          </div>
+          <div class="order-meta">
+            ${courtInfo}
+            <div class="order-meta-item">Người thuê: <strong>${esc(order.customerName)} (${esc(order.customerPhone)})</strong></div>
+          </div>
+          <div class="order-items">${itemsHtml}</div>
+          <div class="order-footer">
+            <span class="order-total-label">Tổng tiền cọc/thuê</span>
+            <span class="order-total-value">${fmt(order.totalAmount)}</span>
+          </div>
+        </div>`;
+    }).join('');
+    
+  } catch (err) {
+    list.innerHTML = `<div style="text-align: center; color: red; padding: 40px;">Lỗi tải dữ liệu: ${err.message}</div>`;
+  }
+}
+
+function fmt(n) { return new Intl.NumberFormat('vi-VN', { style:'currency', currency:'VND', maximumFractionDigits:0 }).format(n||0); }
+function esc(str) { const d = document.createElement('div'); d.appendChild(document.createTextNode(str || '')); return d.innerHTML; }
+</script>
+</body>
+</html>

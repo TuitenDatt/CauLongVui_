@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dịch vụ Thuê Vợt – Cầu Lông Vui</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/header-footer.css" />
+  <style>
+    body { font-family: 'Be Vietnam Pro', sans-serif; background: var(--bg); }
+    .page-hero { text-align: center; padding: 60px 20px 40px; background: linear-gradient(135deg, #16a34a 0%, #059669 100%); color: #fff; margin-bottom: 30px; }
+    .page-hero h1 { font-size: 36px; font-weight: 900; margin-bottom: 12px; }
+    .page-hero p { font-size: 16px; opacity: 0.9; max-width: 600px; margin: 0 auto; }
+    
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .racket-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; margin-bottom: 60px; }
+    
+    .racket-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: transform 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; border: 1px solid var(--border); }
+    .racket-card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.1); }
+    
+    .racket-img { width: 100%; height: 220px; object-fit: cover; background: #f8f9fa; }
+    .racket-img-placeholder { width: 100%; height: 220px; background: var(--green-pale); display: flex; align-items: center; justify-content: center; font-size: 64px; }
+    
+    .racket-info { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+    .racket-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 12px; align-self: flex-start; }
+    .badge-b { background: #e8f5f0; color: #16a34a; }
+    .badge-i { background: #e0e7ff; color: #4338ca; }
+    .badge-a { background: #fef9c3; color: #ca8a04; }
+    
+    .racket-name { font-size: 18px; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
+    .racket-desc { font-size: 13px; color: var(--muted); margin-bottom: 16px; flex: 1; }
+    .racket-price { font-size: 18px; font-weight: 900; color: var(--green); margin-bottom: 16px; }
+    
+    .racket-status { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; margin-bottom: 16px; }
+    .status-ok { color: #16a34a; }
+    .status-out { color: #dc2626; }
+    
+    .btn-rent { width: 100%; padding: 12px; border: none; border-radius: 10px; background: var(--green); color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; font-family: inherit; }
+    .btn-rent:hover:not(:disabled) { background: #14532d; }
+    .btn-rent:disabled { background: #9ca3af; cursor: not-allowed; }
+    
+    .floating-cart { position: fixed; bottom: 30px; right: 30px; background: var(--dark); color: #fff; border-radius: 30px; padding: 12px 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 12px; text-decoration: none; z-index: 99; transition: transform 0.2s; }
+    .floating-cart:hover { transform: translateY(-3px); }
+    .floating-cart .icon { font-size: 24px; }
+    .floating-cart .text { font-size: 15px; font-weight: 700; }
+    .floating-cart .badge { background: var(--green); color: #fff; padding: 2px 8px; border-radius: 20px; font-size: 13px; font-weight: 800; }
+  </style>
+</head>
+<body>
+<div id="header-placeholder"></div>
+
+<div class="page-hero">
+  <h1>Dịch vụ Thuê Vợt</h1>
+  <p>Cung cấp các dòng vợt từ cơ bản đến cao cấp, giúp bạn có trải nghiệm tốt nhất trên sân.</p>
+</div>
+
+<div class="container" id="mainContainer">
+  <div class="racket-grid" id="racketGrid">
+    <!-- Rendered via JS -->
+    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--muted);">Đang tải dữ liệu...</div>
+  </div>
+</div>
+
+<a href="/racket-cart.html" class="floating-cart" id="floatingCart" style="display:none;">
+  <span class="icon"></span>
+  <span class="text">Giỏ Thuê Vợt</span>
+  <span class="badge" id="rCartBadge">0</span>
+</a>
+
+<div id="footer-placeholder"></div>
+<div id="toast-container"></div>
+
+<script src="/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  updateRCartBadge();
+  await loadRackets();
+});
+
+async function loadRackets() {
+  try {
+    const rackets = await fetchAPI('/v1/rackets');
+    renderRackets(rackets);
+  } catch (err) {
+    document.getElementById('racketGrid').innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: red;">Lỗi tải dữ liệu: ${err.message}</div>`;
+  }
+}
+
+function renderRackets(rackets) {
+  const grid = document.getElementById('racketGrid');
+  if(!rackets.length) {
+    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px;">Hiện chưa có vợt cho thuê.</div>`;
+    return;
+  }
+  
+  grid.innerHTML = rackets.map(r => {
+    let badgeClass, badgeText;
+    if(r.racketType === 'BASIC') { badgeClass = 'badge-b'; badgeText = 'Vợt cơ bản'; }
+    else if(r.racketType === 'INTERMEDIATE') { badgeClass = 'badge-i'; badgeText = 'Vợt trung cấp'; }
+    else { badgeClass = 'badge-a'; badgeText = 'Vợt cao cấp'; }
+    
+    const isOutOfStock = r.stockQuantity <= 0;
+    const statusHtml = isOutOfStock 
+      ? `<div class="racket-status status-out">Hết vợt</div>`
+      : `<div class="racket-status status-ok">Còn hàng (${r.stockQuantity} chiếc)</div>`;
+      
+    const imgHtml = r.imageUrl 
+      ? `<img class="racket-img" src="${r.imageUrl}" alt="${r.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+      : '';
+    const placeholder = `<div class="racket-img-placeholder" style="${r.imageUrl?'display:none':''}">🎾</div>`;
+    
+    return `
+      <div class="racket-card">
+        ${imgHtml}${placeholder}
+        <div class="racket-info">
+          <span class="racket-badge ${badgeClass}">${badgeText}</span>
+          <div class="racket-name">${escapeHtml(r.name)}</div>
+          <div class="racket-desc">${escapeHtml(r.description || '')}</div>
+          <div class="racket-price">${formatCurrency(r.rentalPrice)} / buổi</div>
+          ${statusHtml}
+          <button class="btn-rent" ${isOutOfStock ? 'disabled' : ''} onclick="addToRCart(${r.id}, '${escapeQuote(r.name)}', ${r.rentalPrice}, '${r.imageUrl||''}', ${r.stockQuantity})">
+            ${isOutOfStock ? 'Hết hàng' : 'Chọn thuê'}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function addToRCart(id, name, price, img, maxQty) {
+  if(!requireAuth('/rackets.html')) return;
+  const cart = getRCart();
+  const existing = cart.find(x => x.racketId === id);
+  if (existing) {
+    if (existing.quantity >= maxQty) {
+      showToast(`Kho chỉ còn ${maxQty} cây vợt này!`, 'warning');
+      return;
+    }
+    existing.quantity += 1;
+    existing.maxQty = maxQty;
+  } else {
+    cart.push({ racketId: id, name, unitPrice: price, quantity: 1, imageUrl: img, maxQty: maxQty });
+  }
+  localStorage.setItem('racketCart', JSON.stringify(cart));
+  updateRCartBadge();
+  showToast(`Đã thêm ${name} vào giỏ thuê vợt.`, 'success');
+}
+
+function getRCart() {
+  try { return JSON.parse(localStorage.getItem('racketCart') || '[]'); } catch { return []; }
+}
+
+function updateRCartBadge() {
+  const cart = getRCart();
+  const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const fab = document.getElementById('floatingCart');
+  const badge = document.getElementById('rCartBadge');
+  if (count > 0) {
+    fab.style.display = 'flex';
+    badge.textContent = count;
+  } else {
+    fab.style.display = 'none';
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escapeQuote(str) {
+  if (!str) return '';
+  return String(str).replace(/'/g,"\\'").replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

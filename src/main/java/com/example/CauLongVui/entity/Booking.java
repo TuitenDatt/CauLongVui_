@@ -48,6 +48,13 @@ public class Booking {
     @Column
     private Double totalPrice;
 
+    @Builder.Default
+    @Column(name = "is_pass")
+    private Boolean isPass = false;
+
+    @Column
+    private Double passPrice;
+
     public enum BookingStatus {
         PENDING, CONFIRMED, CANCELLED, COMPLETED
     }

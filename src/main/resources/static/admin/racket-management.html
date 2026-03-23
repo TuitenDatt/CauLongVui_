@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản lý Dịch vụ Cho Thuê Vợt – Cầu Lông Vui</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/header-footer.css" />
+  <style>
+    body { font-family: 'Be Vietnam Pro', sans-serif; background: var(--bg); }
+    .mgmt-page { padding: 90px 0 60px; min-height: 100vh; }
+    .mgmt-container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .mgmt-header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px; margin-bottom: 28px;
+    }
+    .mgmt-title { font-size: 26px; font-weight: 900; color: var(--dark); }
+    .mgmt-title span { color: var(--green); }
+    .breadcrumb { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .breadcrumb a { color: var(--green); text-decoration: none; }
+    .stats-bar { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 24px; }
+    .stat-chip {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 18px; font-size: 13px;
+      font-weight: 600; color: var(--dark); display: flex; align-items: center; gap: 8px;
+    }
+    .stat-chip .val { font-size: 22px; font-weight: 900; color: var(--green); }
+    .toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
+    .toolbar input[type="text"] {
+      flex: 1; min-width: 200px; max-width: 340px;
+      padding: 10px 14px 10px 38px; border: 1.5px solid var(--border);
+      border-radius: 10px; font-size: 14px; outline: none; background: var(--white);
+    }
+    .toolbar input[type="text"]:focus { border-color: var(--green); }
+    .search-wrap { position: relative; }
+    .search-wrap::before {
+      content:'🔍'; position:absolute; left:12px;
+      top:50%; transform:translateY(-50%); font-size:13px;
+    }
+    .toolbar select {
+      padding: 10px 14px; border: 1.5px solid var(--border);
+      border-radius: 10px; font-size: 14px; background: var(--white);
+      font-family: inherit; outline: none; cursor: pointer;
+    }
+    .toolbar select:focus { border-color: var(--green); }
+    .table-wrap {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: #f8f9fa; }
+    th {
+      padding: 14px 16px; text-align: left; font-size: 12px; font-weight: 700;
+      color: var(--muted); text-transform: uppercase; letter-spacing: .5px;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 14px 16px; font-size: 14px; color: var(--dark);
+      border-bottom: 1px solid #f1f5f9; vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #f8fffe; }
+    .prod-thumb { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; border: 1px solid var(--border); background: #f1f5f9; }
+    .prod-thumb-placeholder {
+      width: 52px; height: 52px; border-radius: 10px; background: var(--green-pale);
+      display: flex; align-items: center; justify-content: center; font-size: 24px;
+      border: 1px solid var(--border); flex-shrink: 0;
+    }
+    .prod-name-cell { display: flex; align-items: center; gap: 12px; }
+    .prod-name-text { font-weight: 600; }
+    .prod-desc-text { font-size: 12px; color: var(--muted); margin-top: 2px;
+      max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .badge-basic { background: #e8f5f0; color: #16a34a; }
+    .badge-intermediate { background: #e0e7ff; color: #4338ca; }
+    .badge-advanced { background: #fef9c3; color: #ca8a04; }
+    .badge-stock-ok { background: #e8f5f0; color: #16a34a; }
+    .badge-stock-low { background: #fef9c3; color: #ca8a04; }
+    .badge-stock-out { background: #fee2e2; color: #dc2626; }
+    .action-btns { display: flex; gap: 8px; }
+    .btn-edit { background: #e8f5f0; color: var(--green); border: none; border-radius: 8px; padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; font-family: inherit; }
+    .btn-edit:hover { background: var(--green); color: #fff; }
+    .btn-del { background: #fee2e2; color: #dc2626; border: none; border-radius: 8px; padding: 6px 14px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all .2s; font-family: inherit; }
+    .btn-del:hover { background: #dc2626; color: #fff; }
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-state h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .empty-state p { color: var(--muted); font-size: 14px; }
+    .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-backdrop.open { display: flex; }
+    .modal { background: #fff; border-radius: 18px; width: 100%; max-width: 580px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.2); animation: modalIn .25s ease; }
+    @keyframes modalIn { from { opacity:0; transform:translateY(18px) scale(.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 22px 26px 18px; border-bottom: 1px solid var(--border); }
+    .modal-title { font-size: 18px; font-weight: 800; color: var(--dark); }
+    .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--muted); line-height: 1; transition: color .2s; padding: 4px; }
+    .modal-close:hover { color: var(--dark); }
+    .modal-body { padding: 22px 26px; }
+    .modal-footer { display: flex; gap: 12px; justify-content: flex-end; padding: 16px 26px; border-top: 1px solid var(--border); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 7px; }
+    .form-group label .required { color: #ef4444; margin-left: 2px; }
+    .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; font-family: inherit; outline: none; transition: border-color .2s; box-sizing: border-box; background: #fff; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(22,163,74,.08); }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .img-preview-wrap { margin-top: 10px; border-radius: 10px; overflow: hidden; border: 1.5px dashed var(--border); background: #f8f9fa; min-height: 120px; display: flex; align-items: center; justify-content: center; position: relative; }
+    .img-preview-wrap img { width: 100%; max-height: 200px; object-fit: cover; display: block; }
+    .img-preview-placeholder { text-align: center; padding: 20px; color: var(--muted); }
+    .img-preview-placeholder .icon { font-size: 32px; margin-bottom: 6px; }
+    .img-preview-placeholder p { font-size: 12px; }
+    .confirm-modal { max-width: 400px; }
+    .confirm-body { padding: 30px 26px; text-align: center; }
+    .confirm-icon { font-size: 52px; margin-bottom: 14px; }
+    .confirm-title { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+    .confirm-msg { color: var(--muted); font-size: 14px; }
+    .confirm-product-name { background: #fee2e2; color: #dc2626; border-radius: 8px; padding: 8px 14px; font-weight: 700; font-size: 14px; margin: 12px auto 0; max-width: fit-content; }
+    .btn { padding: 10px 22px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; border: none; transition: all .2s; font-family: inherit; }
+    .btn-primary { background: var(--green); color: #fff; }
+    .btn-primary:hover { background: #14532d; }
+    .btn-primary:disabled { background: #9ca3af; cursor: not-allowed; }
+    .btn-secondary { background: #f1f5f9; color: var(--dark); }
+    .btn-secondary:hover { background: #e2e8f0; }
+    .btn-danger { background: #dc2626; color: #fff; }
+    .btn-danger:hover { background: #b91c1c; }
+    .btn-add { display: flex; align-items: center; gap: 8px; background: var(--green); color: #fff; border: none; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all .2s; font-family: inherit; white-space: nowrap; }
+    .btn-add:hover { background: #14532d; transform: translateY(-1px); }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; margin-right: 6px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .access-denied { text-align: center; padding: 120px 24px; }
+    #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .toast { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-radius: 12px; min-width: 280px; font-size: 14px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.12); animation: toastIn .3s ease; }
+    @keyframes toastIn { from { opacity:0; transform:translateX(40px); } }
+    .toast.success { background: #16a34a; color: #fff; }
+    .toast.error   { background: #dc2626; color: #fff; }
+    .toast.warning { background: #d97706; color: #fff; }
+    .toast-icon { font-size: 18px; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+<div id="header-placeholder"></div>
+
+<div id="accessDenied" style="display:none;" class="mgmt-page">
+  <div class="access-denied">
+    <div style="font-size:64px">🚫</div>
+    <h2>Không có quyền truy cập</h2>
+    <p>Trang này chỉ dành cho Quản trị viên.</p>
+    <a href="/" class="btn btn-primary" style="display:inline-flex;margin-top:20px;text-decoration:none;">Về trang chủ</a>
+  </div>
+</div>
+
+<div id="mgmtPage" style="display:none;" class="mgmt-page">
+  <div class="mgmt-container">
+    <div class="mgmt-header">
+      <div>
+        <div class="breadcrumb">
+          <a href="/admin/admin.html">⚙️ Quản trị</a> › Quản lý Thuê Vợt
+        </div>
+        <h1 class="mgmt-title">🎾 Quản lý Dịch vụ <span>Thuê Vợt</span></h1>
+      </div>
+      <button class="btn-add" onclick="openAddModal()">
+        ＋ Thêm dòng vợt mới
+      </button>
+    </div>
+
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-chip"><span class="val" id="statTotal">—</span> Tổng dòng vợt</div>
+      <div class="stat-chip"><span class="val" id="statInStock">—</span> Còn hàng</div>
+      <div class="stat-chip"><span class="val" id="statLow">—</span> Sắp hết</div>
+      <div class="stat-chip"><span class="val" id="statOut">—</span> Hết hàng</div>
+    </div>
+
+    <div class="toolbar">
+      <div class="search-wrap">
+        <input type="text" id="searchInput" placeholder="Tìm tên vợt..." oninput="applyFilter()" />
+      </div>
+      <select id="filterCategory" onchange="applyFilter()">
+        <option value="">Tất cả loại vợt</option>
+        <option value="BASIC">Vợt cơ bản</option>
+        <option value="INTERMEDIATE">Vợt trung cấp</option>
+        <option value="ADVANCED">Vợt cao cấp</option>
+      </select>
+      <select id="filterStock" onchange="applyFilter()">
+        <option value="">Tất cả hàng tồn</option>
+        <option value="ok">Còn hàng (> 5)</option>
+        <option value="low">Sắp hết (1–5)</option>
+        <option value="out">Hết hàng (0)</option>
+      </select>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:52px">#</th>
+            <th>Vợt</th>
+            <th>Loại vợt</th>
+            <th>Giá thuê / buổi</th>
+            <th>Tồn kho</th>
+            <th style="width:160px">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody id="racketTableBody">
+          <tr>
+            <td colspan="6">
+              <div class="empty-state">
+                <div class="icon">⏳</div>
+                <p>Đang tải dữ liệu...</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Thêm/Sửa -->
+<div class="modal-backdrop" id="racketModal">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modalTitle">Thêm vợt mới</h2>
+      <button class="modal-close" onclick="closeModal('racketModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editId" />
+
+      <div class="form-row">
+        <div class="form-group" style="grid-column:1/-1">
+          <label for="fName">Tên vợt <span class="required">*</span></label>
+          <input type="text" id="fName" placeholder="VD: Yonex Astrox 77 Play" maxlength="150" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="fPrice">Giá thuê (VNĐ) <span class="required">*</span></label>
+          <input type="number" id="fPrice" placeholder="VD: 35000" min="0" step="1000" />
+        </div>
+        <div class="form-group">
+          <label for="fStock">Số lượng tồn kho <span class="required">*</span></label>
+          <input type="number" id="fStock" placeholder="VD: 10" min="0" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="grid-column:1/-1">
+          <label for="fCategory">Loại vợt <span class="required">*</span></label>
+          <select id="fCategory">
+            <option value="">— Chọn phân khúc —</option>
+            <option value="BASIC">Dành cho người mới chơi (Vợt cơ bản)</option>
+            <option value="INTERMEDIATE">Dễ sử dụng, đánh ổn (Vợt trung cấp)</option>
+            <option value="ADVANCED">Chuyên nghiệp, nhẹ, cảm giác tốt (Vợt cao cấp)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="fDesc">Mô tả ngắn</label>
+        <textarea id="fDesc" placeholder="Nhập mô tả về cảm giác đánh, tốc độ..." rows="3"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="fImageUrl">Hình ảnh vợt</label>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="url" id="fImageUrl" placeholder="https://... hoặc dùng nút Chọn ảnh"
+                 oninput="previewImage(this.value)" style="flex:1;" />
+          <button id="adminUploadBtn" type="button" class="btn btn-secondary"
+                  onclick="document.getElementById('adminFileInput').click()"
+                  style="white-space:nowrap;flex-shrink:0;padding:10px 14px;">
+            📷 Chọn ảnh
+          </button>
+          <input type="file" id="adminFileInput" accept="image/*" style="display:none;"
+                 onchange="adminUploadFile()" />
+        </div>
+        <div class="img-preview-wrap" id="imgPreviewWrap">
+          <div class="img-preview-placeholder">
+            <div class="icon">🖼️</div>
+            <p>Nhập URL hoặc upload ảnh để xem trước</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('racketModal')">Hủy</button>
+      <button class="btn btn-primary" id="saveBtn" onclick="saveRacket()">
+        💾 Lưu
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Xác nhận xóa -->
+<div class="modal-backdrop" id="confirmModal">
+  <div class="modal confirm-modal" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <h2 class="modal-title">Xác nhận xóa</h2>
+      <button class="modal-close" onclick="closeModal('confirmModal')">✕</button>
+    </div>
+    <div class="confirm-body">
+      <div class="confirm-icon">🗑️</div>
+      <div class="confirm-title">Xóa dòng vợt này?</div>
+      <div class="confirm-msg">Hành động này không thể hoàn tác.</div>
+      <div class="confirm-product-name" id="confirmProductName"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('confirmModal')">Hủy</button>
+      <button class="btn btn-danger" id="confirmDeleteBtn" onclick="executeDelete()">
+        🗑️ Xóa vĩnh viễn
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<div id="toast-container"></div>
+
+<script src="/js/app.js"></script>
+<script>
+let allRackets = [];
+let pendingDeleteId = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = getCurrentUser();
+  if (!user || user.role !== 'ADMIN') {
+    document.getElementById('accessDenied').style.display = 'block';
+    return;
+  }
+  document.getElementById('mgmtPage').style.display = 'block';
+  await loadRackets();
+});
+
+async function loadRackets() {
+  try {
+    allRackets = await fetchAPI('/v1/rackets');
+    updateStats(allRackets);
+    applyFilter();
+  } catch (err) {
+    document.getElementById('racketTableBody').innerHTML = `
+      <tr><td colspan="6">
+        <div class="empty-state">
+          <div class="icon">⚠️</div>
+          <h3>Không thể tải dữ liệu</h3>
+          <p>${err.message}</p>
+        </div>
+      </td></tr>`;
+    showToast('Lỗi khi tải vợt: ' + err.message, 'error');
+  }
+}
+
+function updateStats(rackets) {
+  const ok  = rackets.filter(p => p.stockQuantity > 5).length;
+  const low = rackets.filter(p => p.stockQuantity > 0 && p.stockQuantity <= 5).length;
+  const out = rackets.filter(p => p.stockQuantity <= 0).length;
+  document.getElementById('statTotal').textContent   = rackets.length;
+  document.getElementById('statInStock').textContent = ok;
+  document.getElementById('statLow').textContent     = low;
+  document.getElementById('statOut').textContent     = out;
+}
+
+function applyFilter() {
+  const search   = document.getElementById('searchInput').value.trim().toLowerCase();
+  const category = document.getElementById('filterCategory').value;
+  const stockF   = document.getElementById('filterStock').value;
+
+  let filtered = allRackets;
+  if (category) filtered = filtered.filter(p => p.racketType === category);
+  if (search)   filtered = filtered.filter(p =>
+    (p.name || '').toLowerCase().includes(search) ||
+    (p.description || '').toLowerCase().includes(search)
+  );
+  if (stockF === 'ok')  filtered = filtered.filter(p => p.stockQuantity > 5);
+  if (stockF === 'low') filtered = filtered.filter(p => p.stockQuantity > 0 && p.stockQuantity <= 5);
+  if (stockF === 'out') filtered = filtered.filter(p => p.stockQuantity <= 0);
+
+  renderTable(filtered);
+}
+
+function renderTable(rackets) {
+  const tbody = document.getElementById('racketTableBody');
+  if (!rackets.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state">
+      <div class="icon">🎾</div>
+      <h3>Không có dữ liệu</h3>
+      <p>Thử thay đổi bộ lọc hoặc thêm dòng vợt mới.</p>
+    </div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rackets.map(p => {
+    const thumb = p.imageUrl
+      ? `<img class="prod-thumb" src="${esc(p.imageUrl)}" alt="${esc(p.name)}"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+      : '';
+    const placeholder = `<div class="prod-thumb-placeholder" style="${p.imageUrl?'display:none':''}">🎾</div>`;
+    const stockBadge = p.stockQuantity <= 0
+      ? `<span class="badge badge-stock-out">Hết hàng</span>`
+      : p.stockQuantity <= 5
+        ? `<span class="badge badge-stock-low">⚠️ Còn ${p.stockQuantity}</span>`
+        : `<span class="badge badge-stock-ok">✓ ${p.stockQuantity}</span>`;
+
+    let badgeClass = '';
+    let typeName = '';
+    if(p.racketType === 'BASIC') { badgeClass = 'badge-basic'; typeName = 'Cơ bản'; }
+    else if(p.racketType === 'INTERMEDIATE') { badgeClass = 'badge-intermediate'; typeName = 'Trung cấp'; }
+    else if(p.racketType === 'ADVANCED') { badgeClass = 'badge-advanced'; typeName = 'Cao cấp'; }
+
+    return `<tr>
+      <td style="color:var(--muted);font-size:12px;">#${p.id}</td>
+      <td>
+        <div class="prod-name-cell">
+          ${thumb}${placeholder}
+          <div>
+            <div class="prod-name-text">${esc(p.name)}</div>
+            <div class="prod-desc-text">${esc(p.description || '—')}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="badge ${badgeClass}">${typeName}</span></td>
+      <td style="font-weight:700;color:var(--green);">${formatCurrency(p.rentalPrice)}</td>
+      <td>${stockBadge}</td>
+      <td>
+        <div class="action-btns">
+          <button class="btn-edit" onclick="openEditModal(${p.id})">✏️ Sửa</button>
+          <button class="btn-del"  onclick="openDeleteConfirm(${p.id}, '${esc(p.name)}')">🗑️</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openAddModal() {
+  document.getElementById('modalTitle').textContent = '➕ Thêm vợt mới';
+  document.getElementById('editId').value   = '';
+  document.getElementById('fName').value    = '';
+  document.getElementById('fPrice').value   = '';
+  document.getElementById('fStock').value   = '';
+  document.getElementById('fCategory').value = '';
+  document.getElementById('fDesc').value    = '';
+  document.getElementById('fImageUrl').value = '';
+  resetImagePreview();
+  openModal('racketModal');
+}
+
+function openEditModal(id) {
+  const p = allRackets.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('modalTitle').textContent = '✏️ Chỉnh sửa thông tin';
+  document.getElementById('editId').value    = p.id;
+  document.getElementById('fName').value     = p.name  || '';
+  document.getElementById('fPrice').value    = p.rentalPrice != null ? p.rentalPrice : '';
+  document.getElementById('fStock').value    = p.stockQuantity != null ? p.stockQuantity : '';
+  document.getElementById('fCategory').value = p.racketType || '';
+  document.getElementById('fDesc').value     = p.description || '';
+  document.getElementById('fImageUrl').value = p.imageUrl || '';
+  previewImage(p.imageUrl || '');
+  openModal('racketModal');
+}
+
+async function saveRacket() {
+  const name     = document.getElementById('fName').value.trim();
+  const rentalPrice    = parseFloat(document.getElementById('fPrice').value);
+  const stock    = parseInt(document.getElementById('fStock').value);
+  const racketType = document.getElementById('fCategory').value;
+  const desc     = document.getElementById('fDesc').value.trim();
+  const imageUrl = document.getElementById('fImageUrl').value.trim();
+  const editId   = document.getElementById('editId').value;
+
+  if (!name)          return showToast('Vui lòng nhập tên vợt!', 'warning');
+  if (isNaN(rentalPrice) || rentalPrice < 0) return showToast('Giá thuê không hợp lệ!', 'warning');
+  if (isNaN(stock) || stock < 0) return showToast('Số lượng không hợp lệ!', 'warning');
+  if (!racketType)      return showToast('Vui lòng chọn loại vợt!', 'warning');
+
+  const payload = { name, rentalPrice, stockQuantity: stock, racketType, description: desc, imageUrl: imageUrl || null };
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Đang lưu...';
+
+  try {
+    if (editId) {
+      await fetchAPI(`/v1/rackets/${editId}`, {
+        method: 'PUT', body: JSON.stringify(payload)
+      });
+      showToast('✅ Cập nhật thành công!', 'success');
+    } else {
+      await fetchAPI('/v1/rackets', {
+        method: 'POST', body: JSON.stringify(payload)
+      });
+      showToast('✅ Thêm thành công!', 'success');
+    }
+    closeModal('racketModal');
+    await loadRackets();
+  } catch (err) {
+    showToast('❌ Lỗi: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '💾 Lưu';
+  }
+}
+
+function openDeleteConfirm(id, name) {
+  pendingDeleteId = id;
+  document.getElementById('confirmProductName').textContent = name;
+  openModal('confirmModal');
+}
+
+async function executeDelete() {
+  if (!pendingDeleteId) return;
+  const btn = document.getElementById('confirmDeleteBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Đang xóa...';
+  try {
+    await fetchAPI(`/v1/rackets/${pendingDeleteId}`, { method: 'DELETE' });
+    showToast('🗑️ Đã xóa thành công!', 'success');
+    closeModal('confirmModal');
+    await loadRackets();
+  } catch (err) {
+    showToast('❌ Lỗi: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🗑️ Xóa vĩnh viễn';
+    pendingDeleteId = null;
+  }
+}
+
+async function adminUploadFile() {
+  const input = document.getElementById('adminFileInput');
+  const file  = input?.files?.[0];
+  if (!file) return;
+
+  const btn = document.getElementById('adminUploadBtn');
+  btn.disabled = true; btn.textContent = '⏳...';
+
+  try {
+    const form = new FormData();
+    form.append('file', file);
+    const res  = await fetch('/api/upload', { method: 'POST', body: form });
+    const json = await res.json();
+    if (!res.ok || !json.success) throw new Error(json.message || 'Upload thất bại');
+
+    document.getElementById('fImageUrl').value = json.data;
+    previewImage(json.data);
+    showToast('✅ Upload ảnh thành công!', 'success');
+  } catch (err) {
+    showToast('❌ Lỗi upload: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = '📷 Chọn ảnh';
+    input.value = '';
+  }
+}
+
+function previewImage(url) {
+  const wrap = document.getElementById('imgPreviewWrap');
+  if (!url) { resetImagePreview(); return; }
+  wrap.innerHTML = `<img src="${url}" alt="preview"
+    onerror="this.parentElement.innerHTML='<div class=\\'img-preview-placeholder\\'><div class=\\'icon\\'>⚠️</div><p>Không tải được ảnh</p></div>'" />`;
+}
+
+function resetImagePreview() {
+  document.getElementById('imgPreviewWrap').innerHTML = `
+    <div class="img-preview-placeholder">
+      <div class="icon">🖼️</div>
+      <p>Nhập URL ảnh để xem trước</p>
+    </div>`;
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); document.body.style.overflow = ''; }
+document.querySelectorAll('.modal-backdrop').forEach(bd => { bd.addEventListener('click', e => { if (e.target === bd) closeModal(bd.id); }); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal-backdrop.open').forEach(m => closeModal(m.id)); });
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

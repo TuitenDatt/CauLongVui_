@@ -25,6 +25,8 @@ public class BookingDTO {
     private LocalTime endTime;
     private Booking.BookingStatus status;
     private Double totalPrice;
+    private Boolean isPass;
+    private Double passPrice;
 
     public static BookingDTO fromEntity(Booking booking) {
         return BookingDTO.builder()
@@ -39,6 +41,8 @@ public class BookingDTO {
                 .endTime(booking.getEndTime())
                 .status(booking.getStatus())
                 .totalPrice(booking.getTotalPrice())
+                .isPass(booking.getIsPass())
+                .passPrice(booking.getPassPrice())
                 .build();
     }
 }

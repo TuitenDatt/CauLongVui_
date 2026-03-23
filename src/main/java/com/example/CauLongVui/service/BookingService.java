@@ -64,6 +64,13 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
+    public List<BookingDTO> getPassBookings() {
+        return bookingRepository.findByIsPassTrueOrderByBookingDateDesc().stream()
+                .map(BookingDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public List<Map<String, String>> getBookedSlots(Long courtId, LocalDate date) {
         return bookingRepository.findByCourtIdAndBookingDate(courtId, date).stream()
                 .filter(b -> b.getStatus() != Booking.BookingStatus.CANCELLED)
@@ -131,6 +138,38 @@ public class BookingService {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đặt sân với ID: " + id));
         booking.setStatus(status);
+        return BookingDTO.fromEntity(bookingRepository.save(booking));
+    }
+
+    @Transactional
+    public BookingDTO updateBookingToPass(Long id) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đặt sân với ID: " + id));
+        booking.setIsPass(true);
+        booking.setPassPrice(booking.getTotalPrice() != null ? booking.getTotalPrice() * 0.8 : 0.0);
+        return BookingDTO.fromEntity(bookingRepository.save(booking));
+    }
+
+    @Transactional
+    public BookingDTO buyPassBooking(Long id, Long newUserId, String newCustomerName, String newCustomerPhone) {
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy đặt sân với ID: " + id));
+        if (!Boolean.TRUE.equals(booking.getIsPass())) {
+            throw new BadRequestException("Sân này không được đăng bán lại.");
+        }
+
+        booking.setIsPass(false);
+        if (booking.getPassPrice() != null) {
+            booking.setTotalPrice(booking.getPassPrice());
+        }
+        booking.setPassPrice(null);
+        
+        if (newUserId != null) {
+            booking.setUser(userRepository.findById(newUserId).orElse(null));
+        }
+        booking.setCustomerName(newCustomerName);
+        booking.setCustomerPhone(newCustomerPhone);
+
         return BookingDTO.fromEntity(bookingRepository.save(booking));
     }
 }

@@ -288,7 +288,7 @@
 <!-- ── Không có quyền ── -->
 <div id="accessDenied" style="display:none;">
   <div class="access-denied">
-    <div style="font-size:64px">🔒</div>
+    <div style="font-size:64px"></div>
     <h2 style="margin:16px 0 8px;font-size:22px;">Vui lòng đăng nhập</h2>
     <p style="color:var(--muted);margin-bottom:24px;">Bạn cần đăng nhập để xem trang này.</p>
     <a href="/auth/login.html?redirect=/profile.html"
@@ -309,16 +309,16 @@
         <h1 id="fullNameEl">—</h1>
         <div class="profile-role-badge" id="roleBadgeEl"></div>
         <div class="profile-hero-meta">
-          <span>📧 <span id="metaEmail">—</span></span>
-          <span>📞 <span id="metaPhone">—</span></span>
+          <span><span id="metaEmail">—</span></span>
+          <span><span id="metaPhone">—</span></span>
         </div>
       </div>
     </div>
 
     <!-- Thông tin tài khoản -->
     <div class="info-card">
-      <h2>👤 Thông tin tài khoản
-        <button class="btn-edit-profile" onclick="openEditModal()">✏️ Chỉnh sửa</button>
+      <h2>Thông tin tài khoản
+        <button class="btn-edit-profile" onclick="openEditModal()">Chỉnh sửa</button>
       </h2>
       <div class="info-row">
         <span class="info-label">Họ và tên</span>
@@ -340,7 +340,7 @@
 
     <!-- Lịch sử đặt sân -->
     <div class="info-card" id="bookingHistoryCard">
-      <h2>🏸 Lịch sử đặt sân</h2>
+      <h2>Lịch sử đặt sân</h2>
       <div class="booking-history" id="bookingHistory">
         <!-- Rendered by JS -->
       </div>
@@ -348,31 +348,27 @@
 
     <!-- Truy cập nhanh -->
     <div class="info-card" id="quickLinksCard">
-      <h2>⚡ Truy cập nhanh</h2>
+      <h2>Truy cập nhanh</h2>
       <div class="quick-links">
         <a href="/courts.html" class="quick-link">
-          <div class="ql-icon">🏟️</div>
           <div class="ql-text">
             <strong>Đặt sân mới</strong>
             <span>Chọn sân và khung giờ</span>
           </div>
         </a>
         <a href="/cart.html" class="quick-link">
-          <div class="ql-icon">🛒</div>
           <div class="ql-text">
             <strong>Giỏ hàng</strong>
             <span>Xem sản phẩm đã chọn</span>
           </div>
         </a>
         <a href="/my-orders.html" class="quick-link">
-          <div class="ql-icon">📋</div>
           <div class="ql-text">
             <strong>Mặt hàng đã đặt</strong>
             <span>Lịch sử đặt hàng cửa hàng</span>
           </div>
         </a>
         <a href="/products.html" class="quick-link">
-          <div class="ql-icon">🛍️</div>
           <div class="ql-text">
             <strong>Cửa hàng</strong>
             <span>Mua cầu, nước, đồ ăn</span>
@@ -383,7 +379,7 @@
 
     <!-- Đăng xuất -->
     <button class="logout-btn" onclick="confirmLogout()">
-      🚪 Đăng xuất khỏi tài khoản
+      Đăng xuất khỏi tài khoản
     </button>
 
   </div>
@@ -395,7 +391,7 @@
 <div class="modal-overlay" id="editModal" onclick="handleOverlayClick(event)">
   <div class="modal-box">
     <div class="modal-header">
-      <h3>✏️ Chỉnh sửa thông tin</h3>
+      <h3>Chỉnh sửa thông tin</h3>
       <button class="modal-close" onclick="closeEditModal()">✕</button>
     </div>
     <div class="modal-body">
@@ -417,15 +413,15 @@
       <div class="form-divider">Đổi mật khẩu (tuỳ chọn)</div>
 
       <div class="form-group">
-        <label>🔒 Mật khẩu hiện tại</label>
+        <label>Mật khẩu hiện tại</label>
         <input type="password" id="editCurrentPwd" placeholder="Nhập mật khẩu hiện tại" />
       </div>
       <div class="form-group">
-        <label>🔑 Mật khẩu mới</label>
+        <label>Mật khẩu mới</label>
         <input type="password" id="editNewPwd" placeholder="Để trống nếu không đổi" />
       </div>
       <div class="form-group">
-        <label>🔑 Xác nhận mật khẩu mới</label>
+        <label>Xác nhận mật khẩu mới</label>
         <input type="password" id="editConfirmPwd" placeholder="Nhập lại mật khẩu mới" />
       </div>
 
@@ -508,7 +504,9 @@ function renderBookings(bookings) {
     return;
   }
 
-  container.innerHTML = bookings.map((b, i) => {
+  const displayBookings = bookings.slice(0, 2);
+
+  const htmlList = displayBookings.map((b, i) => {
     const img = courtImages[i % courtImages.length];
     const expired = isExpired(b.bookingDate, b.endTime);
     const timeBadgeClass = expired ? 'expired' : 'upcoming';
@@ -556,6 +554,14 @@ function renderBookings(bookings) {
         </div>
       </div>`;
   }).join('');
+
+  container.innerHTML = htmlList + `
+    <div style="text-align:center; margin-top:4px;">
+      <a href="/my-bookings.html" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; background:var(--green-pale); color:var(--green); font-size:14px; font-weight:800; padding:12px 24px; border-radius:12px; text-decoration:none; width:100%; transition:all 0.2s;">
+        Xem tất cả
+      </a>
+    </div>
+  `;
 }
 
 async function loadBookings(phone) {

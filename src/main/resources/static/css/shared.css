@@ -46,6 +46,13 @@ body {
   overflow-x: hidden;
   line-height: 1.6;
   padding-top: 68px; /* offset for fixed navbar */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+#footer-placeholder {
+  margin-top: auto;
 }
 
 /* ── Custom Scrollbar ── */

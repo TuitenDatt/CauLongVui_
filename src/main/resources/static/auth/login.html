@@ -1,20 +1,27 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Đăng nhập – Cầu Lông Vui</title>
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="/css/shared.css" />
   <style>
-    html, body { height: 100%; }
+    html,
+    body {
+      height: 100%;
+    }
 
     body {
       display: flex;
+      flex-direction: row;
       align-items: stretch;
       min-height: 100vh;
+      padding-top: 0;
     }
 
     /* ── LEFT PANEL ── */
@@ -34,8 +41,8 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(ellipse 60% 50% at 30% 40%, rgba(45,138,78,0.2) 0%, transparent 70%),
-        radial-gradient(ellipse 40% 60% at 80% 80%, rgba(58,173,98,0.1) 0%, transparent 70%);
+        radial-gradient(ellipse 60% 50% at 30% 40%, rgba(45, 138, 78, 0.2) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 60% at 80% 80%, rgba(58, 173, 98, 0.1) 0%, transparent 70%);
     }
 
     .auth-left-logo {
@@ -46,41 +53,73 @@
       position: relative;
       z-index: 1;
     }
+
     .auth-left-logo .logo-icon {
-      width: 42px; height: 42px;
+      width: 42px;
+      height: 42px;
       background: var(--green);
       border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 20px;
       box-shadow: 0 6px 20px var(--green-glow);
     }
+
     .auth-left-logo span {
-      font-size: 24px; font-weight: 800; color: #fff; letter-spacing: -0.5px;
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
     }
-    .auth-left-logo em { color: var(--green-light); font-style: normal; }
+
+    .auth-left-logo em {
+      color: var(--green-light);
+      font-style: normal;
+    }
 
     .auth-left-content {
-      position: relative; z-index: 1;
+      position: relative;
+      z-index: 1;
     }
 
     .auth-left-content h2 {
-      font-size: 36px; font-weight: 800; color: #fff;
-      line-height: 1.2; margin-bottom: 16px; letter-spacing: -1px;
+      font-size: 36px;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      letter-spacing: -1px;
     }
+
     .auth-left-content p {
-      color: rgba(255,255,255,0.55); font-size: 15px; line-height: 1.7; max-width: 360px;
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 15px;
+      line-height: 1.7;
+      max-width: 360px;
     }
 
     .auth-features {
-      position: relative; z-index: 1;
-      display: flex; flex-direction: column; gap: 14px;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
+
     .auth-feature-item {
-      display: flex; align-items: center; gap: 12px;
-      color: rgba(255,255,255,0.75); font-size: 14px; font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 14px;
+      font-weight: 500;
     }
+
     .auth-feature-dot {
-      width: 8px; height: 8px; border-radius: 50%;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
       background: var(--green-light);
       box-shadow: 0 0 8px var(--green-glow);
       flex-shrink: 0;
@@ -97,24 +136,51 @@
     }
 
     .auth-card {
-      width: 100%; max-width: 420px;
+      width: 100%;
+      max-width: 420px;
     }
 
-    .auth-card-header { margin-bottom: 36px; }
-    .auth-card-header h1 {
-      font-size: 28px; font-weight: 800; color: var(--dark);
-      letter-spacing: -0.5px; margin-bottom: 8px;
+    .auth-card-header {
+      margin-bottom: 36px;
     }
-    .auth-card-header p { color: var(--muted); font-size: 14px; }
-    .auth-card-header a { color: var(--green); font-weight: 600; text-decoration: none; }
-    .auth-card-header a:hover { text-decoration: underline; }
+
+    .auth-card-header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--dark);
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .auth-card-header p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .auth-card-header a {
+      color: var(--green);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .auth-card-header a:hover {
+      text-decoration: underline;
+    }
 
     /* ── Form ── */
-    .form-group { margin-bottom: 18px; }
-    .form-group label {
-      display: block; font-size: 13px; font-weight: 700;
-      color: var(--mid); margin-bottom: 7px; letter-spacing: 0.3px;
+    .form-group {
+      margin-bottom: 18px;
     }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mid);
+      margin-bottom: 7px;
+      letter-spacing: 0.3px;
+    }
+
     .form-group input {
       width: 100%;
       background: var(--white);
@@ -127,11 +193,15 @@
       outline: none;
       transition: all 0.2s;
     }
+
     .form-group input:focus {
       border-color: var(--green);
       box-shadow: 0 0 0 3px var(--green-glow);
     }
-    .form-group input::placeholder { color: var(--muted); }
+
+    .form-group input::placeholder {
+      color: var(--muted);
+    }
 
     .form-options {
       display: flex;
@@ -139,14 +209,27 @@
       justify-content: space-between;
       margin-bottom: 24px;
     }
+
     .form-options label {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 13px; color: var(--muted); cursor: pointer; font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 500;
     }
+
     .form-options a {
-      font-size: 13px; color: var(--green); font-weight: 600; text-decoration: none;
+      font-size: 13px;
+      color: var(--green);
+      font-weight: 600;
+      text-decoration: none;
     }
-    .form-options a:hover { text-decoration: underline; }
+
+    .form-options a:hover {
+      text-decoration: underline;
+    }
 
     .btn-auth {
       width: 100%;
@@ -162,44 +245,93 @@
       transition: all 0.25s;
       box-shadow: 0 6px 20px var(--green-glow);
     }
-    .btn-auth:hover { background: var(--green-light); transform: translateY(-1px); }
-    .btn-auth:active { transform: translateY(0); }
-    .btn-auth:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+    .btn-auth:hover {
+      background: var(--green-light);
+      transform: translateY(-1px);
+    }
+
+    .btn-auth:active {
+      transform: translateY(0);
+    }
+
+    .btn-auth:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
 
     .auth-divider {
-      text-align: center; color: var(--muted); font-size: 13px;
-      margin: 24px 0; position: relative;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      margin: 24px 0;
+      position: relative;
     }
+
     .auth-divider::before {
       content: '';
-      position: absolute; top: 50%; left: 0; right: 0;
-      height: 1px; background: var(--border);
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--border);
     }
-    .auth-divider span { background: var(--bg); padding: 0 12px; position: relative; }
+
+    .auth-divider span {
+      background: var(--bg);
+      padding: 0 12px;
+      position: relative;
+    }
 
     .auth-register-link {
-      text-align: center; margin-top: 28px;
-      font-size: 14px; color: var(--muted);
+      text-align: center;
+      margin-top: 28px;
+      font-size: 14px;
+      color: var(--muted);
     }
-    .auth-register-link a { color: var(--green); font-weight: 700; text-decoration: none; }
-    .auth-register-link a:hover { text-decoration: underline; }
+
+    .auth-register-link a {
+      color: var(--green);
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .auth-register-link a:hover {
+      text-decoration: underline;
+    }
 
     /* Error */
     .form-error {
-      background: #fee2e2; border: 1px solid rgba(224,58,58,0.3);
-      border-radius: var(--r-sm); padding: 12px 16px;
-      color: var(--red); font-size: 13px; font-weight: 600;
-      margin-bottom: 18px; display: none;
+      background: #fee2e2;
+      border: 1px solid rgba(224, 58, 58, 0.3);
+      border-radius: var(--r-sm);
+      padding: 12px 16px;
+      color: var(--red);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 18px;
+      display: none;
     }
-    .form-error.show { display: block; }
+
+    .form-error.show {
+      display: block;
+    }
 
     /* Responsive */
     @media (max-width: 768px) {
-      .auth-left { display: none; }
-      .auth-right { padding: 32px 24px; }
+      .auth-left {
+        display: none;
+      }
+
+      .auth-right {
+        padding: 32px 24px;
+      }
     }
   </style>
 </head>
+
 <body>
   <!-- ── LEFT PANEL ── -->
   <div class="auth-left">
@@ -214,9 +346,15 @@
     </div>
 
     <div class="auth-features">
-      <div class="auth-feature-item"><div class="auth-feature-dot"></div>Đặt sân 24/7, không giới hạn</div>
-      <div class="auth-feature-item"><div class="auth-feature-dot"></div>Quản lý lịch đặt tiện lợi</div>
-      <div class="auth-feature-item"><div class="auth-feature-dot"></div>Cửa hàng dụng cụ chính hãng</div>
+      <div class="auth-feature-item">
+        <div class="auth-feature-dot"></div>Đặt sân 24/7, không giới hạn
+      </div>
+      <div class="auth-feature-item">
+        <div class="auth-feature-dot"></div>Quản lý lịch đặt tiện lợi
+      </div>
+      <div class="auth-feature-item">
+        <div class="auth-feature-dot"></div>Cửa hàng dụng cụ chính hãng
+      </div>
     </div>
   </div>
 
@@ -261,7 +399,7 @@
   <script>
     const loginForm = document.getElementById('loginForm');
     const submitBtn = document.getElementById('submitBtn');
-    const errorDiv  = document.getElementById('loginError');
+    const errorDiv = document.getElementById('loginError');
 
     // Nếu đã đăng nhập thì redirect về trang chủ
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
@@ -273,7 +411,7 @@
       e.preventDefault();
       errorDiv.classList.remove('show');
 
-      const email    = document.getElementById('email').value.trim();
+      const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
 
       if (!email || !password) {
@@ -324,4 +462,5 @@
     }
   </script>
 </body>
+
 </html>

@@ -97,8 +97,13 @@
     .order-total-label { font-size: 14px; font-weight: 600; color: var(--muted); }
     .order-total-value { font-size: 20px; font-weight: 900; color: var(--green); }
 
+    .orders-list-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; align-items: start;
+    }
+    @media (max-width: 768px) { .orders-list-grid { grid-template-columns: 1fr; } }
+    
     /* ── Empty ── */
-    .empty-state { text-align: center; padding: 80px 24px; }
+    .empty-state { text-align: center; padding: 80px 24px; grid-column: 1 / -1; }
     .empty-state .icon { font-size: 64px; margin-bottom: 16px; }
     .empty-state h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
     .empty-state p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
@@ -110,16 +115,16 @@
 <div class="orders-page">
   <a href="/cart.html" class="back-link">← Quay lại giỏ hàng</a>
 
-  <div class="page-title">📋 Các mặt hàng đã đặt</div>
+  <div class="page-title">Các mặt hàng đã đặt</div>
   <div class="page-sub">Lịch sử đặt hàng trong cửa hàng Cầu Lông Vui</div>
 
   <!-- Toolbar -->
   <div class="toolbar" id="toolbar" style="display:none;">
-    <button class="btn-clear-history" onclick="clearHistory()">🗑️ Xóa lịch sử</button>
+    <button class="btn-clear-history" onclick="clearHistory()">Xóa lịch sử</button>
   </div>
 
   <!-- Orders list -->
-  <div id="ordersList"></div>
+  <div id="ordersList" class="orders-list-grid"></div>
 </div>
 
 <div id="footer-placeholder"></div>
@@ -169,7 +174,7 @@ function renderOrders() {
            style="display:inline-flex;align-items:center;gap:8px;background:var(--green);
                   color:#fff;padding:12px 24px;border-radius:12px;text-decoration:none;
                   font-weight:700;font-size:14px;">
-          🛍️ Mua sắm ngay
+          Mua sắm ngay
         </a>
       </div>`;
     return;
@@ -180,10 +185,10 @@ function renderOrders() {
   list.innerHTML = orders.map(order => {
     const isMomo = order.paymentMethod === 'momo';
     const statusClass = isMomo ? 'status-momo' : 'status-cash';
-    const statusLabel = isMomo ? '💜 MoMo' : '💵 Tiền mặt';
+    const statusLabel = isMomo ? 'MoMo' : 'Tiền mặt';
 
     const itemsHtml = (order.items || []).map(item => {
-      const icon = ICONS[item.category] || '📦';
+      const icon = ICONS[item.category] || '';
       const thumb = item.imageUrl
         ? `<div class="oi-thumb"><img src="${esc(item.imageUrl)}" onerror="this.parentElement.textContent='${icon}'" /></div>`
         : `<div class="oi-thumb">${icon}</div>`;
@@ -200,26 +205,26 @@ function renderOrders() {
     }).join('');
 
     const courtInfo = order.courtName
-      ? `<div class="order-meta-item">🏸 Giao tới sân: <strong>${esc(order.courtName)}</strong></div>`
-      : `<div class="order-meta-item">🏪 Nhân viên sẽ liên hệ xác nhận</div>`;
+      ? `<div class="order-meta-item">Giao tới sân: <strong>${esc(order.courtName)}</strong></div>`
+      : `<div class="order-meta-item">Nhân viên sẽ liên hệ xác nhận</div>`;
 
     const customerInfo = order.customerName
-      ? `<div class="order-meta-item">👤 ${esc(order.customerName)} · 📞 ${esc(order.customerPhone || '')}</div>`
+      ? `<div class="order-meta-item"> ${esc(order.customerName)} · ${esc(order.customerPhone || '')}</div>`
       : '';
 
     return `
       <div class="order-card">
         <div class="order-header">
           <div>
-            <div class="order-id">🧾 Mã đơn: ${esc(order.id)}</div>
-            <div class="order-date">🕐 ${esc(order.createdAt)}</div>
+            <div class="order-id">Mã đơn: ${esc(order.id)}</div>
+            <div class="order-date">${esc(order.createdAt)}</div>
           </div>
           <span class="order-status-badge ${statusClass}">${statusLabel} · ${esc(order.status)}</span>
         </div>
         <div class="order-meta">
           ${courtInfo}
           ${customerInfo}
-          <div class="order-meta-item">📦 ${(order.items||[]).reduce((s,i)=>s+i.qty,0)} món</div>
+          <div class="order-meta-item">${(order.items||[]).reduce((s,i)=>s+i.qty,0)} món</div>
         </div>
         <div class="order-items">${itemsHtml}</div>
         <div class="order-footer">

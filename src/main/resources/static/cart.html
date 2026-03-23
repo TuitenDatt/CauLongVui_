@@ -185,13 +185,13 @@
 <div id="header-placeholder"></div>
 
 <div class="cart-page">
-  <div class="page-title">🛒 Giỏ hàng của tôi</div>
+  <div class="page-title">Giỏ hàng của tôi</div>
   <div class="page-sub">Kiểm tra lại sản phẩm trước khi đặt hàng</div>
 
   <!-- Quick actions -->
   <div class="quick-actions">
-    <a href="/my-orders.html" class="quick-action-btn qa-orders">📋 Các mặt hàng đã đặt</a>
-    <a href="/products.html"  class="quick-action-btn qa-shop">🛍️ Tiếp tục mua sắm</a>
+    <a href="/my-orders.html" class="quick-action-btn qa-orders">Các mặt hàng đã đặt</a>
+    <a href="/products.html"  class="quick-action-btn qa-shop">Tiếp tục mua sắm</a>
   </div>
 
   <!-- Empty state -->
@@ -200,7 +200,7 @@
     <h3>Giỏ hàng trống</h3>
     <p>Bạn chưa thêm sản phẩm nào vào giỏ hàng.</p>
     <a href="/products.html" class="quick-action-btn qa-shop" style="margin-top:20px;display:inline-flex;">
-      🛍️ Đến cửa hàng mua sắm
+      Đến cửa hàng mua sắm
     </a>
   </div>
 
@@ -210,15 +210,15 @@
     <!-- Items list -->
     <div class="cart-items-card">
       <div class="cart-items-header">
-        <h2>📦 Sản phẩm đã chọn (<span id="itemCount">0</span>)</h2>
-        <button class="btn-clear-all" onclick="clearCart()">🗑️ Xóa tất cả</button>
+        <h2>Sản phẩm đã chọn (<span id="itemCount">0</span>)</h2>
+        <button class="btn-clear-all" onclick="clearCart()">Xóa tất cả</button>
       </div>
       <div id="cartItemsList"></div>
     </div>
 
     <!-- Order summary -->
     <div class="order-card">
-      <h2>🧾 Tóm tắt đơn hàng</h2>
+      <h2>Tóm tắt đơn hàng</h2>
 
       <div class="order-row">
         <span class="label">Số sản phẩm</span>
@@ -237,17 +237,16 @@
       <div class="section-divider">
         <h3>🏸 Giao đến sân đang chơi</h3>
         <div id="courtSelectWrap">
-          <div class="no-court-msg">⏳ Đang kiểm tra sân của bạn...</div>
+          <div class="no-court-msg">Đang kiểm tra sân của bạn...</div>
         </div>
       </div>
 
       <!-- Phương thức thanh toán -->
       <div class="section-divider">
-        <h3>💳 Phương thức thanh toán</h3>
+        <h3>Phương thức thanh toán</h3>
         <div class="payment-options">
           <label class="payment-option selected" id="optCash" onclick="selectPayment('cash')">
             <input type="radio" name="payment" value="cash" checked />
-            <div class="po-icon">💵</div>
             <div>
               <div class="po-label">Tiền mặt</div>
               <div class="po-desc">Thanh toán trực tiếp với nhân viên</div>
@@ -255,7 +254,6 @@
           </label>
           <label class="payment-option" id="optMomo" onclick="selectPayment('momo')">
             <input type="radio" name="payment" value="momo" />
-            <div class="po-icon">💜</div>
             <div>
               <div class="po-label">Ví MoMo</div>
               <div class="po-desc">Quét QR — nhanh, tiện, an toàn</div>
@@ -265,7 +263,7 @@
 
         <!-- MoMo customer fields -->
         <div id="momoCustomerFields">
-          <p>💜 Vui lòng nhập thông tin để tạo giao dịch MoMo</p>
+          <p>Vui lòng nhập thông tin để tạo giao dịch MoMo</p>
           <input class="momo-input" id="mmName"  type="text" placeholder="Họ và tên của bạn *" />
           <input class="momo-input" id="mmPhone" type="tel"  placeholder="Số điện thoại *" />
         </div>
@@ -273,9 +271,9 @@
 
       <!-- Order button -->
       <button class="btn-order" id="orderBtn" onclick="placeOrder()">
-        ✅ Đặt hàng ngay
+        Đặt hàng ngay
       </button>
-      <a href="/products.html" class="btn-shop">🛍️ Tiếp tục mua sắm</a>
+      <a href="/products.html" class="btn-shop">Tiếp tục mua sắm</a>
     </div>
 
   </div>
@@ -312,10 +310,10 @@ function selectPayment(method) {
   const btn = document.getElementById('orderBtn');
   if (method === 'momo') {
     btn.className = 'btn-order momo-btn';
-    btn.innerHTML = '💜 Thanh toán qua MoMo';
+    btn.innerHTML = 'Thanh toán qua MoMo';
   } else {
     btn.className = 'btn-order';
-    btn.innerHTML = '✅ Đặt hàng ngay';
+    btn.innerHTML = 'Đặt hàng ngay';
   }
 
   // Pre-fill from user profile
@@ -361,7 +359,7 @@ function loadCart() {
 function renderCartItems(cart) {
   document.getElementById('itemCount').textContent = cart.reduce((s,i) => s + i.qty, 0);
   document.getElementById('cartItemsList').innerHTML = cart.map((item, idx) => {
-    const icon = ICONS[item.category] || '📦';
+    const icon = ICONS[item.category] || '';
     const thumb = item.imageUrl
       ? `<div class="ci-thumb"><img src="${esc(item.imageUrl)}" onerror="this.parentElement.textContent='${icon}'" /></div>`
       : `<div class="ci-thumb">${icon}</div>`;
@@ -370,7 +368,7 @@ function renderCartItems(cart) {
       ${thumb}
       <div class="ci-info">
         <div class="ci-name">${esc(item.name)}</div>
-        <div class="ci-category">${esc(item.category || '')}</div>
+        <div class="ci-category">${esc(item.category || '')}  <span style="margin-left:8px;font-weight:600;color:var(--dark);">(Kho: ${item.stock !== undefined ? item.stock : '?'})</span></div>
         <div class="ci-price">${fmt(item.price)} / sản phẩm</div>
       </div>
       <div class="ci-qty">
@@ -396,7 +394,13 @@ function renderSummary(cart) {
    Cart actions
 ───────────────────────────────────────────── */
 function changeQty(idx, delta) {
-  const c = getCart(); c[idx].qty = Math.max(1, (c[idx].qty || 1) + delta);
+  const c = getCart();
+  const newQty = (c[idx].qty || 1) + delta;
+  if (delta > 0 && c[idx].stock !== undefined && newQty > c[idx].stock) {
+    if(typeof showToast === 'function') showToast('Không đủ số lượng trong kho!', 'warning');
+    return;
+  }
+  c[idx].qty = Math.max(1, newQty);
   saveCart(c); loadCart();
 }
 function removeItem(idx) {
@@ -417,7 +421,7 @@ async function loadUserCourts() {
   const user = getCurrentUser();
   const wrap = document.getElementById('courtSelectWrap');
   if (!user || !user.phone) {
-    wrap.innerHTML = `<div class="no-court-msg">📞 Chưa có SĐT trong tài khoản.</div>`;
+    wrap.innerHTML = `<div class="no-court-msg">Chưa có SĐT trong tài khoản.</div>`;
     return;
   }
   try {
@@ -439,7 +443,7 @@ async function loadUserCourts() {
         ).join('')}
       </select>`;
   } catch (err) {
-    wrap.innerHTML = `<div class="no-court-msg">⚠️ Không tải được sân: ${err.message}</div>`;
+    wrap.innerHTML = `<div class="no-court-msg">Không tải được sân: ${err.message}</div>`;
   }
 }
 
@@ -466,7 +470,7 @@ function orderWithCash(cart, courtName, total, now) {
   const order = buildOrderRecord(cart, courtName, total, now, 'cash', 'Đã đặt');
   saveOrder(order);
   saveCart([]);
-  showToast(`✅ Đặt hàng thành công! Tổng: ${fmt(total)}. Nhân viên sẽ thu tiền mặt.`, 'success');
+  showToast(`Đặt hàng thành công! Tổng: ${fmt(total)}. Nhân viên sẽ thu tiền mặt.`, 'success');
   setTimeout(() => loadCart(), 800);
 }
 
@@ -479,7 +483,7 @@ async function orderWithMomo(cart, courtName, total, now) {
   }
 
   const btn = document.getElementById('orderBtn');
-  btn.disabled = true; btn.innerHTML = '⏳ Đang tạo thanh toán MoMo...';
+  btn.disabled = true; btn.innerHTML = 'Đang tạo thanh toán MoMo...';
 
   // Lưu thông tin để payment.html dùng
   const orderId = 'ORD-' + Date.now();
@@ -524,7 +528,7 @@ function momoDevSuccess(cart, courtName, total, now, name, phone, orderId) {
   saveCart([]);
   const btn = document.getElementById('orderBtn');
   btn.disabled = false;
-  showToast(`💜 Thanh toán MoMo thành công! Mã đơn: ${orderId}`, 'success');
+  showToast(`Thanh toán MoMo thành công! Mã đơn: ${orderId}`, 'success');
   setTimeout(() => loadCart(), 900);
 }
 

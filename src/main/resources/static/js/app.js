@@ -214,6 +214,7 @@ function initHeaderEvents() {
             <a href="/my-bookings.html" class="dropdown-item">🏸 Sân đã đặt</a>
             <a href="/cart.html"        class="dropdown-item">🛒 Giỏ hàng của tôi</a>
             <a href="/my-orders.html"   class="dropdown-item">📋 Mặt hàng đã đặt</a>
+            <a href="/my-racket-rentals.html" class="dropdown-item">🎾 Vợt đã thuê</a>
             ${user.role === 'STAFF' ? '<a href="/admin/court-management.html" class="dropdown-item">📋 Quản lý sân</a>' : ''}
             <a href="#" class="dropdown-item dropdown-logout" id="logoutBtn">🚪 Đăng xuất</a>
           </div>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pass Sân – Cầu Lông Vui</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/header-footer.css" />
+  <style>
+    .pass-page { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+    .page-title { font-size: 26px; font-weight: 800; color: var(--dark); margin-bottom: 4px; }
+    .page-sub   { font-size: 14px; color: var(--muted); margin-bottom: 32px; }
+
+    .pass-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; align-items: stretch; }
+    @media (max-width: 768px) { .pass-list { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 500px) { .pass-list { grid-template-columns: 1fr; } }
+
+    .pass-card {
+      background: var(--white); border: 2px dashed #fde047;
+      border-radius: var(--r-md); padding: 20px 24px;
+      display: flex; flex-direction: column; gap: 12px; transition: all 0.2s;
+      box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+    }
+    .pass-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: #eab308; }
+    
+    .pass-badge {
+      position: absolute; top: 12px; right: 12px;
+      background: #fef08a; color: #a16207; font-size: 11px; font-weight: 800;
+      padding: 4px 10px; border-radius: 12px; text-transform: uppercase;
+    }
+
+    .pass-court-name { font-size: 18px; font-weight: 800; color: var(--dark); margin-top: 4px; }
+    .pass-detail { font-size: 13px; color: var(--muted); display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+    .pass-detail span { display: flex; align-items: center; gap: 8px; }
+
+    .pass-price-box { display: flex; justify-content: space-between; align-items: flex-end; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); }
+    .old-price { font-size: 13px; color: var(--muted); text-decoration: line-through; }
+    .new-price { font-size: 22px; font-weight: 900; color: var(--red); }
+    
+    .btn-buy-pass {
+      background: var(--green); color: #fff; border: none;
+      border-radius: var(--r-sm); padding: 10px 20px;
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      font-family: var(--font-main); transition: all 0.2s;
+    }
+    .btn-buy-pass:hover { background: var(--green-light); transform: scale(1.02); }
+
+    /* Empty / loading state */
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); grid-column: 1 / -1; }
+    .empty-state .icon { font-size: 64px; margin-bottom: 12px; }
+    .empty-state h3 { font-size: 18px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+    .empty-state p { font-size: 14px; }
+  </style>
+</head>
+<body>
+<div id="header-placeholder"></div>
+
+<div class="pass-page">
+  <div class="page-title">Sàn Pass Sân</div>
+  <div class="page-sub">Cơ hội mua lại sân từ người khác với giá ưu đãi giảm 20%</div>
+
+  <div class="pass-list" id="passList">
+    <div class="empty-state"><div class="icon"></div><h3>Đang tải dữ liệu...</h3></div>
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<div id="toast-container"></div>
+<script src="/js/app.js"></script>
+<script>
+  let passBookings = [];
+
+  async function loadPassBookings() {
+    const list = document.getElementById('passList');
+    try {
+      const res  = await fetch('/api/bookings?isPass=true');
+      const json = await res.json();
+
+      if (!json.success || !json.data || json.data.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">🏸</div>
+            <p>Hiện không có ai đăng bán lại sân.</p>
+          </div>`;
+        return;
+      }
+
+      const now = new Date();
+      passBookings = json.data.filter(b => {
+        if (!b.bookingDate || !b.endTime) return true;
+        const endDt = new Date(b.bookingDate + 'T' + b.endTime);
+        return now <= endDt;
+      });
+
+      if (passBookings.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">🏸</div>
+            <p>Hiện không có ai đăng bán lại sân.</p>
+          </div>`;
+        return;
+      }
+      
+      list.innerHTML = passBookings.map(b => {
+        return `
+          <div class="pass-card">
+            <div class="pass-badge">Giảm 20%</div>
+            <div class="pass-court-name">🏸 ${b.courtName || 'Sân cầu lông'}</div>
+            <div class="pass-detail">
+              <span>Ngày: <strong>${b.bookingDate || '—'}</strong></span>
+              <span>Giờ: <strong>${b.startTime || '—'} – ${b.endTime || '—'}</strong></span>
+              <span>Người pass: ${b.customerName}</span>
+            </div>
+            
+            <div class="pass-price-box">
+              <div>
+                <div class="old-price">Giá gốc: ${b.totalPrice ? b.totalPrice.toLocaleString('vi-VN') + ' đ' : '—'}</div>
+                <div class="new-price">${b.passPrice ? b.passPrice.toLocaleString('vi-VN') + ' đ' : '—'}</div>
+              </div>
+              <button class="btn-buy-pass" onclick="buyPass(${b.id})">Mua ngay</button>
+            </div>
+          </div>`;
+      }).join('');
+
+    } catch (err) {
+      list.innerHTML = `<div class="empty-state"><div class="icon"></div><h3>Lỗi tải dữ liệu</h3><p>${err.message}</p></div>`;
+    }
+  }
+
+  async function buyPass(bookingId) {
+    if (!requireAuth()) return;
+    const user = getCurrentUser();
+
+    const conf = confirm('Bạn muốn mua lại sân này? Sân sẽ được chuyển vào Lịch sử đặt sân của bạn.');
+    if (!conf) return;
+
+    try {
+      const payload = {
+        userId: user.id,
+        customerName: user.fullName,
+        customerPhone: user.phone
+      };
+
+      const res = await fetch(`/api/bookings/${bookingId}/buy-pass`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const json = await res.json();
+      if (json.success) {
+        showToast('Mua lại sân thành công! Xin kiểm tra trong Lịch sử đặt sân.', 'success');
+        loadPassBookings();
+      } else {
+        showToast('Lỗi: ' + json.message, 'error');
+      }
+    } catch (err) {
+      showToast('Đã xảy ra lỗi kết nối.', 'error');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', loadPassBookings);
+</script>
+</body>
+</html>

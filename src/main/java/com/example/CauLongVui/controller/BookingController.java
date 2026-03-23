@@ -35,9 +35,12 @@ public class BookingController {
     public ResponseEntity<ApiResponse<List<BookingDTO>>> getAllBookings(
             @RequestParam(name = "courtId", required = false) Long courtId,
             @RequestParam(name = "userId",  required = false) Long userId,
-            @RequestParam(name = "phone",   required = false) String phone) {
+            @RequestParam(name = "phone",   required = false) String phone,
+            @RequestParam(name = "isPass",  required = false) Boolean isPass) {
         List<BookingDTO> bookings;
-        if (courtId != null) {
+        if (Boolean.TRUE.equals(isPass)) {
+            bookings = bookingService.getPassBookings();
+        } else if (courtId != null) {
             bookings = bookingService.getBookingsByCourtId(courtId);
         } else if (userId != null) {
             bookings = bookingService.getBookingsByUserId(userId);
@@ -71,5 +74,21 @@ public class BookingController {
                                                                   @RequestParam(name = "status") Booking.BookingStatus status) {
         return ResponseEntity.ok(ApiResponse.success("Cập nhật trạng thái thành công",
                 bookingService.updateBookingStatus(id, status)));
+    }
+
+    // PATCH /api/bookings/{id}/pass — đăng bán lại sân
+    @PatchMapping("/{id}/pass")
+    public ResponseEntity<ApiResponse<BookingDTO>> updateToPass(@PathVariable Long id) {
+        return ResponseEntity.ok(ApiResponse.success("Đăng bán lại sân thành công",
+                bookingService.updateBookingToPass(id)));
+    }
+
+    // POST /api/bookings/{id}/buy-pass — mua lại sân
+    @PostMapping("/{id}/buy-pass")
+    public ResponseEntity<ApiResponse<BookingDTO>> buyPassBooking(
+            @PathVariable Long id,
+            @RequestBody BookingDTO request) {
+        return ResponseEntity.ok(ApiResponse.success("Mua lại sân thành công",
+                bookingService.buyPassBooking(id, request.getUserId(), request.getCustomerName(), request.getCustomerPhone())));
     }
 }

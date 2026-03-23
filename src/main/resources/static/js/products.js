@@ -46,7 +46,7 @@ async function loadProducts() {
   } catch (err) {
     productsGrid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
-        <div class="empty-icon">⚠️</div>
+        <div class="empty-icon"></div>
         <h3>Không thể tải sản phẩm</h3>
         <p>${err.message}</p>
       </div>`;
@@ -58,7 +58,7 @@ function renderProducts(products) {
   if (!products.length) {
     productsGrid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
-        <div class="empty-icon">🛒</div>
+        <div class="empty-icon"></div>
         <h3>Không tìm thấy sản phẩm</h3>
         <p>Thử thay đổi từ khóa tìm kiếm.</p>
       </div>`;
@@ -82,7 +82,7 @@ function renderProducts(products) {
       <div class="card-img-wrapper" style="height: 180px;">
         ${imageContent}
         <div class="card-badge">
-           ${isAdmin ? '⚙️ Admin' : stockLabel(p.stockQuantity)}
+           ${isAdmin ? 'Admin' : stockLabel(p.stockQuantity)}
         </div>
         ${isAdmin 
           ? `<div class="card-fav" onclick="openShopEditModal(${p.id})" title="Sửa sản phẩm" style="font-size:16px;">✏️</div>` 
@@ -95,7 +95,7 @@ function renderProducts(products) {
         
         <div class="card-meta-inline" style="margin-bottom: 2px;">
           <div class="card-meta-item">
-            <span class="icon">🏷️</span> ${escapeHtml(p.category || 'Dụng cụ')}
+            <span class="icon"></span> ${escapeHtml(p.category || 'Dụng cụ')}
           </div>
         </div>
         
@@ -116,7 +116,7 @@ function renderProducts(products) {
           <button class="btn-book-premium ${p.stockQuantity <= 0 ? 'disabled' : ''}" style="padding: 8px 14px; font-size: 13px;"
             onclick="addToCart(${p.id}, '${safeName}', ${p.price})"
             ${p.stockQuantity <= 0 ? 'disabled' : ''}>
-            🛒 ${p.stockQuantity > 0 ? 'Thêm vào giỏ' : 'Hết hàng'}
+            ${p.stockQuantity > 0 ? 'Thêm vào giỏ' : 'Hết hàng'}
           </button>
         </div>
         
@@ -131,9 +131,9 @@ function renderProducts(products) {
 }
 
 function stockLabel(qty) {
-  if (qty <= 0) return `<span style="color:var(--red);">🔴 Hết hàng</span>`;
-  if (qty <= 5) return `<span style="color:#b8860b;">🟡 Còn ${qty}</span>`;
-  return `<span style="color:var(--green);">🟢 Còn hàng</span>`;
+  if (qty <= 0) return `<span style="color:var(--red);">Hết hàng</span>`;
+  if (qty <= 5) return `<span style="color:#b8860b;">Còn ${qty}</span>`;
+  return `<span style="color:var(--green);">Còn hàng</span>`;
 }
 
 // ─────────────────────────────────────────────────
@@ -190,7 +190,7 @@ function openDetailModal(id) {
 
   const cartBtn = document.getElementById('detailCartBtn');
   cartBtn.disabled    = p.stockQuantity <= 0;
-  cartBtn.textContent = p.stockQuantity > 0 ? '🛒 Thêm vào giỏ hàng' : '❌ Hết hàng';
+  cartBtn.textContent = p.stockQuantity > 0 ? 'Thêm vào giỏ hàng' : 'Hết hàng';
   cartBtn.onclick = () => { addToCart(p.id, p.name, p.price); closeModal('detailModal'); };
 
   openModal('detailModal');
@@ -200,7 +200,7 @@ function openDetailModal(id) {
 // Modal Sửa / Thêm sản phẩm (Admin)
 // ─────────────────────────────────────────────────
 function openShopAddModal() {
-  document.getElementById('shopEditModalTitle').textContent = '➕ Thêm sản phẩm mới';
+  document.getElementById('shopEditModalTitle').textContent = 'Thêm sản phẩm mới';
   ['shopEditId','shopFName','shopFPrice','shopFStock','shopFDesc','shopFImageUrl'].forEach(id => {
     document.getElementById(id).value = '';
   });
@@ -212,7 +212,7 @@ function openShopAddModal() {
 function openShopEditModal(id) {
   const p = allProducts.find(x => x.id === id);
   if (!p) return;
-  document.getElementById('shopEditModalTitle').textContent = '✏️ Chỉnh sửa sản phẩm';
+  document.getElementById('shopEditModalTitle').textContent = 'Chỉnh sửa sản phẩm';
   document.getElementById('shopEditId').value    = p.id;
   document.getElementById('shopFName').value     = p.name          || '';
   document.getElementById('shopFPrice').value    = p.price         != null ? p.price : '';
@@ -241,22 +241,22 @@ async function saveShopProduct() {
   const payload = { name, price, stockQuantity: stock, category,
                     description: desc, imageUrl: imageUrl || null };
   const btn = document.getElementById('shopSaveBtn');
-  btn.disabled = true; btn.innerHTML = '⏳ Đang lưu...';
+  btn.disabled = true; btn.innerHTML = 'Đang lưu...';
 
   try {
     if (editId) {
       await fetchAPI(`/products/${editId}`, { method: 'PUT', body: JSON.stringify(payload) });
-      showToast('✅ Cập nhật sản phẩm thành công!', 'success');
+      showToast('Cập nhật sản phẩm thành công!', 'success');
     } else {
       await fetchAPI('/products', { method: 'POST', body: JSON.stringify(payload) });
-      showToast('✅ Thêm sản phẩm thành công!', 'success');
+      showToast('Thêm sản phẩm thành công!', 'success');
     }
     closeModal('shopEditModal');
     await loadProducts();
   } catch (err) {
-    showToast('❌ Lỗi: ' + err.message, 'error');
+    showToast('Lỗi: ' + err.message, 'error');
   } finally {
-    btn.disabled = false; btn.innerHTML = '💾 Lưu sản phẩm';
+    btn.disabled = false; btn.innerHTML = 'Lưu sản phẩm';
   }
 }
 
@@ -264,11 +264,11 @@ function shopPreviewImage(url) {
   const wrap = document.getElementById('shopImgPreview');
   if (!url) { shopResetImgPreview(); return; }
   wrap.innerHTML = `<img src="${url}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;"
-    onerror="this.parentElement.innerHTML='<p style=\\'color:#ef4444;font-size:12px;text-align:center;\\'>⚠️ Không tải được ảnh</p>'" />`;
+    onerror="this.parentElement.innerHTML='<p style=\\'color:#ef4444;font-size:12px;text-align:center;\\'>Không tải được ảnh</p>'" />`;
 }
 function shopResetImgPreview() {
   document.getElementById('shopImgPreview').innerHTML =
-    `<p style="color:var(--muted);font-size:12px;text-align:center;padding:20px 0;">🖼️ Nhập URL để xem trước</p>`;
+    `<p style="color:var(--muted);font-size:12px;text-align:center;padding:20px 0;">Nhập URL để xem trước</p>`;
 }
 
 // ─────────────────────────────────────────────────
@@ -285,16 +285,16 @@ function openShopDeleteConfirm(id, name) {
 async function executeShopDelete() {
   if (!shopPendingDeleteId) return;
   const btn = document.getElementById('shopConfirmDeleteBtn');
-  btn.disabled = true; btn.innerHTML = '⏳ Đang xóa...';
+  btn.disabled = true; btn.innerHTML = 'Đang xóa...';
   try {
     await fetchAPI(`/products/${shopPendingDeleteId}`, { method: 'DELETE' });
-    showToast('🗑️ Đã xóa sản phẩm thành công!', 'success');
+    showToast('Đã xóa sản phẩm thành công!', 'success');
     closeModal('shopConfirmModal');
     await loadProducts();
   } catch (err) {
-    showToast('❌ Lỗi: ' + err.message, 'error');
+    showToast('Lỗi: ' + err.message, 'error');
   } finally {
-    btn.disabled = false; btn.innerHTML = '🗑️ Xóa vĩnh viễn';
+    btn.disabled = false; btn.innerHTML = 'Xóa vĩnh viễn';
     shopPendingDeleteId = null;
   }
 }
@@ -306,26 +306,36 @@ function addToCart(id, name, price) {
   if (!requireAuth()) return;
 
   const product = allProducts.find(p => p.id === id);
+  const stockLimit = product && product.stockQuantity != null ? product.stockQuantity : 999;
   try {
     const cart = JSON.parse(localStorage.getItem('cart') || '[]');
     const existing = cart.find(i => i.id === id);
     if (existing) {
+      if (existing.qty >= stockLimit) {
+        showToast('Kho không đủ số lượng', 'warning');
+        return;
+      }
       existing.qty += 1;
     } else {
+      if (stockLimit <= 0) {
+        showToast('Sản phẩm đã hết hàng', 'warning');
+        return;
+      }
       cart.push({
         id,
         name,
         price,
         qty: 1,
+        stock: stockLimit,
         imageUrl:  product ? product.imageUrl  : null,
         category:  product ? product.category  : null,
       });
     }
     localStorage.setItem('cart', JSON.stringify(cart));
     updateCartBadge();
-    showToast(`🛒 Đã thêm “<strong>${escapeHtml(name)}</strong>” vào giỏ hàng`, 'success');
+    showToast(`Đã thêm “<strong>${escapeHtml(name)}</strong>” vào giỏ hàng`, 'success');
   } catch (err) {
-    showToast('❗ Lỗi giỏ hàng: ' + err.message, 'error');
+    showToast('Lỗi giỏ hàng: ' + err.message, 'error');
   }
 }
 
@@ -350,7 +360,7 @@ async function shopUploadProductImage() {
 
   const uploadBtn = document.getElementById('shopUploadBtn');
   uploadBtn.disabled = true;
-  uploadBtn.textContent = '⏳...';
+  uploadBtn.textContent = '...';
 
   try {
     const form = new FormData();
@@ -361,12 +371,12 @@ async function shopUploadProductImage() {
 
     document.getElementById('shopFImageUrl').value = json.data;
     shopPreviewImage(json.data);
-    showToast('✅ Upload ảnh thành công!', 'success');
+    showToast('Upload ảnh thành công!', 'success');
   } catch (err) {
-    showToast('❌ Lỗi upload: ' + err.message, 'error');
+    showToast('Lỗi upload: ' + err.message, 'error');
   } finally {
     uploadBtn.disabled = false;
-    uploadBtn.textContent = '📷 Chọn ảnh';
+    uploadBtn.textContent = 'Chọn ảnh';
     input.value = '';
   }
 }
