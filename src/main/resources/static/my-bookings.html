@@ -314,8 +314,7 @@
 
     let filtered = allBookings;
 
-    // Tự động xóa (ẩn) các đặt sân từ ngày hôm qua
-    filtered = filtered.filter(b => b.bookingDate >= todayStr);
+    // (Đã gỡ bỏ tính năng tự động ẩn lịch sử cũ để khách có thể xem lại lịch cũ)
 
     if (dateF) { filtered = filtered.filter(b => b.bookingDate === dateF); }
     if (timeF) { 

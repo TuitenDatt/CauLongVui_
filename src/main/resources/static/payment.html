@@ -143,6 +143,44 @@
         <a href="/courts.html" class="btn-home">🏸 Đặt sân khác</a>
         <a href="/my-bookings.html" class="btn-retry" style="color: var(--green, #2d8a4e); border-color: var(--green, #2d8a4e);">📋 Xem lịch đặt của tôi</a>
       </div>`;
+
+      // ── AUTOCREATE MATCHMAKING ── //
+      const gkPendingStr = localStorage.getItem('gk_pending');
+      const userStr = localStorage.getItem('currentUser');
+      if (gkPendingStr) {
+          const gk = JSON.parse(gkPendingStr);
+          const u = (userStr && userStr !== "null") ? JSON.parse(userStr) : null;
+          
+          const now = new Date();
+          const localToday = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+
+          const payload = {
+              userId: u ? u.id : 0,  // 0 or null for guest
+              authorName: (u && u.fullName) ? u.fullName : custName,
+              title: gk.title,
+              phoneContact: (u && u.phone) ? u.phone : custPhone,
+              courtName: courtName,
+              playDate: localStorage.getItem('bk_dateRaw') || localToday,
+              startTime: localStorage.getItem('bk_startTime'),
+              endTime: localStorage.getItem('bk_endTime'),
+              level: gk.level,
+              requiredPlayers: gk.requiredPlayers,
+              costPerPerson: gk.costPerPerson,
+              status: 'OPEN'
+          };
+
+          fetch('/api/matchmaking', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify(payload)
+          }).then(res => res.json()).then(json => {
+              if(json.success) {
+                  const bd = document.querySelector('.result-body');
+                  if(bd) bd.innerHTML += `<div style="margin-top:20px;padding:12px;background:#fefce8;border-radius:10px;text-align:center;border:1px dashed #eab308;color:#a16207;font-size:13px;font-weight:700;">🤝 Hệ thống đã đăng tự động TÌM ĐỒNG ĐỘI lên Sàn Ghép Kèo. <br><a href="/ghep-keo.html" style="color:var(--green);text-decoration:underline;">Tới Sàn Ghép Kèo</a></div>`;
+              }
+          }).catch(err => console.error(err))
+          .finally(() => localStorage.removeItem('gk_pending'));
+      }
   }
 
   function renderFailed() {

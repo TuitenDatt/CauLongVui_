@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sàn Ghép Kèo – Cầu Lông Vui</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/header-footer.css" />
+  <style>
+    .ghepkeo-page { max-width: 1000px; margin: 0 auto; padding: 40px 24px 80px; }
+    .page-title { font-size: 26px; font-weight: 800; color: var(--dark); margin-bottom: 4px; }
+    .page-sub   { font-size: 14px; color: var(--muted); margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end;}
+    
+    .btn-create-post {
+      background: var(--green); color: #fff; border: none; padding: 10px 20px;
+      border-radius: var(--r-sm); font-size: 14px; font-weight: 700; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 8px; font-family: inherit;
+    }
+    .btn-create-post:hover { background: var(--green-light); transform: translateY(-1px); }
+
+    .keo-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; align-items: stretch; }
+
+    .keo-card {
+      background: var(--white); border: 2px solid #e2e8f0;
+      border-radius: var(--r-md); padding: 20px 24px;
+      display: flex; flex-direction: column; gap: 12px; transition: all 0.2s;
+      box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+    }
+    .keo-card:hover { box-shadow: var(--shadow-md); border-color: var(--green); }
+    
+    .keo-badge {
+      position: absolute; top: 12px; right: 12px;
+      background: #dcfce7; color: #166534; font-size: 11px; font-weight: 800;
+      padding: 4px 10px; border-radius: 12px; text-transform: uppercase;
+    }
+    .keo-badge.full { background: #fee2e2; color: #b91c1c; }
+
+    .keo-title { font-size: 16px; font-weight: 800; color: var(--dark); margin-top: 8px; margin-right: 60px; line-height: 1.4; }
+    .keo-detail { font-size: 13px; color: var(--muted); display: flex; flex-direction: column; gap: 8px; margin: 4px 0; }
+    .keo-detail span { display: flex; align-items: flex-start; gap: 8px; }
+    .keo-detail span i { font-style: normal; font-size: 14px; min-width: 20px; }
+
+    .keo-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border); }
+    .keo-author { font-size: 13px; font-weight: 600; color: var(--dark); display: flex; align-items: center; gap: 6px; }
+    
+    .btn-join {
+      background: var(--green-pale); color: var(--green); border: none;
+      border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 800;
+      cursor: pointer; font-family: inherit; transition: all 0.2s; text-decoration: none;
+    }
+    .btn-join:hover { background: var(--green); color: #fff; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); grid-column: 1 / -1; }
+    .empty-state .icon { font-size: 64px; margin-bottom: 12px; }
+    .empty-state h3 { font-size: 18px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+    .empty-state p { font-size: 14px; }
+
+    /* Modal */
+    .modal-box { max-width: 500px; padding: 24px; }
+    .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; text-align: left; }
+    .form-group label { font-size: 13px; font-weight: 700; color: var(--dark); }
+    .form-group input, .form-group select {
+      padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+      font-size: 14px; font-family: inherit; color: var(--dark);
+    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--green); outline: none; }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  </style>
+</head>
+<body>
+<div id="header-placeholder"></div>
+
+<div class="ghepkeo-page">
+  <div class="page-sub">
+    <div>
+        <div class="page-title">Sàn Ghép Kèo</div>
+        <div>Tìm đồng đội đánh cầu, chia sẻ đam mê và kinh phí sân.</div>
+    </div>
+  </div>
+
+  <div class="keo-list" id="keoList">
+    <div class="empty-state"><div class="icon">⏳</div><h3>Đang tải kèo...</h3></div>
+  </div>
+</div>
+
+
+
+<div id="footer-placeholder"></div>
+<div id="toast-container"></div>
+
+<script src="/js/app.js"></script>
+<script>
+  // Set datePicker min to today
+  document.addEventListener('DOMContentLoaded', () => {
+    loadKeos();
+    const now = new Date();
+    const today = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+    document.getElementById('gkDate').min = today;
+  });
+
+  async function loadKeos() {
+    const list = document.getElementById('keoList');
+    try {
+      const res = await fetch('/api/matchmaking');
+      const json = await res.json();
+      
+      if (!json.success || !json.data || json.data.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">🤝</div>
+            <h3>Khụng có kèo nào</h3>
+            <p>Hãy là người đầu tiên tạo kèo giao lưu!</p>
+          </div>`;
+        return;
+      }
+
+      list.innerHTML = json.data.map(k => {
+        let badge = k.status === 'OPEN' ? 'Đang mở' : 'Hết slot';
+        let badgeClass = k.status === 'OPEN' ? '' : 'full';
+
+        // formatting date nicely
+        const [y, m, d] = (k.playDate||'').split('-');
+        const dateStr = `${d}/${m}/${y}`;
+        const costStr = k.costPerPerson ? k.costPerPerson.toLocaleString('vi-VN') + ' đ' : 'Thỏa thuận';
+
+        return `
+          <div class="keo-card">
+            <div class="keo-badge ${badgeClass}">${badge}</div>
+            <div class="keo-title">${escapeHtml(k.title)}</div>
+            
+            <div class="keo-detail">
+              <span><i>🏸</i> <strong>Sân:</strong> ${escapeHtml(k.courtName)}</span>
+              <span><i>⏰</i> <strong>Thời gian:</strong> ${k.startTime} - ${k.endTime} (${dateStr})</span>
+              <span><i>🔥</i> <strong>Trình độ:</strong> ${escapeHtml(k.level)}</span>
+              <span><i>💰</i> <strong>Chi phí:</strong> ${costStr}/người</span>
+              <span><i>👥</i> <strong>Cần tìm:</strong> ${k.requiredPlayers} người</span>
+              <span><i>📞</i> <strong>Liên hệ:</strong> ${escapeHtml(k.phoneContact)}</span>
+            </div>
+            
+            <div class="keo-footer">
+              <div class="keo-author">🧑 ${escapeHtml(k.authorName)}</div>
+              ${k.status === 'OPEN' 
+                ? `<div style="display:flex; gap:8px;">
+                     <button onclick="joinKeo(${k.id})" class="btn-join" style="background:var(--green);color:#fff;">Tham gia (${k.joinedPlayers||0}/${k.requiredPlayers})</button>
+                     <a href="https://zalo.me/${k.phoneContact}" target="_blank" class="btn-join">Nhắn Zalo</a>
+                   </div>` 
+                : `<span style="font-size:12px;font-weight:700;color:var(--muted);">Đã đủ người (${k.joinedPlayers||k.requiredPlayers}/${k.requiredPlayers})</span>`
+              }
+            </div>
+          </div>
+        `;
+      }).join('');
+    } catch (err) {
+      list.innerHTML = `<div class="empty-state"><div class="icon">😵</div><h3>Lỗi tải dữ liệu</h3><p>${err.message}</p></div>`;
+    }
+  }
+
+
+
+  async function joinKeo(id) {
+    if (!requireAuth()) return;
+    const user = getCurrentUser();
+
+    if(!confirm("Xác nhận tham gia kèo này? Bạn nên liên hệ Zalo chủ kèo để chốt nhé!")) return;
+
+    try {
+        const res = await fetch(`/api/matchmaking/${id}/join?userId=${user.id}`, { method: 'POST' });
+        const json = await res.json();
+
+        if (json.success) {
+            showToast(json.message, 'success');
+            loadKeos(); // Refresh list to show updated count
+        } else {
+            showToast('Lỗi: ' + json.message, 'error');
+        }
+    } catch (err) {
+        showToast('Lỗi kết nối khi tham gia kèo.', 'error');
+    }
+  }
+
+  function escapeHtml(str) {
+      if(!str) return '';
+      const div = document.createElement('div');
+      div.appendChild(document.createTextNode(str));
+      return div.innerHTML;
+  }
+</script>
+</body>
+</html>

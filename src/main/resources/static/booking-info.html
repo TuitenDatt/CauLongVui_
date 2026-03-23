@@ -50,8 +50,44 @@
     </div>
   </div>
 
-  <div style="padding: 15px; color:#666; font-size:13px; margin-bottom: 70px;">
+  <div style="padding: 15px; color:#666; font-size:13px; margin-bottom: 20px;">
     <i>⚠️ Thanh toán qua Ví MoMo — bạn sẽ được chuyển đến trang MoMo để quét QR và hoàn tất.</i>
+  </div>
+
+  <div class="info-section light" style="margin-bottom: 150px; border-radius: 8px;">
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+      <input type="checkbox" id="chk-ghepkeo" style="width:18px; height:18px; accent-color:var(--green);" onchange="toggleGhepKeo()">
+      <label for="chk-ghepkeo" style="font-weight:700; color:var(--dark); cursor:pointer;">Đăng lên sàn Ghép Kèo tìm đồng đội</label>
+    </div>
+    
+    <div id="ghepkeo-fields" style="display:none; border-top:1px dashed #ccc; padding-top:12px; margin-top:12px;">
+      <div class="input-group">
+        <label>Tiêu đề (ngắn gọn) *</label>
+        <input type="text" id="gk-title" class="form-control form-input" placeholder="VD: Tìm 2 bạn nam đánh TB khá giao lưu" />
+      </div>
+      <div class="input-group">
+        <label>Trình độ yêu cầu</label>
+        <select id="gk-level" class="form-control form-input" style="appearance:auto;">
+          <option value="Mới chơi (Beginner)">Mới chơi (Beginner)</option>
+          <option value="Trung bình" selected>Trung bình</option>
+          <option value="TB - Khá">TB - Khá</option>
+          <option value="Khá - Giỏi">Khá - Giỏi</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:12px;">
+         <div class="input-group" style="flex:1;">
+           <label>Số người cần tìm *</label>
+           <input type="number" id="gk-req" class="form-control form-input" value="2" min="1" max="10" />
+         </div>
+         <div class="input-group" style="flex:1;">
+           <label>Tiền góp (đ/người) *</label>
+           <input type="number" id="gk-cost" class="form-control form-input" placeholder="VD: 50000" />
+         </div>
+      </div>
+      <div style="font-size:12px; color:#d97706; background:#fef3c7; padding:8px; border-radius:6px; margin-top:4px;">
+         Hệ thống sẽ tự nhận diện sân, ngày và giờ đặt của bạn để tạo kèo.
+      </div>
+    </div>
   </div>
 
   <div class="bottom-bar">
@@ -80,6 +116,11 @@
       document.getElementById('cus-phone').value = user.phone || '';
     }
 
+    function toggleGhepKeo() {
+      const chk = document.getElementById('chk-ghepkeo').checked;
+      document.getElementById('ghepkeo-fields').style.display = chk ? 'block' : 'none';
+    }
+
     async function goToPay(devBypass = false) {
       const name  = document.getElementById('cus-name').value.trim();
       const phone = document.getElementById('cus-phone').value.trim();
@@ -92,6 +133,29 @@
       // Lưu thông tin khách hàng
       localStorage.setItem('bk_name',  name);
       localStorage.setItem('bk_phone', phone);
+
+      // Kèo ghép (nếu có)
+      const isGhepKeo = document.getElementById('chk-ghepkeo').checked;
+      if (isGhepKeo) {
+        const gkTitle = document.getElementById('gk-title').value.trim();
+        const gkReq = document.getElementById('gk-req').value;
+        const gkCost = document.getElementById('gk-cost').value;
+        if(!gkTitle || !gkReq || !gkCost) {
+            alert('Vui lòng nhập đủ thông tin Ghép Kèo (Tiêu đề, Số người, Tiền)!');
+            payBtn.disabled = false;
+            payBtn.textContent = 'XÁC NHẬN & THANH TOÁN MOMO';
+            return;
+        }
+        const gkPayload = {
+            title: gkTitle,
+            level: document.getElementById('gk-level').value,
+            requiredPlayers: parseInt(gkReq),
+            costPerPerson: parseFloat(gkCost)
+        };
+        localStorage.setItem('gk_pending', JSON.stringify(gkPayload));
+      } else {
+        localStorage.removeItem('gk_pending');
+      }
 
       try {
         // 1. Tạo booking trước

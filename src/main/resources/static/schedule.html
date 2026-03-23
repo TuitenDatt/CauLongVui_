@@ -59,7 +59,7 @@
     .selection-hint.visible { display: block; }
 
     /* ── Active court row highlight ── */
-    tr.court-active td { background: #f0fdf4 !important; }
+    tr.court-active td.empty:not(.selected) { background: #f0fdf4 !important; }
     tr.court-active td.court-name {
       background: #dcfce7 !important;
       border-left: 3px solid #2d8a4e;
@@ -135,8 +135,9 @@
     // ── Date picker & 7-day bar ────────────────────────────────
     const dp = document.getElementById('datePicker');
     const today = new Date();
-    dp.min   = today.toISOString().split('T')[0];
-    dp.value = today.toISOString().split('T')[0];
+    const todayLocalStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+    dp.min   = todayLocalStr;
+    dp.value = todayLocalStr;
     updateDateLabel();
     buildWeekBar();
 
@@ -158,7 +159,7 @@
       for (let i = 0; i < 14; i++) {
         const d = new Date(today);
         d.setDate(today.getDate() + i);
-        const iso = d.toISOString().split('T')[0];
+        const iso = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
         const btn = document.createElement('button');
         btn.className = 'day-btn' + (i === 0 ? ' today' : '');
         btn.dataset.iso = iso;
@@ -281,9 +282,8 @@
     }
 
     // ── Consecutive slot selection logic ───────────────────────
-    let selCourtId   = null;
-    let selIdxMin    = null;
-    let selIdxMax    = null;
+    let selCourtId      = null;
+    let selectedIndices = [];
 
     function isPastSlot(slotTimeStr) {
       // Only block past slots on today's date
@@ -301,55 +301,62 @@
       const courtId = cell.dataset.courtId;
       const idx     = parseInt(cell.dataset.idx);
 
-      // If clicking on a different court, reset & start fresh on new court
+      if (cell.classList.contains('booked')) {
+        showScheduleToast('Giờ này đã có người đặt!', 'warning');
+        return;
+      }
+      if (isPastSlot(cell.dataset.time)) {
+        showScheduleToast('Không thể chọn khung giờ đã qua!', 'warning');
+        return;
+      }
+
+      // Nếu click sang sân khác, clear và chọn lại từ đầu (đây là sân mới)
       if (selCourtId !== null && selCourtId !== courtId) {
         clearSelection();
-        // Highlight: remove old row highlight
         document.querySelectorAll('tr.court-active').forEach(r => r.classList.remove('court-active'));
       }
 
       if (selCourtId === null) {
-        // First click — check if past
-        if (isPastSlot(cell.dataset.time)) {
-          showScheduleToast('\u23F0 Kh\u00f4ng th\u1EC3 ch\u1EBDn kh\u1EE7ng gi\u1EDD \u0111\u00E3 qua!', 'warning');
-          return;
-        }
-        // First selection on this court
         selCourtId = courtId;
-        selIdxMin  = idx;
-        selIdxMax  = idx;
-        // Highlight active court row
+        selectedIndices = [idx];
         highlightCourtRow(courtId);
       } else {
-        // Extend or shrink range
-        if (idx < selIdxMin) selIdxMin = idx;
-        else if (idx > selIdxMax) selIdxMax = idx;
-        else if (idx === selIdxMax && selIdxMax > selIdxMin) selIdxMax--;
-        else if (idx === selIdxMin && selIdxMin < selIdxMax) selIdxMin++;
-        else { clearSelection(); return; }
+        // Nếu đã click rồi
+        if (selectedIndices.includes(idx)) {
+           // Bỏ chọn (nhưng chỉ cho bỏ ở 2 đầu để giữ tính liên tục)
+           const minIdx = Math.min(...selectedIndices);
+           const maxIdx = Math.max(...selectedIndices);
+           if (idx === minIdx || idx === maxIdx) {
+               selectedIndices = selectedIndices.filter(i => i !== idx);
+               if (selectedIndices.length === 0) {
+                   selCourtId = null;
+                   document.querySelectorAll('tr.court-active').forEach(r => r.classList.remove('court-active'));
+               }
+           } else {
+               showScheduleToast('Vui lòng bỏ chọn từ các ô ngoài cùng để giữ liên tục đoạn giữa!', 'warning');
+               return;
+           }
+        } else {
+           // Chọn thêm ô mới. Ô này PHẢI liền kề.
+           const minIdx = Math.min(...selectedIndices);
+           const maxIdx = Math.max(...selectedIndices);
+           if (idx === minIdx - 1 || idx === maxIdx + 1) {
+               selectedIndices.push(idx);
+               selectedIndices.sort((a,b) => a - b);
+           } else {
+               showScheduleToast('Lưu ý: Chỉ được phép chọn các khung giờ LIÊN TỤC NHAU trên cùng 1 đơn!', 'warning');
+               // GIỮ NGUYÊN các ô đỏ cũ, không xóa!
+               return;
+           }
+        }
       }
 
-      // Check no booked slot in range
-      let hasConflict = false;
-      for (let i = selIdxMin; i <= selIdxMax; i++) {
-        if (isBooked(courtId, times[i])) { hasConflict = true; break; }
-      }
-      if (hasConflict) {
-        document.getElementById('selHint').classList.add('visible');
-        clearSelection();
-        return;
-      }
-
-      // Render selection
       renderSelection();
-      document.getElementById('selHint').classList.remove('visible');
       calcTotal();
     }
 
     function highlightCourtRow(courtId) {
-      // Remove previous highlight
       document.querySelectorAll('tr.court-active').forEach(r => r.classList.remove('court-active'));
-      // Find the row: any cell with data-court-id matching
       const anyCell = document.querySelector(`.slot[data-court-id="${courtId}"]`);
       if (anyCell && anyCell.closest('tr')) {
         anyCell.closest('tr').classList.add('court-active');
@@ -357,38 +364,41 @@
     }
 
     function renderSelection() {
-      // Clear all selected
       document.querySelectorAll('.slot.selected').forEach(c => c.classList.remove('selected'));
-      if (selCourtId === null) return;
-      for (let i = selIdxMin; i <= selIdxMax; i++) {
-        const cell = document.querySelector(`.slot[data-court-id="${selCourtId}"][data-idx="${i}"]`);
-        if (cell) cell.classList.add('selected');
-      }
+      if (selCourtId === null || selectedIndices.length === 0) return;
+      selectedIndices.forEach(idx => {
+         const cell = document.querySelector(`.slot[data-court-id="${selCourtId}"][data-idx="${idx}"]`);
+         if (cell) cell.classList.add('selected');
+      });
     }
 
     function clearSelection() {
-      selCourtId = null; selIdxMin = null; selIdxMax = null;
+      selCourtId = null;
+      selectedIndices = [];
       document.querySelectorAll('.slot.selected').forEach(c => c.classList.remove('selected'));
       calcTotal();
     }
 
     // ── Calculate total ────────────────────────────────────────
     function calcTotal() {
-      if (selCourtId === null || selIdxMin === null) {
+      if (selCourtId === null || selectedIndices.length === 0) {
         document.getElementById('total-hours').textContent = 'Tổng giờ: 0h00';
         document.getElementById('total-price').textContent = 'Tổng tiền: 0 đ';
         localStorage.removeItem('bk_price');
         return;
       }
 
-      const count = selIdxMax - selIdxMin + 1;
+      const count = selectedIndices.length;
       const m  = count * 30;
       const h  = Math.floor(m / 60);
       const mm = m % 60;
       const timeStr = h + 'h' + (mm > 0 ? mm : '00');
 
+      const minIdx = Math.min(...selectedIndices);
+      const maxIdx = Math.max(...selectedIndices);
+
       // Get price from court cell
-      const firstCell = document.querySelector(`.slot[data-court-id="${selCourtId}"][data-idx="${selIdxMin}"]`);
+      const firstCell = document.querySelector(`.slot[data-court-id="${selCourtId}"][data-idx="${minIdx}"]`);
       const priceHour  = firstCell ? parseFloat(firstCell.dataset.price) : 0;
       const total      = Math.round((count * 0.5) * priceHour);
       const courtName  = firstCell ? firstCell.dataset.courtName : '';
@@ -404,8 +414,8 @@
       localStorage.setItem('bk_time',         timeStr);
       localStorage.setItem('bk_dateRaw',      dp.value);
       localStorage.setItem('bk_date',         d2 + '/' + mo + '/' + y);
-      localStorage.setItem('bk_startTime',    idxToTime(selIdxMin));
-      localStorage.setItem('bk_endTime',      idxToTime(selIdxMax + 1));
+      localStorage.setItem('bk_startTime',    idxToTime(minIdx));
+      localStorage.setItem('bk_endTime',      idxToTime(maxIdx + 1));
     }
 
     function goToNext() {
