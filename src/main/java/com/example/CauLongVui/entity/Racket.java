@@ -15,7 +15,6 @@ public class Racket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @org.hibernate.annotations.Nationalized
     @Column(nullable = false, length = 150)
     private String name;
 
@@ -23,7 +22,6 @@ public class Racket {
     @Column(nullable = false)
     private RacketType racketType;
 
-    @org.hibernate.annotations.Nationalized
     @Column(length = 1000)
     private String description;
 

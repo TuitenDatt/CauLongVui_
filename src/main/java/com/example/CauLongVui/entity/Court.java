@@ -15,11 +15,9 @@ public class Court {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @org.hibernate.annotations.Nationalized
     @Column(nullable = false, length = 100)
     private String name;
 
-    @org.hibernate.annotations.Nationalized
     @Column(length = 500)
     private String description;
 

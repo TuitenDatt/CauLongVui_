@@ -138,107 +138,136 @@ const ICONS = {
   'Nước uống':'🧋','Đồ ăn':'🍜',
 };
 
-function getOrders() {
-  try { return JSON.parse(localStorage.getItem('orders') || '[]'); } catch { return []; }
-}
-
 function fmt(n) {
   return new Intl.NumberFormat('vi-VN', { style:'currency', currency:'VND', maximumFractionDigits:0 }).format(n||0);
 }
 function esc(str) {
+  if (!str) return '';
   const d = document.createElement('div');
-  d.appendChild(document.createTextNode(str || ''));
+  d.appendChild(document.createTextNode(str));
   return d.innerHTML;
 }
 
 function clearHistory() {
-  if (!confirm('Xóa toàn bộ lịch sử đặt hàng?')) return;
+  if (!confirm('Xóa lịch sử đơn hàng từ giỏ hàng (localStorage)?')) return;
   localStorage.removeItem('orders');
   renderOrders();
-  showToast('Đã xóa lịch sử đặt hàng', 'success');
+  showToast('Đã xóa lịch sử', 'success');
 }
 
-function renderOrders() {
-  const orders = getOrders();
-  const list   = document.getElementById('ordersList');
-  const toolbar = document.getElementById('toolbar');
+/* ─── Render 1 card ─────────────────────────────────────── */
+function renderCard(order) {
+  // Normalize to a common shape
+  const isApiOrder = !!order._apiOrder;
 
-  if (!orders.length) {
+  const statusClass = order.status === 'COMPLETED' ? 'status-cash'
+                    : order.status === 'CANCELLED'  ? 'status-momo' : '';
+  const statusLabel = order.status === 'PENDING'   ? 'Chờ giao / xử lý'
+                    : order.status === 'COMPLETED' ? 'Đã giao / hoàn thành'
+                    : order.status === 'CANCELLED'  ? 'Đã hủy' : order.status;
+
+  const itemsHtml = (order.items || []).map(item => {
+    const icon  = ICONS[item.category] || '🥤';
+    const thumb = item.imageUrl
+      ? `<div class="oi-thumb"><img src="${esc(item.imageUrl)}" onerror="this.parentElement.textContent='${icon}'"/></div>`
+      : `<div class="oi-thumb">${icon}</div>`;
+    const name  = item.productName || item.name || '—';
+    const price = item.unitPrice   || item.price  || 0;
+    const qty   = item.quantity    || item.qty    || 0;
+    const sub   = item.subTotal    || (price * qty);
+    return `<div class="order-item">
+      ${thumb}
+      <div class="oi-info">
+        <div class="oi-name">${esc(name)}</div>
+        <div class="oi-meta">${fmt(price)} × ${qty}</div>
+      </div>
+      <div class="oi-subtotal">${fmt(sub)}</div>
+    </div>`;
+  }).join('');
+
+  const courtInfo = order.courtName
+    ? `<div class="order-meta-item">Giao tới sân: <strong>${esc(order.courtName)}</strong></div>`
+    : `<div class="order-meta-item">Mua từ cửa hàng</div>`;
+
+  const srcBadge = isApiOrder
+    ? `<span style="font-size:10px;background:#dcfce7;color:#16a34a;padding:2px 7px;border-radius:8px;margin-left:8px;">Tại Sân</span>`
+    : `<span style="font-size:10px;background:#f1f5f9;color:#64748b;padding:2px 7px;border-radius:8px;margin-left:8px;">Cửa Hàng</span>`;
+
+  const total = order.totalAmount ?? order.total ?? 0;
+  const itemCount = (order.items||[]).reduce((s,i) => s + (i.quantity || i.qty || 0), 0);
+
+  return `<div class="order-card">
+    <div class="order-header">
+      <div>
+        <div class="order-id">Mã đơn: #${esc(String(order.id))}${srcBadge}</div>
+        <div class="order-date">${esc(order.createdAt || (order.orderDate ? new Date(order.orderDate).toLocaleString('vi-VN') : ''))}</div>
+      </div>
+      <span class="order-status-badge ${statusClass}">${statusLabel}</span>
+    </div>
+    <div class="order-meta">
+      ${courtInfo}
+      <div class="order-meta-item">${itemCount} món</div>
+    </div>
+    <div class="order-items">${itemsHtml}</div>
+    <div class="order-footer">
+      <span class="order-total-label">Tổng đơn hàng</span>
+      <span class="order-total-value">${fmt(total)}</span>
+    </div>
+  </div>`;
+}
+
+/* ─── Main render ─────────────────────────────────────────── */
+async function renderOrders() {
+  requireAuth();
+  const user    = getCurrentUser();
+  const list    = document.getElementById('ordersList');
+  const toolbar = document.getElementById('toolbar');
+  list.innerHTML = `<div class="empty-state"><div class="icon">⏳</div><p>Đang tải...</p></div>`;
+
+  /* 1. Lấy đơn từ API (food orders tại sân) */
+  let apiOrders = [];
+  try {
+    const res  = await fetch('/api/v1/food-orders?page=1&limit=200');
+    const json = await res.json();
+    if (json.success) {
+      apiOrders = (json.data.items || [])
+        .filter(o => o.customerName === (user.fullName || user.name || 'Khách'))
+        .map(o => ({ ...o, _apiOrder: true,
+          status: o.status || 'PENDING',
+          _sortKey: o.orderDate ? new Date(o.orderDate).getTime() : 0 }));
+    }
+  } catch (e) { console.warn('API food-orders error:', e); }
+
+  /* 2. Lấy đơn từ localStorage (đặt qua giỏ hàng cart.html) */
+  let localOrders = [];
+  try {
+    localOrders = JSON.parse(localStorage.getItem('orders') || '[]')
+      .map(o => ({ ...o, _apiOrder: false,
+        status: o.status || 'Đã đặt',
+        _sortKey: o.createdAt ? new Date(o.createdAt).getTime() : 0 }));
+  } catch (e) {}
+
+  /* 3. Gộp và sort mới nhất lên đầu */
+  const all = [...apiOrders, ...localOrders]
+    .sort((a, b) => (b._sortKey || 0) - (a._sortKey || 0));
+
+  if (!all.length) {
     toolbar.style.display = 'none';
-    list.innerHTML = `
-      <div class="empty-state">
-        <div class="icon">🛒</div>
-        <h3>Chưa có đơn hàng nào</h3>
-        <p>Bạn chưa đặt hàng nào từ cửa hàng.</p>
-        <a href="/products.html"
-           style="display:inline-flex;align-items:center;gap:8px;background:var(--green);
-                  color:#fff;padding:12px 24px;border-radius:12px;text-decoration:none;
-                  font-weight:700;font-size:14px;">
-          Mua sắm ngay
-        </a>
-      </div>`;
+    list.innerHTML = `<div class="empty-state">
+      <div class="icon">🛒</div>
+      <h3>Chưa có đơn hàng nào</h3>
+      <p>Bạn chưa đặt hàng nào từ cửa hàng hoặc tại sân.</p>
+      <a href="/products.html"
+         style="display:inline-flex;align-items:center;gap:8px;background:var(--green);
+                color:#fff;padding:12px 24px;border-radius:12px;text-decoration:none;
+                font-weight:700;font-size:14px;">Mua sắm ngay</a>
+    </div>`;
     return;
   }
 
   toolbar.style.display = 'flex';
-
-  list.innerHTML = orders.map(order => {
-    const isMomo = order.paymentMethod === 'momo';
-    const statusClass = isMomo ? 'status-momo' : 'status-cash';
-    const statusLabel = isMomo ? 'MoMo' : 'Tiền mặt';
-
-    const itemsHtml = (order.items || []).map(item => {
-      const icon = ICONS[item.category] || '';
-      const thumb = item.imageUrl
-        ? `<div class="oi-thumb"><img src="${esc(item.imageUrl)}" onerror="this.parentElement.textContent='${icon}'" /></div>`
-        : `<div class="oi-thumb">${icon}</div>`;
-      return `
-        <div class="order-item">
-          ${thumb}
-          <div class="oi-info">
-            <div class="oi-name">${esc(item.name)}</div>
-            <div class="oi-desc">${esc(item.description || item.category || '—')}</div>
-            <div class="oi-meta">${fmt(item.price)} × ${item.qty} ${item.category ? `· ${esc(item.category)}` : ''}</div>
-          </div>
-          <div class="oi-subtotal">${fmt(item.price * item.qty)}</div>
-        </div>`;
-    }).join('');
-
-    const courtInfo = order.courtName
-      ? `<div class="order-meta-item">Giao tới sân: <strong>${esc(order.courtName)}</strong></div>`
-      : `<div class="order-meta-item">Nhân viên sẽ liên hệ xác nhận</div>`;
-
-    const customerInfo = order.customerName
-      ? `<div class="order-meta-item"> ${esc(order.customerName)} · ${esc(order.customerPhone || '')}</div>`
-      : '';
-
-    return `
-      <div class="order-card">
-        <div class="order-header">
-          <div>
-            <div class="order-id">Mã đơn: ${esc(order.id)}</div>
-            <div class="order-date">${esc(order.createdAt)}</div>
-          </div>
-          <span class="order-status-badge ${statusClass}">${statusLabel} · ${esc(order.status)}</span>
-        </div>
-        <div class="order-meta">
-          ${courtInfo}
-          ${customerInfo}
-          <div class="order-meta-item">${(order.items||[]).reduce((s,i)=>s+i.qty,0)} món</div>
-        </div>
-        <div class="order-items">${itemsHtml}</div>
-        <div class="order-footer">
-          <span class="order-total-label">Tổng đơn hàng</span>
-          <span class="order-total-value">${fmt(order.total)}</span>
-        </div>
-      </div>`;
-  }).join('');
+  list.innerHTML = all.map(renderCard).join('');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  requireAuth();
-  renderOrders();
-});
+document.addEventListener('DOMContentLoaded', () => { renderOrders(); });
 </script>
-</body>
-</html>

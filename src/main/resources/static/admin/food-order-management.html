@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản lý Đơn Tại Sân – Cầu Lông Vui</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/shared.css" />
+  <link rel="stylesheet" href="/css/header-footer.css" />
+  <style>
+    body { font-family: 'Be Vietnam Pro', sans-serif; background: var(--bg); }
+    .mgmt-page { padding: 90px 0 60px; min-height: 100vh; }
+    .mgmt-container { max-width: 1300px; margin: 0 auto; padding: 0 24px; }
+
+    /* Header */
+    .mgmt-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; }
+    .mgmt-title  { font-size: 26px; font-weight: 900; color: var(--dark); }
+    .mgmt-title span { color: var(--green); }
+    .breadcrumb  { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    .breadcrumb a { color: var(--green); text-decoration: none; }
+
+    /* Stats */
+    .stats-bar { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 24px; }
+    .stat-chip {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 18px; font-size: 13px;
+      font-weight: 600; color: var(--dark); display: flex; align-items: center; gap: 8px;
+    }
+    .stat-chip .val { font-size: 22px; font-weight: 900; }
+    .val-pending   { color: #f59e0b; }
+    .val-completed { color: #16a34a; }
+    .val-cancelled { color: #dc2626; }
+
+    /* Toolbar */
+    .toolbar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 20px; }
+    .search-wrap { position: relative; }
+    .search-wrap::before { content: '🔍'; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 13px; }
+    .toolbar input[type="text"], .toolbar input[type="date"] {
+      padding: 10px 14px 10px 38px; min-width: 200px;
+      border: 1.5px solid var(--border); border-radius: 10px;
+      font-size: 14px; outline: none; background: var(--white); font-family: inherit;
+    }
+    .toolbar input:focus { border-color: var(--green); }
+    .toolbar select {
+      padding: 10px 14px; border: 1.5px solid var(--border);
+      border-radius: 10px; font-size: 14px; background: var(--white);
+      font-family: inherit; outline: none; cursor: pointer;
+    }
+    .toolbar select:focus { border-color: var(--green); }
+    .btn-refresh {
+      background: var(--green); color: #fff; border: none; border-radius: 10px;
+      padding: 10px 18px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all .2s;
+    }
+    .btn-refresh:hover { background: #14532d; }
+
+    /* Table */
+    .table-wrap { background: var(--white); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,.04); }
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: #f8f9fa; }
+    th { padding: 14px 16px; text-align: left; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--border); }
+    td { padding: 13px 16px; font-size: 14px; color: var(--dark); border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    tbody tr:hover { background: #f8fffe; }
+
+    /* Status badges */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 11px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+    .badge-PENDING   { background: #fef3c7; color: #92400e; }
+    .badge-COMPLETED { background: #dcfce7; color: #15803d; }
+    .badge-CANCELLED { background: #fee2e2; color: #b91c1c; }
+
+    /* Action buttons */
+    .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+    .btn-complete { background: #dcfce7; color: #15803d; border: none; border-radius: 8px; padding: 5px 12px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .2s; }
+    .btn-complete:hover { background: #15803d; color: #fff; }
+    .btn-cancel2 { background: #fee2e2; color: #dc2626; border: none; border-radius: 8px; padding: 5px 12px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .2s; }
+    .btn-cancel2:hover { background: #dc2626; color: #fff; }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 60px 20px; }
+    .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-state h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .empty-state p { color: var(--muted); font-size: 14px; }
+
+    /* Items list inside table */
+    .items-list { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+    .items-list strong { color: var(--dark); }
+
+    /* Access denied */
+    .access-denied { text-align: center; padding: 120px 24px; }
+  </style>
+</head>
+<body>
+<div id="header-placeholder"></div>
+
+<!-- Access Denied -->
+<div id="accessDenied" style="display:none;" class="mgmt-page">
+  <div class="access-denied">
+    <div style="font-size:64px">🚫</div>
+    <h2>Không có quyền truy cập</h2>
+    <p>Trang này chỉ dành cho Quản trị viên và Nhân viên.</p>
+    <a href="/auth/login.html" class="btn-refresh" style="display:inline-block;margin-top:20px;text-decoration:none;">Đăng nhập</a>
+  </div>
+</div>
+
+<!-- Main -->
+<div id="mgmtPage" style="display:none;" class="mgmt-page">
+  <div class="mgmt-container">
+
+    <div class="mgmt-header">
+      <div>
+        <div class="breadcrumb"><a href="/admin/admin.html">⚙️ Quản trị</a> › Quản lý Đồ Uống</div>
+        <h1 class="mgmt-title">🥤 Quản lý <span>Đơn Order Tại Sân</span></h1>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-chip"><span class="val val-pending"  id="sPending">—</span> Chờ giao</div>
+      <div class="stat-chip"><span class="val val-completed" id="sCompleted">—</span> Đã giao</div>
+      <div class="stat-chip"><span class="val val-cancelled" id="sCancelled">—</span> Đã hủy</div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="search-wrap">
+        <input type="text" id="searchInput" placeholder="Tìm sân, khách hàng..." oninput="applyFilter()" />
+      </div>
+      <select id="statusFilter" onchange="applyFilter()">
+        <option value="">Tất cả trạng thái</option>
+        <option value="PENDING">Chờ giao</option>
+        <option value="COMPLETED">Đã giao</option>
+        <option value="CANCELLED">Đã hủy</option>
+      </select>
+      <button class="btn-refresh" onclick="loadOrders()">🔄 Làm mới</button>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Khách & Sân</th>
+            <th>Danh sách món</th>
+            <th>Tổng tiền</th>
+            <th>Thời gian</th>
+            <th>Trạng thái</th>
+            <th style="min-width:180px;">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody id="orderTableBody">
+          <tr><td colspan="7"><div class="empty-state"><div class="icon">⏳</div><p>Đang tải dữ liệu...</p></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<div id="footer-placeholder"></div>
+<div id="toast-container"></div>
+
+<script src="/js/app.js"></script>
+<script>
+let allOrders = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = getCurrentUser();
+  if (!user || (user.role !== 'ADMIN' && user.role !== 'STAFF')) {
+    document.getElementById('accessDenied').style.display = 'block';
+    return;
+  }
+  document.getElementById('mgmtPage').style.display = 'block';
+  await loadOrders();
+});
+
+async function loadOrders() {
+  const tbody = document.getElementById('orderTableBody');
+  tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">⏳</div><p>Đang tải...</p></div></td></tr>`;
+  try {
+    const res  = await fetch('/api/v1/food-orders?page=1&limit=200');
+    const json = await res.json();
+    if (!json.success) throw new Error(json.message);
+    allOrders = json.data.items || [];
+    updateStats();
+    applyFilter();
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">⚠️</div><h3>Không thể tải dữ liệu</h3><p>${esc(err.message)}</p></div></td></tr>`;
+    showToast('Lỗi: ' + err.message, 'error');
+  }
+}
+
+function updateStats() {
+  document.getElementById('sPending').textContent   = allOrders.filter(o => o.status === 'PENDING').length;
+  document.getElementById('sCompleted').textContent = allOrders.filter(o => o.status === 'COMPLETED').length;
+  document.getElementById('sCancelled').textContent = allOrders.filter(o => o.status === 'CANCELLED').length;
+}
+
+function applyFilter() {
+  const search = document.getElementById('searchInput').value.trim().toLowerCase();
+  const status = document.getElementById('statusFilter').value;
+
+  let filtered = allOrders;
+  if (status) filtered = filtered.filter(o => o.status === status);
+  if (search) filtered = filtered.filter(o =>
+    (o.courtName || '').toLowerCase().includes(search) ||
+    (o.customerName || '').toLowerCase().includes(search)
+  );
+
+  // Newest first
+  filtered.sort((a,b) => new Date(b.orderDate) - new Date(a.orderDate));
+  renderTable(filtered);
+}
+
+function renderTable(orders) {
+  const tbody = document.getElementById('orderTableBody');
+  if (!orders.length) {
+    tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="icon">🥥</div><h3>Chưa có đơn hàng</h3><p>Không tìm thấy lịch sử order đồ ăn.</p></div></td></tr>`;
+    return;
+  }
+
+  const statusLabel = { PENDING: 'Chờ giao', COMPLETED: 'Đã giao', CANCELLED: 'Đã hủy' };
+
+  tbody.innerHTML = orders.map((o) => {
+    const canComplete = o.status === 'PENDING';
+    const canCancel   = o.status === 'PENDING';
+    
+    const itemsHtml = o.items.map(i => `<div>${i.quantity}x <strong>${esc(i.productName)}</strong></div>`).join('');
+    const dDate = new Date(o.orderDate);
+    
+    return `<tr>
+      <td style="color:var(--muted);font-size:12px;">#${o.id}</td>
+      <td>
+        <div style="font-weight:700;">${esc(o.customerName || '—')}</div>
+        <div style="font-size:12px;color:var(--green);">${esc(o.courtName || 'Giao tại sân')}</div>
+      </td>
+      <td><div class="items-list">${itemsHtml}</div></td>
+      <td style="font-weight:700;color:var(--green);">${(o.totalAmount || 0).toLocaleString('vi-VN')} đ</td>
+      <td style="font-size:12px;">${dDate.toLocaleDateString('vi-VN')} ${dDate.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'})}</td>
+      <td><span class="badge badge-${o.status}">${statusLabel[o.status] || o.status}</span></td>
+      <td>
+        <div class="action-btns">
+          ${canComplete ? `<button class="btn-complete" onclick="updateStatus(${o.id},'COMPLETED')">✅ Giao xong</button>` : ''}
+          ${canCancel   ? `<button class="btn-cancel2"  onclick="updateStatus(${o.id},'CANCELLED')">🚫 Hủy đơn</button>` : ''}
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function updateStatus(id, newStatus) {
+  if (newStatus === 'CANCELLED' && !confirm('Hủy đơn hàng này? Việc này sẽ không hoàn lại Tồn kho tự động trong phiên bản hiện tại. Tiếp tục?')) return;
+  
+  try {
+    const res = await fetch(`/api/v1/food-orders/${id}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    });
+    const json = await res.json();
+    if (!res.ok || !json.success) throw new Error(json.message || 'Lỗi xử lý');
+    
+    showToast(`✅ Đã cập nhật đơn hàng thành công!`, 'success');
+    await loadOrders();
+  } catch(err) {
+    showToast(`❌ Lỗi: ${err.message}`, 'error');
+  }
+}
+
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>

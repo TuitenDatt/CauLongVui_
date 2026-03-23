@@ -23,14 +23,12 @@ public class RacketRentalOrder {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @org.hibernate.annotations.Nationalized
     @Column(nullable = false, length = 100)
     private String customerName;
 
     @Column(length = 20)
     private String customerPhone;
 
-    @org.hibernate.annotations.Nationalized
     @Column(length = 255)
     private String courtName;
 

@@ -107,6 +107,8 @@
     .btn-order-items:hover { background: var(--green-light); }
     .btn-pass-san { background: #fef08a; color: #a16207; border: 1.5px solid #fde047; }
     .btn-pass-san:hover { background: #fde047; }
+    .btn-cancel-booking { background: #fee2e2; color: #dc2626; border: 1.5px solid #fca5a5; }
+    .btn-cancel-booking:hover { background: #dc2626; color: #fff; }
     
     /* Order Menu Modal (Mini Menu) */
     .menu-modal-box { max-width: 900px; height: 85vh; max-height: 700px; display: flex; flex-direction: column; }
@@ -413,10 +415,23 @@
     let footerHtml = '';
     if (isExpired) {
         footerHtml += `<div style="width:100%; text-align:center; color:var(--red); font-weight:700; font-size:14px; padding:8px; background:#fee2e2; border-radius:8px;">Sân đã quá thời hạn sử dụng</div>`;
+    } else if (b.status === 'CANCELLED') {
+        footerHtml += `<div style="width:100%; text-align:center; color:#dc2626; font-weight:700; font-size:14px; padding:8px; background:#fee2e2; border-radius:8px;">Booking này đã bị hủy</div>`;
     } else {
         footerHtml += `<button onclick="openOrderMenu()" class="modal-btn btn-order-items">Order Đồ Uống & Vợt</button>`;
-        // Prevent reselling an already resold court or cancelled/completed court
         if (b.status === 'CONFIRMED' || b.status === 'PENDING') {
+            // Check if cancellable: at least 1 hour before start
+            let canCancel = false;
+            if (b.bookingDate && b.startTime) {
+                const startDT = new Date(b.bookingDate + 'T' + b.startTime);
+                const diffMs  = startDT - new Date();
+                canCancel = diffMs > 60 * 60 * 1000; // > 1 hour
+            }
+            if (canCancel) {
+                footerHtml += `<button class="modal-btn btn-cancel-booking" onclick="cancelBooking()">🚫 Hủy Đặt Sân</button>`;
+            } else {
+                footerHtml += `<div style="font-size:12px;color:#f59e0b;text-align:center;padding:6px;">⚠️ Không thể hủy trong vòng 1 giờ trước giờ đánh</div>`;
+            }
             if (!b.isPass) {
                 footerHtml += `<button class="modal-btn btn-pass-san" onclick="confirmResell()">Bán lại sân (Giảm 20%)</button>`;
             }
@@ -707,24 +722,27 @@
         if(!rRes.ok) throw new Error('Lỗi tạo đơn thuê vợt');
       }
 
-      // 2. Process Products (LocalStorage Mock that cart.html uses)
+      // 2. Process Products — gọi API thật
       if(c1.length > 0) {
-        const totalAmount = c1.reduce((s,i)=>s+i.price*i.qty,0);
-        const mockOrder = {
-          id: 'ORD-' + Date.now(),
-          createdAt: new Date().toLocaleString('vi-VN'),
-          items: c1,
-          total: totalAmount,
-          courtName: courtNameText,
-          paymentMethod: payMethod.toLowerCase(),
-          status: payMethod === 'MOMO' ? 'Đã thanh toán MoMo' : 'Đã đặt',
+        const bk = allBookings.find(x => x.id === currentBookingId);
+        const foodPayload = {
           customerName: user.fullName || user.name || 'Khách',
-          customerPhone: user.phone || '0000'
+          courtId:      bk ? bk.courtId : null,
+          bookingId:    currentBookingId,
+          deliveryTime: null,
+          items: c1.map(i => ({ productId: i.id, quantity: i.qty }))
         };
-        const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-        orders.unshift(mockOrder);
-        localStorage.setItem('orders', JSON.stringify(orders.slice(0,50)));
+        const foodRes = await fetch('/api/v1/food-orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(foodPayload)
+        });
+        if (!foodRes.ok) {
+          const errJson = await foodRes.json().catch(() => ({}));
+          throw new Error(errJson.message || 'Lỗi tạo đơn đồ ăn');
+        }
       }
+      // (food orders đã được gửi lên API thật ở code bên trên)
 
       // Clear carts
       localStorage.removeItem('cart');
@@ -756,6 +774,27 @@
       if(typeof updateCartBadge === 'function') updateCartBadge();
   }
 
+
+  // ── Hủy booking ────────────────────────────────────────────
+  async function cancelBooking() {
+    if (!currentBookingId) return;
+    const b = allBookings.find(x => x.id === currentBookingId);
+    if (!b) return;
+
+    const confirmed = confirm(`Bạn có chắc chắn muốn hủy đặt sân?\n\n🏸 Sân: ${b.courtName}\n📅 Ngày: ${b.bookingDate}\n⏰ Giờ: ${b.startTime} – ${b.endTime}\n\n⚠️ Hành động này không thể hoàn tác!`);
+    if (!confirmed) return;
+
+    try {
+      const res  = await fetch(`/api/bookings/${currentBookingId}/status?status=CANCELLED`, { method: 'PATCH' });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.message || 'Hủy thất bại');
+      showToast('✅ Đã hủy đặt sân thành công!', 'success');
+      closeModal();
+      fetchBookings();
+    } catch (err) {
+      showToast('❌ Lỗi: ' + err.message, 'error');
+    }
+  }
 
   async function confirmResell() {
     if (!currentBookingId) return;
