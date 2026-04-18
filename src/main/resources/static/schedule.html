@@ -3,128 +3,186 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lịch đặt sân – Cầu Lông Vui</title>
+  <title>Đặt Lịch Sân – Cầu Lông Vui</title>
+  <meta name="description" content="Chọn sân và khung giờ đặt sân cầu lông trực quan">
   <link rel="icon" type="image/png" href="/favicon.png">
-  <link rel="stylesheet" href="/css/momo-booking.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/momo-booking.css">
   <style>
-    /* ── 7-day quick picker ── */
     .week-bar {
-      display: flex; gap: 6px; padding: 10px 12px;
-      background: #fff; border-bottom: 1px solid #e0e0e0;
+      display: flex; gap: 8px; padding: 12px 16px;
+      background: #fff; border-bottom: 1px solid #f0f0f0;
       overflow-x: auto; scrollbar-width: none;
     }
     .week-bar::-webkit-scrollbar { display: none; }
     .day-btn {
       flex-shrink: 0; display: flex; flex-direction: column;
-      align-items: center; padding: 8px 12px; border-radius: 12px;
-      border: 1.5px solid #e0e0e0; background: #fff; cursor: pointer;
-      font-family: inherit; transition: all 0.2s; min-width: 54px;
+      align-items: center; padding: 8px 14px; border-radius: 14px;
+      border: 1.5px solid #e5e7eb; background: #fff; cursor: pointer;
+      font-family: inherit; transition: all 0.18s; min-width: 56px;
     }
-    .day-btn .day-name { font-size: 11px; color: #888; font-weight: 600; }
-    .day-btn .day-num  { font-size: 18px; font-weight: 800; color: #333; }
-    .day-btn.today     { border-color: #2d8a4e; background: #f0fdf4; }
-    .day-btn.today .day-name { color: #2d8a4e; }
-    .day-btn.selected  { border-color: #2d8a4e; background: #2d8a4e; }
-    .day-btn.selected .day-name,
-    .day-btn.selected .day-num  { color: #fff; }
+    .day-btn:hover { border-color: #16a34a; background: #f0fdf4; }
+    .day-btn .day-name { font-size: 11px; color: #9ca3af; font-weight: 700; letter-spacing: 0.04em; }
+    .day-btn .day-num  { font-size: 20px; font-weight: 900; color: #1a2e1a; line-height: 1.2; }
+    .day-btn.today     { border-color: #16a34a; background: #f0fdf4; }
+    .day-btn.today .day-name { color: #16a34a; }
+    .day-btn.selected  { border-color: #16a34a; background: #16a34a; box-shadow: 0 4px 12px rgba(22,163,74,0.3); }
+    .day-btn.selected .day-name, .day-btn.selected .day-num { color: #fff; }
 
-    /* ── Slot State Colors ── */
-    .slot.booked { background: #e04f5f !important; cursor: not-allowed; } /* Red */
-    .slot.held.by-me { background: #bbf7d0 !important; cursor: pointer; }
-    .slot.selected { background: #2d8a4e !important; color: white; } /* Green - Win over held.by-me */
-
-    /* ── Custom date picker ── */
     .date-picker-bar {
-      background: #fff; padding: 8px 12px;
-      display: flex; align-items: center; gap: 10px;
-      border-bottom: 1px solid #e0e0e0; font-size: 14px;
+      background: #fff; padding: 10px 16px;
+      display: flex; align-items: center; gap: 12px;
+      border-bottom: 1px solid #f0f0f0; font-size: 14px;
     }
-    .date-picker-bar label { font-weight: 600; color: #444; white-space: nowrap; }
+    .date-picker-bar label { font-weight: 700; color: #374151; white-space: nowrap; font-size: 13px; }
     .date-picker-bar input[type=date] {
-      border: 1.5px solid #ccc; border-radius: 8px;
-      padding: 6px 12px; font-size: 14px; font-family: inherit;
-      outline: none; cursor: pointer;
+      border: 1.5px solid #e5e7eb; border-radius: 10px;
+      padding: 7px 12px; font-size: 14px; font-family: inherit;
+      outline: none; cursor: pointer; color: #1a2e1a; background: #f9fafb;
+      transition: border-color 0.2s;
     }
-    .date-picker-bar input[type=date]:focus { border-color: #2d8a4e; }
+    .date-picker-bar input[type=date]:focus { border-color: #16a34a; background: #f0fdf4; }
+    #dateLabel { color: #16a34a; font-weight: 800; font-size: 14px; }
     .court-filter-hint {
-      font-size: 12px; color: #888; margin-left: auto;
-      white-space: nowrap;
+      font-size: 12px; color: #6b7280; margin-left: auto; white-space: nowrap;
+      background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 20px;
+      padding: 4px 12px; font-weight: 600;
     }
 
-    /* ── Court row highlight on hover ── */
-    .slot.empty:hover { background: #bbf7d0 !important; cursor: pointer; }
-    .slot.past { background: #f1f5f9 !important; cursor: not-allowed; opacity: 0.5; }
+    .status-bar {
+      display: flex; gap: 20px; padding: 9px 16px;
+      background: #fff; border-bottom: 1px solid #f0f0f0;
+      align-items: center; font-size: 12px; flex-wrap: wrap;
+    }
+    .status-dot { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
+    .status-bar > div { color: #374151; font-weight: 600; display: flex; align-items: center; }
+    .s-empty   { background: white; border: 1.5px solid #d1d5db; }
+    .s-booked  { background: #f87171; }
+    .s-held    { background: #fde68a; border: 1px solid #fbbf24; }
+    .s-selected{ background: #16a34a; }
 
-    /* ── Consecutive selection guide ── */
     .selection-hint {
-      font-size: 12px; color: #f39c12; padding: 4px 12px;
+      font-size: 12px; color: #92400e; padding: 7px 16px;
       background: #fffbeb; border-bottom: 1px solid #fde68a;
-      display: none;
+      display: none; font-weight: 600;
     }
-    .selection-hint.visible { display: block; }
+    .selection-hint.visible { display: flex; align-items: center; gap: 6px; }
 
-    /* ── Active court row highlight ── */
+    .schedule-container { overflow-x: auto; background: #fafafa; padding-bottom: 100px; }
+    .schedule-table { border-collapse: collapse; min-width: 1200px; width: 100%; }
+    .schedule-table th, .schedule-table td {
+      border: 1px solid #f0f0f0; text-align: center;
+      padding: 0; height: 38px; min-width: 44px; cursor: pointer;
+    }
+    .schedule-table thead tr th {
+      background: #f8fafc; font-size: 11px; font-weight: 700;
+      color: #94a3b8; letter-spacing: 0.04em; border-bottom: 2px solid #e2e8f0;
+    }
+    .court-name {
+      background: #f8fafc !important; font-size: 12px; font-weight: 800;
+      position: sticky; left: 0; z-index: 10;
+      border-right: 2px solid #e2e8f0 !important;
+      padding: 6px 10px !important; min-width: 90px; text-align: left !important;
+    }
+    .slot.empty   { background: #fff; transition: background 0.1s; }
+    .slot.empty:hover { background: #dcfce7 !important; cursor: pointer; }
+    .slot.booked  { background: #fee2e2 !important; cursor: not-allowed; }
+    .slot.selected{ background: #16a34a !important; color: white; }
+    .slot.held    { background: #fef3c7 !important; cursor: not-allowed; }
+    .slot.held.by-me { background: #bbf7d0 !important; cursor: pointer; }
+    .slot.past    { background: #f8fafc !important; cursor: not-allowed; opacity: 0.45; }
     tr.court-active td.empty:not(.selected) { background: #f0fdf4 !important; }
-    tr.court-active td.court-name {
-      background: #dcfce7 !important;
-      border-left: 3px solid #2d8a4e;
-    }
+    tr.court-active td.court-name { background: #dcfce7 !important; border-left: 3px solid #16a34a !important; }
 
-    /* ── RSocket Held State ── */
-    .slot.held {
-      background: #fef3c7 !important; /* light yellow */
-      cursor: not-allowed;
-      position: relative;
+    .bottom-bar {
+      position: fixed; bottom: 0; left: 0; width: 100%;
+      background: #fff; border-top: 1px solid #e5e7eb;
+      padding: 14px 20px 18px;
+      box-shadow: 0 -6px 24px rgba(0,0,0,0.07);
+      z-index: 200;
     }
+    .summary {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 12px; padding: 10px 16px;
+      background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 12px;
+    }
+    .summary span { font-size: 14px; font-weight: 700; color: #14532d; }
+    .summary span:last-child { color: #16a34a; font-size: 17px; font-weight: 900; }
+    .btn-next {
+      background: #16a34a; color: white; border: none; padding: 15px; width: 100%;
+      font-size: 15px; font-weight: 800; cursor: pointer; border-radius: 12px;
+      font-family: inherit; transition: all 0.2s; letter-spacing: 0.05em;
+      box-shadow: 0 4px 16px rgba(22,163,74,0.3);
+    }
+    .btn-next:hover { background: #14532d; transform: translateY(-1px); }
   </style>
 </head>
 <body>
+
+  <!-- Header -->
   <div class="momo-header">
-    <a href="courts.html" class="btn-back">❮</a>
-    <h2>ĐẶT LỊCH TRỰC QUAN</h2>
-    <div style="width:30px;"></div>
+    <a href="courts.html" class="btn-back" title="Quay lại">❮</a>
+    <h2>Đặt Lịch Trực Quan</h2>
+    <div style="width:36px;"></div>
   </div>
 
-  <!-- Thanh chọn nhanh 7 ngày -->
+  <!-- 7-day quick picker -->
   <div class="week-bar" id="weekBar"></div>
 
-  <!-- Date picker chính xác -->
+  <!-- Date picker -->
   <div class="date-picker-bar">
     <label>📅 Ngày:</label>
-    <input type="date" id="datePicker" />
-    <span id="dateLabel" style="color:#2d8a4e; font-weight:700;"></span>
+    <input type="date" id="datePicker">
+    <span id="dateLabel"></span>
     <span class="court-filter-hint" id="courtCountLabel"></span>
   </div>
 
-  <!-- Gợi ý chọn slot liên tục -->
+  <!-- Selection hint -->
   <div class="selection-hint" id="selHint">
-    ⚠️ Vui lòng chọn các khung giờ <b>liên tiếp nhau</b>.
+    ⚠️ Vui lòng chọn các khung giờ <b>liên tiếp nhau</b> trên cùng một sân.
   </div>
 
+  <!-- Status legend -->
   <div class="status-bar">
-    <div><span class="status-dot s-empty"></span> Trống</div>
-    <div><span class="status-dot s-booked"></span> Đã đặt</div>
-    <div><span class="status-dot s-held" style="background:#fef3c7;"></span> Đang giữ</div>
-    <div><span class="status-dot s-selected" style="background:#2d8a4e;"></span> Đang chọn</div>
+    <div><span class="status-dot s-empty"></span>Trống</div>
+    <div><span class="status-dot s-booked"></span>Đã đặt</div>
+    <div><span class="status-dot s-held"></span>Đang giữ</div>
+    <div><span class="status-dot s-selected"></span>Đang chọn</div>
   </div>
 
+  <!-- Schedule grid -->
   <div class="schedule-container">
     <table class="schedule-table" id="grid">
       <thead>
         <tr id="time-header">
-          <th class="court-name" style="min-width:80px;">Sân</th>
+          <th class="court-name" style="min-width:90px;">Sân</th>
         </tr>
       </thead>
       <tbody id="grid-body"></tbody>
     </table>
   </div>
 
+  <!-- Bottom bar -->
   <div class="bottom-bar">
     <div class="summary">
-      <span id="total-hours">Tổng giờ: 0h00</span>
-      <span id="total-price">Tổng tiền: 0 đ</span>
+      <span id="total-hours">&#x23f1; T&#x1ed5ng gi&#x1edd;: 0h00</span>
+      <span id="total-price">0 &#x111;</span>
     </div>
-    <button class="btn-next" onclick="goToNext()">TIẾP THEO</button>
+    <!-- Bundle mode: hien thi so san da chon -->
+    <div id="bundle-bar" style="display:none;margin-bottom:8px;padding:8px 12px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;font-size:13px;">
+      <span style="font-weight:700;color:#16a34a;">&#x1f3d8; Ch&#x1ebf; &#x111;&#x1ed9; c&#x1ee5;m:</span>
+      <span id="bundle-count" style="color:#14532d;font-weight:800;">0 s&#xE2;n</span>
+      <span id="bundle-courts-list" style="color:#6b7280;font-size:12px;"></span>
+      <button onclick="clearBundleSelection()" style="float:right;background:none;border:none;color:#dc2626;font-weight:700;cursor:pointer;font-size:13px;">X&#xf3;a h&#x1ebf;t</button>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button id="btn-bundle-mode" class="btn-next" style="flex:0 0 auto;width:auto;padding:15px 18px;background:#f0fdf4;color:#16a34a;border:2px solid #16a34a;font-size:13px;" onclick="toggleBundleMode()">
+        &#x1f3d8; &#x110;&#x1eb7;t c&#x1ee5;m
+      </button>
+      <button class="btn-next" style="flex:1;" onclick="goToNext()">Ti&#x1ebf;p Theo &#x2192;</button>
+    </div>
   </div>
 
   <script>
@@ -338,9 +396,62 @@
       await buildGrid();
     }
 
-    // ── Consecutive slot selection logic ───────────────────────
+    // ── Single-court selection state ──────────────────────────
     let selCourtId      = null;
     let selectedIndices = [];
+
+    // ── Bundle (multi-court) selection state ───────────────────
+    let bundleMode = false;     // khi bật: có thể chọn nhiều sân
+    // bundleCourts: Map<courtId, {courtName, pricePerHour, minIdx, maxIdx}>
+    let bundleCourts = new Map();
+
+    function toggleBundleMode() {
+      bundleMode = !bundleMode;
+      const btn = document.getElementById('btn-bundle-mode');
+      const bar = document.getElementById('bundle-bar');
+      if (bundleMode) {
+        btn.style.background = '#16a34a'; btn.style.color = '#fff';
+        btn.textContent = '✅ Đặt cụm';
+        bar.style.display = 'block';
+        showScheduleToast('Chế độ cụm: chọn nhiều sân cùng khung giờ', 'info');
+        
+        // Nếu đã chọn sẵn 1 sân -> tự động đưa vào danh sách cụm
+        if (selCourtId && selectedIndices.length > 0) {
+          const min = Math.min(...selectedIndices), max = Math.max(...selectedIndices);
+          const cell = document.querySelector(`.slot[data-court-id="${selCourtId}"][data-idx="${min}"]`);
+          bundleCourts.set(selCourtId, {
+            courtName: cell ? cell.dataset.courtName : 'Sân',
+            pricePerHour: cell ? parseFloat(cell.dataset.price) : 0,
+            minIdx: min, maxIdx: max
+          });
+          updateBundleBar();
+        }
+      } else {
+        btn.style.background = '#f0fdf4'; btn.style.color = '#16a34a';
+        btn.textContent = '🏛 Đặt cụm';
+        bar.style.display = bundleCourts.size > 0 ? 'block' : 'none';
+      }
+    }
+
+    function clearBundleSelection() {
+      bundleCourts.clear();
+      selCourtId = null; selectedIndices = [];
+      document.querySelectorAll('.slot.selected').forEach(c => c.classList.remove('selected'));
+      document.querySelectorAll('tr.court-active').forEach(r => r.classList.remove('court-active'));
+      document.getElementById('bundle-bar').style.display = 'none';
+      calcTotal();
+    }
+
+    function updateBundleBar() {
+      const bar = document.getElementById('bundle-bar');
+      const count = document.getElementById('bundle-count');
+      const list  = document.getElementById('bundle-courts-list');
+      if (bundleCourts.size === 0) { bar.style.display = 'none'; return; }
+      bar.style.display = 'block';
+      count.textContent = bundleCourts.size + ' sân';
+      const names = [...bundleCourts.values()].map(v => v.courtName).join(', ');
+      list.textContent = ' — ' + names;
+    }
 
     function isPastSlot(slotTimeStr) {
       // Only block past slots on today's date
@@ -355,18 +466,45 @@
     }
 
     async function handleSlotClick(cell) {
-      const courtId = cell.dataset.courtId;
-      const idx     = parseInt(cell.dataset.idx);
-      const dateStr = dp.value;
+      const courtId   = cell.dataset.courtId;
+      const courtName = cell.dataset.courtName;
+      const idx       = parseInt(cell.dataset.idx);
+      const dateStr   = dp.value;
 
-      if (cell.classList.contains('booked')) {
-        showScheduleToast('Giờ này đã có người đặt!', 'warning');
-        return;
+      if (cell.classList.contains('booked')) { showScheduleToast('Giờ này đã có người đặt!', 'warning'); return; }
+      if (isPastSlot(cell.dataset.time)) { showScheduleToast('Không thể chọn khung giờ đã qua!', 'warning'); return; }
+
+      // ── Bundle mode: mỗi click vào 1 sân bổ sung/xóa sân đó khỏi bundle ──
+      if (bundleMode) {
+        // Nếu click vào sân đang "active" (đang điều chỉnh khung giờ) hoặc chưa có sân nào trong cụm
+        // -> cho phép điều chỉnh khung giờ như bình thường (rơi xuống logic bên dưới)
+        if (selCourtId === courtId || bundleCourts.size === 0) {
+          // tiếp tục xử lý logic chọn giờ bên dưới...
+        } else {
+          // Nếu click vào sân KHÁC sân đang active -> thêm/bớt sân đó vào cụm với CÙNG khung giờ
+          if (bundleCourts.has(courtId)) {
+            bundleCourts.delete(courtId);
+            document.querySelectorAll(`.slot[data-court-id="${courtId}"].selected`).forEach(c => c.classList.remove('selected'));
+          } else {
+            if (selectedIndices.length === 0) {
+              // Nếu chưa chọn giờ mà đã click sân khác -> chọn slot đó làm gốc
+              selCourtId = courtId; selectedIndices = [idx]; highlightCourtRow(courtId);
+            }
+            const min = Math.min(...selectedIndices), max = Math.max(...selectedIndices);
+            bundleCourts.set(courtId, {
+              courtName, pricePerHour: parseFloat(cell.dataset.price),
+              minIdx: min, maxIdx: max
+            });
+            // Highlight các slot tương ứng trên sân mới
+            for (let i = min; i <= max; i++) {
+              const c = document.querySelector(`.slot[data-court-id="${courtId}"][data-idx="${i}"]`);
+              if (c) c.classList.add('selected');
+            }
+          }
+          updateBundleBar(); calcTotal(); return;
+        }
       }
-      if (isPastSlot(cell.dataset.time)) {
-        showScheduleToast('Không thể chọn khung giờ đã qua!', 'warning');
-        return;
-      }
+
 
       // If already selected, and it's my hold, release it
       if (cell.classList.contains('selected') && cell.classList.contains('by-me')) {
@@ -429,6 +567,32 @@
       }
 
       renderSelection();
+      
+      // Nếu đang ở chế độ cụm -> đồng bộ khung giờ mới cho TẤT CẢ các sân trong cụm
+      if (bundleMode && selectedIndices.length > 0) {
+        const min = Math.min(...selectedIndices), max = Math.max(...selectedIndices);
+        // Cập nhật sân active trong bundleCourts (nếu chưa có thì thêm)
+        const cell = document.querySelector(`.slot[data-court-id="${selCourtId}"][data-idx="${min}"]`);
+        bundleCourts.set(selCourtId, {
+          courtName: cell ? cell.dataset.courtName : 'Sân',
+          pricePerHour: cell ? parseFloat(cell.dataset.price) : 0,
+          minIdx: min, maxIdx: max
+        });
+        // Cập nhật tất cả các sân khác trong cụm theo khung giờ này
+        bundleCourts.forEach((v, cid) => {
+          v.minIdx = min; v.maxIdx = max;
+        });
+        // Re-render highlight cho toàn bộ sân trong cụm
+        document.querySelectorAll('.slot.selected').forEach(c => c.classList.remove('selected'));
+        bundleCourts.forEach((v, cid) => {
+          for (let i = min; i <= max; i++) {
+            const c = document.querySelector(`.slot[data-court-id="${cid}"][data-idx="${i}"]`);
+            if (c) c.classList.add('selected');
+          }
+        });
+        updateBundleBar();
+      }
+
       calcTotal();
 
       // Request hold for the new selection
@@ -493,9 +657,40 @@
 
     // ── Calculate total ────────────────────────────────────────
     function calcTotal() {
+      // BUNDLE MODE
+      if (typeof bundleCourts !== 'undefined' && bundleCourts.size > 0) {
+        let totalPrice = 0;
+        let timeStr = '0h00';
+        bundleCourts.forEach(v => {
+          const count = v.maxIdx - v.minIdx + 1;
+          const minutes = count * 30;
+          const h = Math.floor(minutes / 60), mm = minutes % 60;
+          timeStr = h + 'h' + (mm > 0 ? mm : '00');
+          totalPrice += Math.round((count * 0.5) * v.pricePerHour);
+        });
+        document.getElementById('total-hours').textContent = '⏱ ' + bundleCourts.size + ' sân × ' + timeStr;
+        document.getElementById('total-price').textContent = totalPrice.toLocaleString('vi-VN') + ' đ';
+
+        const first = [...bundleCourts.values()][0];
+        const [y, mo, d2] = dp.value.split('-');
+        localStorage.setItem('bk_bundle_mode',    '1');
+        localStorage.setItem('bk_bundle_courts',  JSON.stringify([...bundleCourts.entries()].map(([id, v]) => ({courtId: id, ...v}))));
+        localStorage.setItem('bk_price',          totalPrice);
+        localStorage.setItem('bk_time',           timeStr);
+        localStorage.setItem('bk_dateRaw',        dp.value);
+        localStorage.setItem('bk_date',           d2 + '/' + mo + '/' + y);
+        localStorage.setItem('bk_startTime',      idxToTime(first.minIdx));
+        localStorage.setItem('bk_endTime',        idxToTime(first.maxIdx + 1));
+        return;
+      }
+
+      // SINGLE COURT MODE
+      localStorage.removeItem('bk_bundle_mode');
+      localStorage.removeItem('bk_bundle_courts');
+
       if (selCourtId === null || selectedIndices.length === 0) {
-        document.getElementById('total-hours').textContent = 'Tổng giờ: 0h00';
-        document.getElementById('total-price').textContent = 'Tổng tiền: 0 đ';
+        document.getElementById('total-hours').textContent = '⏱ Tổng giờ: 0h00';
+        document.getElementById('total-price').textContent = '0 đ';
         localStorage.removeItem('bk_price');
         return;
       }
@@ -515,8 +710,8 @@
       const total      = Math.round((count * 0.5) * priceHour);
       const courtName  = firstCell ? firstCell.dataset.courtName : '';
 
-      document.getElementById('total-hours').textContent = 'Tổng giờ: ' + timeStr;
-      document.getElementById('total-price').textContent = 'Tổng tiền: ' + total.toLocaleString('vi-VN') + ' đ';
+      document.getElementById('total-hours').textContent = '⏱ Tổng giờ: ' + timeStr;
+      document.getElementById('total-price').textContent = total.toLocaleString('vi-VN') + ' đ';
 
       const [y, mo, d2] = dp.value.split('-');
       localStorage.setItem('bk_courtId',      selCourtId);
@@ -531,6 +726,10 @@
     }
 
     function goToNext() {
+      if (typeof bundleCourts !== 'undefined' && bundleCourts.size > 0) {
+        window.location.href = 'bundle-booking.html';
+        return;
+      }
       if (!localStorage.getItem('bk_price')) {
         alert('Vui lòng chọn sân và khung giờ!');
         return;

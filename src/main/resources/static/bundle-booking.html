@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đặt Cụm Sân – Cầu Lông Vui</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/momo-booking.css">
+  <style>
+    .bundle-table { width:100%; border-collapse:collapse; font-size:14px; }
+    .bundle-table th { background:#f0fdf4; color:#16a34a; font-weight:800; text-align:left; padding:10px 14px; border-bottom:2px solid #bbf7d0; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; }
+    .bundle-table td { padding:12px 14px; border-bottom:1px solid #f0f0f0; }
+    .bundle-table tr:last-child td { border-bottom:none; }
+    .court-badge { display:inline-flex; align-items:center; gap:6px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:4px 10px; font-weight:700; color:#16a34a; font-size:13px; }
+    .total-bundle { background:linear-gradient(135deg,#16a34a,#14532d); color:white; border-radius:14px; padding:18px 22px; display:flex; justify-content:space-between; align-items:center; margin-top:4px; }
+    .total-bundle .label { font-size:14px; font-weight:700; opacity:.9; }
+    .total-bundle .amount { font-size:26px; font-weight:900; }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <a href="schedule.html" class="btn-back">❮</a>
+    <h2>Đặt Cụm Sân</h2>
+    <div class="header-spacer"></div>
+  </div>
+
+  <div class="checkout-layout">
+    <!-- LEFT: Chi tiết cụm -->
+    <div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header">
+          <div class="card-header-icon">🏢</div>
+          <h3>Thông tin cụm</h3>
+        </div>
+        <div class="card-body">
+          <div class="info-row">
+            <span class="info-label">📅 Ngày</span>
+            <span class="info-value" id="t-date">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">⏱ Khung giờ</span>
+            <span class="info-value" id="t-time">—</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">🏸 Số sân</span>
+            <span class="info-value" id="t-count">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon">🏟️</div>
+          <h3>Danh sách sân trong cụm</h3>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <table class="bundle-table">
+            <thead>
+              <tr>
+                <th>Sân</th>
+                <th>Giá/giờ</th>
+                <th>Thành tiền</th>
+              </tr>
+            </thead>
+            <tbody id="courts-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Thông tin & thanh toán -->
+    <div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-header">
+          <div class="card-header-icon">👤</div>
+          <h3>Thông tin đặt</h3>
+        </div>
+        <div class="card-body">
+          <div class="input-group">
+            <label>Tên cụm (tùy chọn)</label>
+            <input type="text" id="bundle-name" class="form-input" placeholder="VD: Công ty ABC – Thứ 5">
+          </div>
+          <div class="input-group">
+            <label>Tên người đặt *</label>
+            <input type="text" id="cus-name" class="form-input" placeholder="Nguyễn Văn A">
+          </div>
+          <div class="input-group">
+            <label>Số điện thoại *</label>
+            <input type="tel" id="cus-phone" class="form-input" placeholder="0901234567">
+          </div>
+          <div class="input-group">
+            <label>Ghi chú</label>
+            <input type="text" id="bundle-note" class="form-input" placeholder="VD: Đặt cho nhóm 10 người">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-header-icon">💰</div>
+          <h3>Thanh toán</h3>
+        </div>
+        <div class="card-body">
+          <div class="total-bundle">
+            <span class="label">Tổng tiền cụm</span>
+            <span class="amount" id="t-total">0 đ</span>
+          </div>
+
+          <div class="wallet-status-card" id="walletStatusBox" style="margin-top:14px;">
+            <div class="wallet-status-row">
+              <span style="font-size:13px;font-weight:700;">💳 Số dư ví</span>
+              <span class="wallet-balance" id="walletBalanceText">—</span>
+            </div>
+            <span class="wallet-hint" id="walletStatusText"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom bar -->
+  <div class="bottom-bar">
+    <div class="bottom-bar-inner">
+      <div class="pay-row">
+        <button class="btn-pay btn-pay-wallet" id="walletPayBtn" onclick="doPay('wallet')">
+          🏦 Thanh Toán Bằng Ví
+        </button>
+        <button class="btn-pay btn-pay-momo" id="momoPayBtn" onclick="doPay('momo')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="10" opacity="0.3"/><path d="M8 12a4 4 0 1 1 8 0 4 4 0 0 1-8 0z" fill="white"/></svg>
+          Thanh Toán MoMo
+        </button>
+      </div>
+      <button class="btn-pay btn-pay-dev" onclick="doPay('momo', true)">🛠 (DEV) Test thành công</button>
+    </div>
+  </div>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    const bundleCourtsRaw = JSON.parse(localStorage.getItem('bk_bundle_courts') || '[]');
+    const totalPrice = parseInt(localStorage.getItem('bk_price') || '0');
+    const dateRaw = localStorage.getItem('bk_dateRaw') || '';
+    const dateStr = localStorage.getItem('bk_date') || '';
+    const startTime = localStorage.getItem('bk_startTime') || '';
+    const endTime   = localStorage.getItem('bk_endTime') || '';
+
+    if (!bundleCourtsRaw.length) {
+      alert('Không có dữ liệu cụm. Quay lại trang chọn sân.');
+      location.href = 'schedule.html';
+    }
+
+    // Fill header info
+    document.getElementById('t-date').textContent = dateStr;
+    document.getElementById('t-time').textContent = startTime + ' – ' + endTime;
+    document.getElementById('t-count').textContent = bundleCourtsRaw.length + ' sân';
+    document.getElementById('t-total').textContent = totalPrice.toLocaleString('vi-VN') + ' đ';
+
+    // Fill user info
+    if (user) {
+      document.getElementById('cus-name').value = user.fullName || '';
+      document.getElementById('cus-phone').value = user.phone || '';
+      loadWalletStatus();
+    } else {
+      document.getElementById('walletPayBtn').disabled = true;
+      document.getElementById('walletPayBtn').textContent = '🔒 Đăng nhập để dùng ví';
+    }
+
+    // Build courts table
+    const tbody = document.getElementById('courts-tbody');
+    bundleCourtsRaw.forEach(c => {
+      const hours = (c.maxIdx - c.minIdx + 1) * 0.5;
+      const price = Math.round(hours * c.pricePerHour);
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><span class="court-badge">🏸 ${c.courtName}</span></td>
+        <td>${Number(c.pricePerHour).toLocaleString('vi-VN')} đ</td>
+        <td style="font-weight:800;color:#16a34a;">${price.toLocaleString('vi-VN')} đ</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    function formatMoney(n) { return Number(n||0).toLocaleString('vi-VN') + ' đ'; }
+
+    async function loadWalletStatus() {
+      try {
+        const res = await fetch(`/api/wallets/user/${user.id}`);
+        const json = await res.json();
+        const box = document.getElementById('walletStatusBox');
+        box.style.display = 'block';
+        if (!res.ok || !json.success) throw new Error(json.message);
+        const balance = Number(json.data.balance || 0);
+        document.getElementById('walletBalanceText').textContent = formatMoney(balance);
+        const hint = document.getElementById('walletStatusText');
+        const btn = document.getElementById('walletPayBtn');
+        if (balance >= totalPrice) {
+          hint.textContent = 'Số dư đủ để thanh toán toàn cụm.';
+          hint.className = 'wallet-hint'; btn.disabled = false;
+        } else {
+          hint.textContent = `Thiếu ${formatMoney(totalPrice - balance)}.`;
+          hint.className = 'wallet-hint error'; btn.disabled = true;
+          btn.textContent = '🏦 Số dư không đủ';
+        }
+      } catch (e) {
+        document.getElementById('walletStatusBox').style.display = 'block';
+        document.getElementById('walletStatusText').textContent = e.message;
+        document.getElementById('walletPayBtn').disabled = true;
+      }
+    }
+
+    function setBtnsLoading(loading, method) {
+      ['walletPayBtn','momoPayBtn'].forEach(id => document.getElementById(id).disabled = loading);
+    }
+
+    async function doPay(method, devBypass = false) {
+      const name  = document.getElementById('cus-name').value.trim();
+      const phone = document.getElementById('cus-phone').value.trim();
+      if (!name || !phone) { alert('Vui lòng nhập Tên và Số điện thoại!'); return; }
+      if (!user && method === 'wallet') { alert('Cần đăng nhập để dùng ví.'); return; }
+
+      setBtnsLoading(true);
+
+      const courtIds = bundleCourtsRaw.map(c => c.courtId);
+      const bundleName = document.getElementById('bundle-name').value.trim();
+      const note = document.getElementById('bundle-note').value.trim();
+
+      try {
+        // Bước 1: Tạo bundle
+        const createRes = await fetch('/api/bundles', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user ? user.id : null,
+            bundleName: bundleName || null,
+            note: note || null,
+            bookingDate: dateRaw,
+            startTime, endTime,
+            courtIds,
+            paymentMethod: method === 'wallet' ? 'WALLET' : 'MOMO',
+            customerName: name,
+            customerPhone: phone
+          })
+        });
+        const createJson = await createRes.json();
+        if (!createRes.ok || !createJson.success) throw new Error(createJson.message || 'Không thể tạo cụm');
+        const bundleId = createJson.data.id;
+        localStorage.setItem('bk_bundleId', bundleId);
+
+        // Bước 2: Thanh toán
+        if (method === 'wallet') {
+          const payRes = await fetch(`/api/bundles/${bundleId}/pay-wallet?userId=${user.id}`, { method: 'POST' });
+          const payJson = await payRes.json();
+          if (!payRes.ok || !payJson.success) throw new Error(payJson.message || 'Thanh toán ví thất bại');
+          window.location.href = `/payment.html?result=success&flow=wallet-bundle&orderId=BUNDLE-${bundleId}&amount=${totalPrice}&message=Dat_cum_san_thanh_cong`;
+          return;
+        }
+
+        if (devBypass) {
+          // Xác nhận thanh toán dev
+          await fetch(`/api/bundles/${bundleId}/confirm-payment?method=MOMO&paymentReference=DEVTEST`, { method: 'POST' });
+          alert(`✅ Đặt cụm ${bundleCourtsRaw.length} sân thành công!\nMã cụm: #${bundleId}\nVào "Hồ sơ" để quản lý cụm.`);
+          localStorage.removeItem('bk_bundle_mode');
+          window.location.href = 'my-bookings.html';
+          return;
+        }
+
+        const momoRes = await fetch('/api/payment/momo', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookingId: bundleId, amount: totalPrice, courtName: 'Cum san ' + bundleCourtsRaw.length + ' san', customerName: name, isBundlePayment: true })
+        });
+        const momoJson = await momoRes.json();
+        if (momoJson.success && momoJson.data?.payUrl) { window.location.href = momoJson.data.payUrl; return; }
+        throw new Error(momoJson.message || 'Không thể tạo thanh toán MoMo');
+      } catch (err) {
+        alert('Lỗi: ' + err.message);
+        setBtnsLoading(false);
+      }
+    }
+  </script>
+</body>
+</html>

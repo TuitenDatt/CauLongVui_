@@ -32,6 +32,8 @@ public class BookingDTO {
     private String paymentReference;
     private LocalDateTime paidAt;
     private LocalDateTime refundedAt;
+    private LocalDateTime paymentDeadline;
+    private Long bundleId;
 
     public static BookingDTO fromEntity(Booking booking) {
         return BookingDTO.builder()
@@ -52,6 +54,8 @@ public class BookingDTO {
                 .paymentReference(booking.getPaymentReference())
                 .paidAt(booking.getPaidAt())
                 .refundedAt(booking.getRefundedAt())
+                .paymentDeadline(booking.getPaymentDeadline())
+                .bundleId(booking.getBundle() != null ? booking.getBundle().getId() : null)
                 .build();
     }
 }

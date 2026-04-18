@@ -83,12 +83,29 @@ public class BookingController {
                 bookingService.updateBookingToPass(id)));
     }
 
-    // POST /api/bookings/{id}/buy-pass — mua lại sân
+    // POST /api/bookings/{id}/buy-pass
     @PostMapping("/{id}/buy-pass")
     public ResponseEntity<ApiResponse<BookingDTO>> buyPassBooking(
             @PathVariable Long id,
             @RequestBody BookingDTO request) {
-        return ResponseEntity.ok(ApiResponse.success("Mua lại sân thành công",
+        return ResponseEntity.ok(ApiResponse.success("Mua lai san thanh cong",
                 bookingService.buyPassBooking(id, request.getUserId(), request.getCustomerName(), request.getCustomerPhone())));
+    }
+
+    /** POST /api/bookings/{id}/pay-later — PRO/VIP thanh toan booking da dat truoc */
+    @PostMapping("/{id}/pay-later")
+    public ResponseEntity<ApiResponse<BookingDTO>> payLater(
+            @PathVariable Long id,
+            @RequestParam Long userId,
+            @RequestParam(defaultValue = "WALLET") Booking.PaymentMethod method,
+            @RequestParam(required = false) String paymentReference) {
+        BookingDTO result = bookingService.payDeposit(id, userId, method, paymentReference);
+        return ResponseEntity.ok(ApiResponse.success("Thanh toan thanh cong!", result));
+    }
+
+    /** GET /api/bookings/unpaid?userId= — booking chua thanh toan */
+    @GetMapping("/unpaid")
+    public ResponseEntity<ApiResponse<List<BookingDTO>>> getUnpaidBookings(@RequestParam Long userId) {
+        return ResponseEntity.ok(ApiResponse.success(bookingService.getUnpaidBookings(userId)));
     }
 }

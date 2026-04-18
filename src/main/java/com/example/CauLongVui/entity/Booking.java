@@ -69,11 +69,20 @@ public class Booking {
     @Column
     private LocalDateTime refundedAt;
 
+    /** Deadline tra tien cho booking dat truoc (PRO/VIP). Null = da tra hoac khong ap dung. */
+    @Column
+    private LocalDateTime paymentDeadline;
+
+    /** Cụm đặt sân (nullable). */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bundle_id")
+    private BookingBundle bundle;
+
     public enum BookingStatus {
         PENDING, CONFIRMED, CANCELLED, COMPLETED
     }
 
     public enum PaymentMethod {
-        CASH, MOMO, WALLET
+        CASH, MOMO, WALLET, BOOK_NOW_PAY_LATER
     }
 }

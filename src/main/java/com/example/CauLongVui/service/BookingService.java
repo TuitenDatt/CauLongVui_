@@ -115,8 +115,9 @@ public class BookingService {
         long minutes = Duration.between(bookingDTO.getStartTime(), bookingDTO.getEndTime()).toMinutes();
         double totalPrice = (minutes / 60.0) * court.getPricePerHour();
 
+        com.example.CauLongVui.entity.User user = null;
         if (bookingDTO.getUserId() != null) {
-            com.example.CauLongVui.entity.User user = userRepository.findById(bookingDTO.getUserId()).orElse(null);
+            user = userRepository.findById(bookingDTO.getUserId()).orElse(null);
             if (user != null && user.getMembershipTier() != null
                     && user.getMembershipExpiry() != null
                     && user.getMembershipExpiry().isAfter(LocalDateTime.now())) {
@@ -128,19 +129,46 @@ public class BookingService {
             }
         }
 
+        // ── Book-now-pay-later: chỉ PRO/VIP mới được phép ──
+        boolean isBookNowPayLater = bookingDTO.getPaymentMethod() == Booking.PaymentMethod.BOOK_NOW_PAY_LATER;
+        if (isBookNowPayLater) {
+            if (user == null) throw new BadRequestException("Phai dang nhap de dung tinh nang dat truoc.");
+            var tier = user.getMembershipTier();
+            boolean eligible = (tier == com.example.CauLongVui.entity.MembershipTier.PRO
+                    || tier == com.example.CauLongVui.entity.MembershipTier.VIP)
+                    && user.getMembershipExpiry() != null
+                    && user.getMembershipExpiry().isAfter(LocalDateTime.now());
+            if (!eligible) throw new BadRequestException("Chi thanh vien PRO/VIP moi duoc dat truoc - thanh toan sau.");
+        }
+
+        // Tính paymentDeadline nếu đặt trước
+        LocalDateTime paymentDeadline = null;
+        if (isBookNowPayLater) {
+            LocalDateTime matchStart = bookingDTO.getBookingDate().atTime(bookingDTO.getStartTime());
+            var tier = user.getMembershipTier();
+            if (tier == com.example.CauLongVui.entity.MembershipTier.VIP) {
+                paymentDeadline = matchStart.minusHours(2);  // VIP: phải trả trước 2 tiếng
+            } else {
+                paymentDeadline = matchStart.minusHours(24); // PRO: phải trả trước 24 tiếng
+            }
+            // Deadline không được trong quá khứ
+            if (paymentDeadline.isBefore(LocalDateTime.now())) {
+                paymentDeadline = LocalDateTime.now().plusMinutes(30);
+            }
+        }
+
         Booking booking = Booking.builder()
                 .court(court)
-                .user(bookingDTO.getUserId() != null
-                        ? userRepository.findById(bookingDTO.getUserId()).orElse(null)
-                        : null)
+                .user(user)
                 .customerName(bookingDTO.getCustomerName())
                 .customerPhone(bookingDTO.getCustomerPhone())
                 .bookingDate(bookingDTO.getBookingDate())
                 .startTime(bookingDTO.getStartTime())
                 .endTime(bookingDTO.getEndTime())
                 .totalPrice(totalPrice)
-                .status(Booking.BookingStatus.PENDING)
+                .status(isBookNowPayLater ? Booking.BookingStatus.CONFIRMED : Booking.BookingStatus.PENDING)
                 .paymentMethod(bookingDTO.getPaymentMethod())
+                .paymentDeadline(paymentDeadline)
                 .build();
 
         return BookingDTO.fromEntity(bookingRepository.save(booking));
@@ -148,6 +176,39 @@ public class BookingService {
 
     public BookingDTO createBooking(BookingDTO bookingDTO) {
         return createBooking(bookingDTO, null);
+    }
+
+    /**
+     * PRO/VIP thanh toán sau khi đã đặt trước.
+     * Hỗ trợ method: WALLET hoặc MOMO (redirect).
+     */
+    @Transactional
+    public BookingDTO payDeposit(Long bookingId, Long userId, Booking.PaymentMethod method,
+                                  String paymentReference) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResourceNotFoundException("Khong tim thay booking: " + bookingId));
+        if (booking.getPaidAt() != null) {
+            throw new BadRequestException("Booking nay da duoc thanh toan.");
+        }
+        if (booking.getStatus() == Booking.BookingStatus.CANCELLED) {
+            throw new BadRequestException("Booking da bi huy, khong the thanh toan.");
+        }
+        if (booking.getUser() == null || !booking.getUser().getId().equals(userId)) {
+            throw new BadRequestException("Ban khong co quyen thanh toan booking nay.");
+        }
+
+        if (method == Booking.PaymentMethod.WALLET) {
+            walletService.payBookingWithWallet(
+                    userId, BigDecimal.valueOf(booking.getTotalPrice()),
+                    "BOOKING-" + bookingId, "Thanh toan dat san #" + bookingId);
+        }
+
+        booking.setPaymentMethod(method);
+        booking.setPaymentReference(paymentReference);
+        booking.setPaidAt(LocalDateTime.now());
+        booking.setPaymentDeadline(null); // clear deadline
+        booking.setStatus(Booking.BookingStatus.CONFIRMED);
+        return BookingDTO.fromEntity(bookingRepository.save(booking));
     }
 
     public BookingDTO updateBookingStatus(Long id, Booking.BookingStatus status) {
@@ -233,5 +294,13 @@ public class BookingService {
         booking.setCustomerPhone(newCustomerPhone);
 
         return BookingDTO.fromEntity(bookingRepository.save(booking));
+    }
+
+    @Transactional(readOnly = true)
+    public List<BookingDTO> getUnpaidBookings(Long userId) {
+        return bookingRepository
+                .findByUserIdAndPaidAtIsNullAndPaymentDeadlineIsNotNullAndStatusNotOrderByBookingDateAsc(
+                        userId, Booking.BookingStatus.CANCELLED)
+                .stream().map(BookingDTO::fromEntity).collect(Collectors.toList());
     }
 }

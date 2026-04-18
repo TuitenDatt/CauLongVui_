@@ -25,6 +25,7 @@ public class MomoController {
     private final BookingService bookingService;
     private final com.example.CauLongVui.service.MembershipService membershipService;
     private final WalletService walletService;
+    private final com.example.CauLongVui.service.BookingBundleService bundleService;
 
     @PostMapping("/momo")
     public ResponseEntity<ApiResponse<Map<String, String>>> createMomoPayment(
@@ -36,11 +37,12 @@ public class MomoController {
             String courtName = body.getOrDefault("courtName", "Dat san cau long").toString();
             String customerName = body.getOrDefault("customerName", "Khach hang").toString();
             String customOrderId = body.getOrDefault("orderId", "").toString();
+            boolean isBundle = Boolean.TRUE.equals(body.get("isBundlePayment"));
 
             String orderId = (customOrderId != null && !customOrderId.isBlank())
                     ? customOrderId
-                    : "CLV-" + bookingId + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
-            String orderInfo = "Dat san " + courtName + " - " + customerName;
+                    : (isBundle ? "BUNDLE-" : "CLV-") + bookingId + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+            String orderInfo = (isBundle ? "Dat cum san " : "Dat san ") + courtName + " - " + customerName;
 
             MomoPaymentResponse response = momoService.createPayment(amount, orderId, orderInfo);
 
@@ -116,6 +118,21 @@ public class MomoController {
                 log.warn("Could not update wallet topup status: {}", e.getMessage());
             }
             flow = "wallet-topup";
+        } else if (orderId != null && orderId.startsWith("BUNDLE-")) {
+            try {
+                String[] parts = orderId.split("-");
+                if (parts.length >= 2) {
+                    Long bundleId = Long.parseLong(parts[1]);
+                    if (success) {
+                        bundleService.confirmBundlePayment(bundleId, Booking.PaymentMethod.MOMO, orderId);
+                    }
+                    // Bundle doesn't have a "failed" status update logic in service yet, 
+                    // usually they just stay PENDING or get auto-deleted if needed.
+                }
+            } catch (Exception e) {
+                log.warn("Could not update bundle status: {}", e.getMessage());
+            }
+            flow = "bundle";
         }
 
         String redirectUrl = "/payment.html?result=" + (success ? "success" : "failed")
@@ -157,6 +174,14 @@ public class MomoController {
                     walletService.completeTopUp(orderId, body.getOrDefault("transId", "").toString());
                 } else {
                     walletService.failTopUp(orderId, body.getOrDefault("message", "").toString());
+                }
+            } else if (orderId.startsWith("BUNDLE-")) {
+                String[] parts = orderId.split("-");
+                if (parts.length >= 2) {
+                    Long bundleId = Long.parseLong(parts[1]);
+                    if (success) {
+                        bundleService.confirmBundlePayment(bundleId, Booking.PaymentMethod.MOMO, orderId);
+                    }
                 }
             }
         } catch (Exception e) {

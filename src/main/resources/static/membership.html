@@ -26,9 +26,16 @@
     .plan-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: var(--green); }
     .plan-card.popular { border: 2px solid var(--green); transform: scale(1.03); z-index: 1; }
     .plan-card.popular:hover { transform: scale(1.03) translateY(-8px); }
+    .plan-card.current-plan { border: 2px solid #888; opacity: 0.75; }
+    .plan-card.current-plan:hover { transform: none; box-shadow: none; border-color: #888; }
     
     .popular-tag {
       position: absolute; top: 0; right: 0; background: var(--green); color: #fff;
+      font-size: 11px; font-weight: 800; padding: 8px 20px; border-radius: 0 0 0 12px;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .current-tag {
+      position: absolute; top: 0; right: 0; background: #888; color: #fff;
       font-size: 11px; font-weight: 800; padding: 8px 20px; border-radius: 0 0 0 12px;
       text-transform: uppercase; letter-spacing: 0.05em;
     }
@@ -57,8 +64,13 @@
     .btn-purchase-primary:hover { background: var(--green-light); transform: translateY(-2px); }
     .btn-purchase-outline { background: transparent; border: 2.5px solid var(--green); color: var(--green); }
     .btn-purchase-outline:hover { background: var(--green-pale); }
+    .btn-purchase-disabled {
+      background: #e5e7eb; color: #9ca3af; cursor: not-allowed;
+      border: 2px solid #e5e7eb;
+    }
+    .btn-purchase-disabled:hover { transform: none; }
 
-    /* Modal chọn phương thức */
+    /* Modal */
     .modal {
         display: none; position: fixed; inset: 0; z-index: 9999;
         background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
@@ -68,8 +80,16 @@
         background: #fff; border-radius: 20px; width: 100%; max-width: 440px;
         padding: 32px; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
     }
-    .modal-header { margin-bottom: 24px; text-align: center; }
+    .modal-header { margin-bottom: 8px; text-align: center; }
     .modal-title { font-size: 24px; font-weight: 800; color: var(--dark); }
+    .modal-plan-info { text-align: center; margin-bottom: 20px; font-size: 14px; color: var(--muted); }
+    .modal-price-display {
+        background: var(--green-pale); border: 1.5px solid var(--green); border-radius: 12px;
+        padding: 14px 20px; margin-bottom: 20px; text-align: center;
+    }
+    .modal-price-original { font-size: 13px; color: var(--muted); text-decoration: line-through; }
+    .modal-price-effective { font-size: 22px; font-weight: 900; color: var(--green); }
+    .modal-price-discount { font-size: 12px; color: var(--green); font-weight: 600; }
     .modal-options { display: flex; flex-direction: column; gap: 12px; }
     .payment-option {
         display: flex; align-items: center; gap: 16px; padding: 18px;
@@ -78,12 +98,18 @@
     }
     .payment-option:hover { border-color: var(--green); background: var(--green-pale); }
     .payment-option.active { border-color: var(--green); background: var(--green-pale); box-shadow: 0 0 0 2px var(--green); }
-    .payment-icon { width: 44px; height: 44px; object-fit: contain; }
-    .payment-text { display: flex; flex-direction: column; gap: 2px; }
+    .payment-icon { width: 44px; height: 44px; object-fit: contain; border-radius: 8px; }
+    .payment-text { display: flex; flex-direction: column; gap: 2px; flex: 1; }
     .payment-name { font-weight: 700; color: var(--dark); font-size: 16px; }
     .payment-desc { font-size: 12px; color: var(--muted); }
+    .wallet-balance-badge {
+        background: var(--green); color: #fff; font-size: 11px; font-weight: 700;
+        padding: 3px 8px; border-radius: 20px; white-space: nowrap;
+    }
+    .wallet-insufficient { opacity: 0.5; cursor: not-allowed !important; }
+    .wallet-insufficient:hover { border-color: var(--border) !important; background: transparent !important; box-shadow: none !important; }
     
-    .modal-footer { margin-top: 32px; display: flex; gap: 12px; }
+    .modal-footer { margin-top: 24px; display: flex; gap: 12px; }
     .btn-confirm { flex: 2; }
     .btn-cancel { flex: 1; background: #eee; color: var(--muted); }
 
@@ -118,20 +144,27 @@
       <div class="modal-header">
         <h3 class="modal-title">Chọn Phương Thức Thanh Toán</h3>
       </div>
+      <div class="modal-plan-info" id="modalPlanInfo"></div>
+      <div class="modal-price-display" id="modalPriceDisplay" style="display:none">
+        <div class="modal-price-original" id="modalOriginalPrice"></div>
+        <div class="modal-price-effective" id="modalEffectivePrice"></div>
+        <div class="modal-price-discount" id="modalDiscount"></div>
+      </div>
       <div class="modal-options">
-        <div class="payment-option active" data-method="momo">
+        <div class="payment-option active" id="optMomo" data-method="momo">
             <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" class="payment-icon" alt="Momo">
             <div class="payment-text">
                 <span class="payment-name">Ví MoMo</span>
                 <span class="payment-desc">Thanh toán qua ứng dụng MoMo</span>
             </div>
         </div>
-        <div class="payment-option" data-method="vnpay">
-            <img src="https://sandbox.vnpayment.vn/paymentv2/images/graph/vnpay-logo.png" class="payment-icon" alt="VNPay">
+        <div class="payment-option" id="optWallet" data-method="wallet">
+            <div class="payment-icon" style="background:linear-gradient(135deg,#16a34a,#22c55e);display:flex;align-items:center;justify-content:center;font-size:22px;">🏦</div>
             <div class="payment-text">
-                <span class="payment-name">VNPay</span>
-                <span class="payment-desc">Thanh toán qua Ngân hàng hoặc QR</span>
+                <span class="payment-name">Ví Cầu Lông Vui</span>
+                <span class="payment-desc" id="walletBalanceDesc">Đang tải số dư...</span>
             </div>
+            <span class="wallet-balance-badge" id="walletBadge"></span>
         </div>
       </div>
       <div class="modal-footer">
@@ -147,9 +180,26 @@
   <script>
     let selectedPlanId = null;
     let selectedMethod = 'momo';
+    let effectivePriceCache = null;
+    let walletBalance = 0;
+
+    // Tier hierarchy for comparison
+    const TIER_ORDER = { 'NORMAL': 0, 'PRO': 1, 'VIP': 2 };
 
     async function loadPlans() {
       const grid = document.getElementById('plansGrid');
+      const user = getCurrentUser();
+      const userTier = user ? (user.membershipTier || 'NORMAL') : 'NORMAL';
+      const tierOrdinal = TIER_ORDER[userTier] ?? 0;
+
+      // Load wallet balance nếu đã đăng nhập
+      if (user) {
+        try {
+          const walletData = await fetchAPI('/wallet/' + user.id);
+          walletBalance = walletData.balance || 0;
+        } catch(e) { walletBalance = 0; }
+      }
+
       try {
         const plans = await fetchAPI('/membership/plans');
         
@@ -180,10 +230,49 @@
         grid.innerHTML = plans.map(plan => {
           const isPopular = plan.tier === 'PRO';
           const features = featureMap[plan.tier] || [];
-          
+          const planOrdinal = TIER_ORDER[plan.tier] ?? 0;
+
+          // Xác định trạng thái nút
+          let btnClass, btnLabel, btnDisabled, tagHtml;
+
+          if (plan.tier === 'NORMAL') {
+            // Gói thường: luôn disable, chỉ để xem
+            btnClass = 'btn-purchase-disabled';
+            btnLabel = 'Gói mặc định';
+            btnDisabled = true;
+            tagHtml = '';
+          } else if (planOrdinal < tierOrdinal) {
+            // Gói thấp hơn tier hiện tại
+            btnClass = 'btn-purchase-disabled';
+            btnLabel = 'Không thể hạ cấp';
+            btnDisabled = true;
+            tagHtml = '';
+          } else if (planOrdinal === tierOrdinal) {
+            // Gói đang dùng
+            btnClass = 'btn-purchase-disabled';
+            btnLabel = '✓ Đang sử dụng';
+            btnDisabled = true;
+            tagHtml = '<div class="current-tag">Đang dùng</div>';
+          } else {
+            // Gói cao hơn — có thể mua
+            if (isPopular) {
+              btnClass = 'btn-purchase-primary';
+              btnLabel = tierOrdinal > 0 ? '⬆ Nâng cấp ngay' : 'Mua gói ngay';
+              tagHtml = '<div class="popular-tag">Phổ biến nhất</div>';
+            } else {
+              btnClass = 'btn-purchase-outline';
+              btnLabel = 'Mua gói ngay';
+              tagHtml = '';
+            }
+            btnDisabled = false;
+          }
+
+          const cardClass = planOrdinal === tierOrdinal ? 'plan-card current-plan' : (isPopular ? 'plan-card popular' : 'plan-card');
+          const onclickAttr = btnDisabled ? '' : `onclick="openPaymentModal(${plan.id}, '${plan.name}', ${plan.price})"`;
+
           return `
-            <div class="plan-card ${isPopular ? 'popular' : ''}">
-              ${isPopular ? '<div class="popular-tag">Phổ biến nhất</div>' : ''}
+            <div class="${cardClass}">
+              ${tagHtml}
               <span class="plan-tier">${plan.tier}</span>
               <h3 class="plan-name">${plan.name}</h3>
               <div class="plan-price">
@@ -198,9 +287,8 @@
                   </li>
                 `).join('')}
               </ul>
-              <button class="btn-purchase ${isPopular ? 'btn-purchase-primary' : 'btn-purchase-outline'}" 
-                      onclick="openPaymentModal(${plan.id})">
-                Mua gói ngay
+              <button class="btn-purchase ${btnClass}" ${btnDisabled ? 'disabled' : ''} ${onclickAttr}>
+                ${btnLabel}
               </button>
             </div>
           `;
@@ -210,9 +298,55 @@
       }
     }
 
-    function openPaymentModal(planId) {
+    async function openPaymentModal(planId, planName, originalPrice) {
       if (!requireAuth()) return;
+      const user = getCurrentUser();
       selectedPlanId = planId;
+      selectedMethod = 'momo';
+      effectivePriceCache = null;
+
+      // Reset về momo active
+      document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('active'));
+      document.getElementById('optMomo').classList.add('active');
+
+      // Hiển thị thông tin gói
+      document.getElementById('modalPlanInfo').textContent = planName;
+
+      // Cập nhật số dư ví
+      const walletBadge = document.getElementById('walletBadge');
+      const walletDesc = document.getElementById('walletBalanceDesc');
+      walletBadge.textContent = formatCurrency(walletBalance);
+      walletDesc.textContent = 'Số dư: ' + formatCurrency(walletBalance);
+
+      // Gọi API tính giá thực tế
+      try {
+        const costData = await fetchAPI(`/membership/upgrade-cost?planId=${planId}&userId=${user.id}`);
+        effectivePriceCache = costData.effectivePrice;
+        const discount = costData.discount;
+
+        const priceDisplay = document.getElementById('modalPriceDisplay');
+        if (discount > 0) {
+          document.getElementById('modalOriginalPrice').textContent = 'Giá gốc: ' + formatCurrency(originalPrice);
+          document.getElementById('modalEffectivePrice').textContent = formatCurrency(effectivePriceCache);
+          document.getElementById('modalDiscount').textContent = '🎉 Được khấu trừ ' + formatCurrency(discount) + ' từ gói hiện tại';
+          priceDisplay.style.display = 'block';
+        } else {
+          priceDisplay.style.display = 'none';
+        }
+
+        // Kiểm tra số dư ví có đủ không
+        const walletOpt = document.getElementById('optWallet');
+        if (walletBalance < effectivePriceCache) {
+          walletOpt.classList.add('wallet-insufficient');
+          walletDesc.textContent = `Không đủ số dư (cần ${formatCurrency(effectivePriceCache)})`;
+        } else {
+          walletOpt.classList.remove('wallet-insufficient');
+        }
+      } catch(e) {
+        effectivePriceCache = originalPrice;
+        document.getElementById('modalPriceDisplay').style.display = 'none';
+      }
+
       document.getElementById('paymentModal').style.display = 'flex';
     }
 
@@ -221,9 +355,10 @@
       selectedPlanId = null;
     }
 
-    // Modal option logic
+    // Modal option selection
     document.querySelectorAll('.payment-option').forEach(opt => {
         opt.addEventListener('click', () => {
+            if (opt.classList.contains('wallet-insufficient')) return; // Không cho chọn nếu không đủ tiền
             document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('active'));
             opt.classList.add('active');
             selectedMethod = opt.dataset.method;
@@ -237,13 +372,19 @@
       btn.textContent = 'Đang xử lý...';
 
       try {
-        // API endpoint: /api/membership/purchase/{planId}?userId={userId}&method={method}
         const res = await fetch(`${API_BASE}/membership/purchase/${selectedPlanId}?userId=${user.id}&method=${selectedMethod}`, {
           method: 'POST'
         });
         
         const json = await res.json();
-        if (res.ok && json.data.paymentUrl) {
+        if (!res.ok) throw new Error(json.message || 'Lỗi thanh toán');
+
+        if (json.data && json.data.success) {
+          // Thanh toán ví thành công → không redirect
+          closeModal();
+          showToast('🎉 Thanh toán thành công! Gói hội viên đã được kích hoạt.', 'success');
+          setTimeout(() => window.location.reload(), 1500);
+        } else if (json.data && json.data.paymentUrl) {
           window.location.href = json.data.paymentUrl;
         } else {
           throw new Error(json.message || 'Lỗi thanh toán');

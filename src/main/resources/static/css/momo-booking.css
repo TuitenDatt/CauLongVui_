@@ -1,60 +1,202 @@
 :root {
-  --momo-green: #00703c;
-  --momo-dark: #005a30;
-  --bg-color: #f2f2f2;
-  --text-color: #333;
+  --green: #16a34a;
+  --green-dark: #14532d;
+  --green-light: #22c55e;
+  --green-pale: #f0fdf4;
+  --green-border: #bbf7d0;
+  --text: #1a2e1a;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --white: #ffffff;
+  --bg: #f8fafb;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  --radius: 16px;
 }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  font-family: 'Inter', sans-serif;
-  background-color: var(--bg-color);
-  margin: 0; padding: 0; color: var(--text-color);
+  font-family: 'Be Vietnam Pro', 'Inter', sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh;
 }
-.momo-header {
-  background-color: var(--momo-green); color: white; padding: 15px;
-  display: flex; align-items: center; position: sticky; top: 0; z-index: 100;
+
+/* ══ BOOKING-INFO page ══ */
+.page-header {
+  background: var(--white); border-bottom: 1px solid var(--border);
+  padding: 0 24px; height: 60px; display: flex; align-items: center;
+  position: sticky; top: 0; z-index: 100; gap: 16px;
 }
-.momo-header h2 { margin: 0; font-size: 18px; text-align: center; flex: 1; text-transform: uppercase;}
-.momo-header .btn-back { color: white; text-decoration: none; font-size: 20px; font-weight: bold; width: 30px;}
-.status-bar {
-  display: flex; gap: 15px; padding: 10px 15px; background: var(--momo-dark);
-  color: white; align-items: center; font-size: 13px;
+.page-header h2 {
+  flex: 1; font-size: 16px; font-weight: 800; color: var(--text);
+  text-align: center; letter-spacing: -0.3px;
 }
-.status-dot { display: inline-block; width: 14px; height: 14px; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
-.s-empty { background: white; }
-.s-booked { background: #e04f5f; }
-.s-selected { background: #ef4444; border: 2px solid #000; }
-.schedule-container {
-  overflow-x: auto; background: #e8faed; padding-bottom: 80px;
+.header-spacer { width: 36px; flex-shrink: 0; }
+
+.btn-back {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--green-pale); border: 1.5px solid var(--green-border);
+  color: var(--green); display: flex; align-items: center; justify-content: center;
+  font-size: 18px; font-weight: 700; text-decoration: none;
+  transition: background 0.2s; flex-shrink: 0;
 }
-.schedule-table {
-  border-collapse: collapse; min-width: 1200px; width: 100%;
+.btn-back:hover { background: var(--green-border); }
+
+.checkout-layout {
+  max-width: 960px; margin: 0 auto;
+  padding: 28px 20px 180px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
 }
-.schedule-table th, .schedule-table td {
-  border: 1px solid #ccc; text-align: center; padding: 0; height: 35px; min-width: 40px; cursor: pointer;
+@media (max-width: 700px) {
+  .checkout-layout { grid-template-columns: 1fr; padding: 20px 16px 200px; }
 }
-.schedule-table th { background: #cce5e4; font-size: 11px; font-weight: normal; }
-.court-name { background: #cce5e4 !important; font-size: 12px; font-weight: bold; position: sticky; left: 0; z-index: 10; }
-.slot.empty { background: white; }
-.slot.booked { background: #e04f5f; cursor: not-allowed; }
-.slot.selected { background: #ef4444 !important; color: white; }
+
+.card {
+  background: var(--white); border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+}
+.card-header {
+  padding: 16px 22px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.card-header-icon {
+  width: 32px; height: 32px; background: var(--green-pale);
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+}
+.card-header h3 {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.card-body { padding: 20px 22px; }
+
+.info-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px;
+}
+.info-row:last-child { border-bottom: none; }
+.info-label { color: var(--muted); }
+.info-value { font-weight: 700; color: var(--text); text-align: right; }
+
+.total-row {
+  background: var(--green-pale); border: 1.5px solid var(--green-border);
+  border-radius: 12px; padding: 16px 22px;
+  display: flex; align-items: center; justify-content: space-between; margin-top: 4px;
+}
+.total-label { font-size: 15px; font-weight: 700; color: var(--text); }
+.total-amount { font-size: 24px; font-weight: 900; color: var(--green); }
+
+.input-group { margin-bottom: 16px; }
+.input-group:last-child { margin-bottom: 0; }
+.input-group label {
+  display: block; font-size: 12px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px;
+}
+.form-input {
+  width: 100%; padding: 12px 14px; border: 1.5px solid var(--border);
+  border-radius: 10px; font-size: 14px; font-family: inherit;
+  color: var(--text); background: var(--white);
+  transition: border-color 0.2s, box-shadow 0.2s; appearance: auto;
+}
+.form-input:focus {
+  outline: none; border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(22,163,74,0.1);
+}
+
+.wallet-status-card {
+  background: var(--green-pale); border: 1.5px solid var(--green-border);
+  border-radius: 12px; padding: 14px 16px; margin-top: 16px; display: none;
+}
+.wallet-status-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.wallet-balance { font-weight: 900; color: var(--green); font-size: 16px; }
+.wallet-hint { font-size: 12px; color: var(--muted); }
+.wallet-hint.error { color: #dc2626; }
+
+.ghepkeo-toggle { display: flex; align-items: center; gap: 10px; padding: 14px 0 0; cursor: pointer; }
+.ghepkeo-toggle input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--green); flex-shrink: 0; cursor: pointer; }
+.ghepkeo-toggle span { font-size: 14px; font-weight: 700; color: var(--text); user-select: none; }
+.ghepkeo-fields { display: none; border-top: 1px dashed var(--border); margin-top: 14px; padding-top: 14px; }
+.row-2col { display: flex; gap: 12px; }
+.row-2col .input-group { flex: 1; }
+.ghepkeo-note { font-size: 12px; color: #b45309; background: #fef3c7; border-radius: 8px; padding: 8px 12px; margin-top: 8px; }
+
 .bottom-bar {
-  position: fixed; bottom: 0; left: 0; width: 100%; background: var(--momo-dark);
-  padding: 10px 15px; box-sizing: border-box; color: white; border-top-left-radius: 12px; border-top-right-radius: 12px;
+  position: fixed; bottom: 0; left: 0; width: 100%;
+  background: var(--white); border-top: 1px solid var(--border);
+  padding: 16px 20px 20px; box-shadow: 0 -8px 32px rgba(0,0,0,0.08);
+  display: flex; flex-direction: column; gap: 10px; z-index: 200;
 }
-.bottom-bar .summary { display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 10px; font-size: 14px;}
+.bottom-bar-inner { max-width: 960px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 10px; }
+.btn-pay {
+  width: 100%; padding: 15px 20px; border: none; border-radius: 12px;
+  font-family: inherit; font-size: 15px; font-weight: 800; cursor: pointer;
+  transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+  gap: 8px; letter-spacing: 0.02em;
+}
+.btn-pay-wallet { background: var(--green-pale); color: var(--green); border: 2px solid var(--green-border); }
+.btn-pay-wallet:hover:not(:disabled) { background: var(--green-border); }
+.btn-pay-momo { background: #ae2070; color: #fff; box-shadow: 0 4px 16px rgba(174,32,112,0.25); }
+.btn-pay-momo:hover:not(:disabled) { background: #97185f; transform: translateY(-1px); }
+.btn-pay-dev { background: #fff7ed; color: #c2410c; border: 1.5px dashed #fdba74; font-size: 13px; padding: 11px; }
+.btn-pay:disabled { opacity: 0.45; cursor: not-allowed; transform: none !important; }
+.pay-row { display: flex; gap: 10px; }
+.pay-row .btn-pay { flex: 1; }
+
+
+/* ══ SCHEDULE page ══ */
+.momo-header {
+  background: var(--green); color: white; padding: 14px 16px;
+  display: flex; align-items: center; position: sticky; top: 0; z-index: 100; gap: 12px;
+}
+.momo-header h2 {
+  margin: 0; font-size: 17px; font-weight: 800;
+  text-align: center; flex: 1; text-transform: uppercase; letter-spacing: 0.04em;
+}
+.momo-header .btn-back {
+  background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3);
+  color: white; text-decoration: none;
+}
+.momo-header .btn-back:hover { background: rgba(255,255,255,0.25); }
+
+.status-bar {
+  display: flex; gap: 16px; padding: 8px 14px;
+  background: var(--green-dark); color: white;
+  align-items: center; font-size: 13px; flex-wrap: wrap;
+}
+.status-dot { display: inline-block; width: 13px; height: 13px; border-radius: 3px; margin-right: 5px; vertical-align: middle; }
+.s-empty   { background: white; border: 1px solid #ccc; }
+.s-booked  { background: #e04f5f; }
+.s-selected{ background: #2d8a4e; }
+
+.schedule-container { overflow-x: auto; background: #f8fafb; padding-bottom: 90px; }
+.schedule-table { border-collapse: collapse; min-width: 1200px; width: 100%; }
+.schedule-table th, .schedule-table td {
+  border: 1px solid #e2e8f0; text-align: center;
+  padding: 0; height: 36px; min-width: 42px; cursor: pointer;
+}
+.schedule-table th { background: #f1f5f9; font-size: 11px; font-weight: 600; color: #64748b; }
+.court-name {
+  background: #f1f5f9 !important; font-size: 12px; font-weight: 700;
+  position: sticky; left: 0; z-index: 10;
+  border-right: 2px solid #e2e8f0 !important; padding: 4px 8px !important;
+}
+.slot.empty   { background: white; }
+.slot.booked  { background: #fecaca !important; cursor: not-allowed; }
+.slot.selected{ background: #16a34a !important; color: white; }
+.slot.held    { background: #fef3c7 !important; cursor: not-allowed; }
+.slot.held.by-me { background: #bbf7d0 !important; cursor: pointer; }
+.slot.past    { background: #f1f5f9 !important; cursor: not-allowed; opacity: 0.5; }
+.slot.empty:hover { background: #dcfce7 !important; }
+tr.court-active td.empty:not(.selected) { background: #f0fdf4 !important; }
+tr.court-active td.court-name { background: #dcfce7 !important; border-left: 3px solid #2d8a4e; }
+
+/* Schedule uses .bottom-bar too but with summary */
+.summary {
+  display: flex; justify-content: space-between;
+  font-weight: 700; font-size: 14px; color: var(--text);
+  margin-bottom: 10px; padding: 0 4px;
+}
 .btn-next {
-  background: #f39c12; color: white; border: none; padding: 12px; width: 100%;
-  font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 4px; text-decoration: none; display: block; text-align: center;
+  background: var(--green); color: white; border: none; padding: 14px; width: 100%;
+  font-size: 15px; font-weight: 800; cursor: pointer; border-radius: 12px;
+  font-family: inherit; transition: all 0.2s; letter-spacing: 0.04em;
+  box-shadow: 0 4px 16px rgba(22,163,74,0.25);
 }
-.info-section { background: var(--momo-dark); color: white; padding: 15px; margin-bottom: 2px; }
-.info-section.light { background: var(--momo-green); }
-.info-title { font-weight: bold; margin-bottom: 15px; font-size: 15px; display:flex; align-items:center; gap:8px;}
-.info-title svg {width: 20px; height: 20px; fill: #f39c12;}
-.info-row { font-size: 14px; margin-bottom: 8px; display: flex; justify-content: space-between; }
-.input-group { margin-bottom: 15px; }
-.input-group label { color: white; font-size: 12px; font-weight: bold; text-transform: uppercase; margin-bottom:5px; display:block;}
-.form-input { width: 100%; padding: 12px; border: none; border-radius: 4px; box-sizing: border-box; font-size:14px; }
-.payment-wrapper { display: flex; gap: 15px; padding: 15px; flex-wrap: wrap; margin-bottom: 80px;}
-.payment-card { background: white; border-radius: 8px; padding: 15px; flex: 1; min-width: 300px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 2px solid var(--momo-green);}
-.qr-code { width: 150px; height: 150px; margin: 0 auto; display: block; border:1px solid #ccc; padding:5px; border-radius: 8px;}
-.timer { text-align: center; font-size: 24px; font-weight: bold; margin: 15px 0; color: #333;}
+.btn-next:hover { background: var(--green-dark); transform: translateY(-1px); }

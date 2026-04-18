@@ -177,6 +177,28 @@ public class WalletService {
     }
 
     @Transactional
+    public void payBookingWithWallet(Long userId, BigDecimal amount, String referenceId, String description) {
+        BigDecimal normalizedAmount = normalizePositiveAmount(amount, "So tien thanh toan");
+        Wallet wallet = getOrCreateWalletForUpdate(userId);
+
+        if (wallet.getBalance().compareTo(normalizedAmount) < 0) {
+            throw new BadRequestException("So du vi khong du de thanh toan. Can " + normalizedAmount + " VND nhung chi co " + wallet.getBalance().longValue() + " VND.");
+        }
+
+        wallet.setBalance(wallet.getBalance().subtract(normalizedAmount));
+        walletRepository.save(wallet);
+
+        walletTransactionRepository.save(WalletTransaction.builder()
+                .wallet(wallet)
+                .amount(normalizedAmount.negate())
+                .status(WalletTransaction.TransactionStatus.COMPLETED)
+                .type(WalletTransaction.TransactionType.PAYMENT)
+                .referenceId(referenceId)
+                .description(description)
+                .build());
+    }
+
+    @Transactional
     public BookingDTO payBookingWithWallet(Long bookingId, Long userId) {
         if (userId == null) {
             throw new BadRequestException("Thieu userId de thanh toan bang vi");
@@ -243,6 +265,26 @@ public class WalletService {
                 .build());
 
         return WalletTransactionDTO.fromEntity(transaction);
+    }
+
+    @Transactional
+    public void deductForMembership(Long userId, long amountVnd, String referenceId, String description) {
+        if (amountVnd <= 0) return; // Nếu giá hiệu quả = 0 (hoàn tiền đủ hoặc dư), không cần trừ
+        BigDecimal amount = BigDecimal.valueOf(amountVnd).setScale(2, java.math.RoundingMode.HALF_UP);
+        Wallet wallet = getOrCreateWalletForUpdate(userId);
+        if (wallet.getBalance().compareTo(amount) < 0) {
+            throw new com.example.CauLongVui.exception.BadRequestException("So du vi khong du. Can " + amountVnd + " VND nhung chi co " + wallet.getBalance().longValue() + " VND.");
+        }
+        wallet.setBalance(wallet.getBalance().subtract(amount));
+        walletRepository.save(wallet);
+        walletTransactionRepository.save(WalletTransaction.builder()
+                .wallet(wallet)
+                .amount(amount.negate())
+                .status(WalletTransaction.TransactionStatus.COMPLETED)
+                .type(WalletTransaction.TransactionType.PAYMENT)
+                .referenceId(referenceId)
+                .description(description)
+                .build());
     }
 
     @Transactional

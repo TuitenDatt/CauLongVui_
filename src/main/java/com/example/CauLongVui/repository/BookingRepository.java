@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -16,10 +17,17 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByCustomerPhoneOrderByBookingDateDesc(String phone);
 
-
     List<Booking> findByBookingDate(LocalDate date);
 
     List<Booking> findByCourtIdAndBookingDate(Long courtId, LocalDate date);
 
     List<Booking> findByIsPassTrueOrderByBookingDateDesc();
+
+    /** Dùng cho scheduler tự động hủy booking đặt trước quá hạn */
+    List<Booking> findByPaymentDeadlineBeforeAndPaidAtIsNullAndStatusNot(
+            LocalDateTime deadline, Booking.BookingStatus status);
+
+    /** Danh sách booking chưa thanh toán của user */
+    List<Booking> findByUserIdAndPaidAtIsNullAndPaymentDeadlineIsNotNullAndStatusNotOrderByBookingDateAsc(
+            Long userId, Booking.BookingStatus excludeStatus);
 }

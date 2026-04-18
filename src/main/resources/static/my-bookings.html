@@ -168,20 +168,27 @@
 <div id="header-placeholder"></div>
 
 <div class="my-bookings-page">
-  <div class="page-title">Lịch đặt sân của tôi</div>
-  <div class="page-sub">Quản lý các sân bạn đã đặt bằng tài khoản này</div>
+  <!-- Tabs -->
+  <div style="display:flex; gap:16px; margin-bottom:20px; border-bottom:1px solid var(--border);">
+    <button id="tab-single" class="menu-tab active" style="border-radius:12px 12px 0 0; padding:12px 20px;" onclick="switchTab('single')">Sân đơn lẻ</button>
+    <button id="tab-bundle" class="menu-tab" style="border-radius:12px 12px 0 0; padding:12px 20px;" onclick="switchTab('bundle')">Đặt theo cụm (Doanh nghiệp)</button>
+  </div>
 
-  <div class="phone-search" style="justify-content: flex-end; border-bottom: 1px solid var(--border); padding-bottom: 16px;">
-    <div style="display: flex; gap: 10px;">
-      <input type="date" id="dateFilter" aria-label="Lọc theo ngày" onchange="searchBookings()" />
-      <input type="time" id="timeFilter" aria-label="Lọc theo giờ" onchange="searchBookings()" />
+  <div id="single-view">
+    <div class="phone-search" style="justify-content: flex-end; padding-bottom: 16px;">
+      <div style="display: flex; gap: 10px;">
+        <input type="date" id="dateFilter" aria-label="Lọc theo ngày" onchange="searchBookings()" />
+        <input type="time" id="timeFilter" aria-label="Lọc theo giờ" onchange="searchBookings()" />
+      </div>
+    </div>
+    <div class="booking-list" id="bookingList">
+      <div class="empty-state"><div class="icon">⏳</div><h3>Đang tải dữ liệu...</h3></div>
     </div>
   </div>
 
-  <div class="booking-list" id="bookingList">
-    <div class="empty-state">
-      <div class="icon">⏳</div>
-      <h3>Đang tải dữ liệu...</h3>
+  <div id="bundle-view" style="display:none;">
+    <div class="booking-list" id="bundleList">
+      <div class="empty-state"><div class="icon">⏳</div><h3>Đang tải dữ liệu cụm...</h3></div>
     </div>
   </div>
 </div>
@@ -262,11 +269,23 @@
 <script src="/js/app.js"></script>
 <script>
   let allBookings = [];
+  let allBundles  = [];
   let currentBookingId = null;
+  let currentBundleId = null;
+  let currentTab = 'single';
 
   document.addEventListener('DOMContentLoaded', () => {
     fetchBookings();
+    fetchBundles();
   });
+
+  function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById('tab-single').classList.toggle('active', tab === 'single');
+    document.getElementById('tab-bundle').classList.toggle('active', tab === 'bundle');
+    document.getElementById('single-view').style.display = tab === 'single' ? 'block' : 'none';
+    document.getElementById('bundle-view').style.display = tab === 'bundle' ? 'block' : 'none';
+  }
 
   function searchBookings() { renderBookings(); }
 
@@ -290,18 +309,53 @@
     try {
       const res  = await fetch('/api/bookings?userId=' + user.id);
       const json = await res.json();
-
-      if (!json.success || !json.data || json.data.length === 0) {
-        allBookings = [];
-        renderBookings();
-        return;
-      }
-
-      allBookings = json.data;
+      allBookings = (json.success && json.data) ? json.data : [];
       renderBookings();
     } catch (err) {
-      list.innerHTML = `<div class="empty-state"><div class="icon"></div><h3>Lỗi tải dữ liệu</h3><p>${err.message}</p></div>`;
+      list.innerHTML = `<div class="empty-state"><h3>Lỗi tải dữ liệu</h3><p>${err.message}</p></div>`;
     }
+  }
+
+  async function fetchBundles() {
+    const user = getCurrentUser();
+    const list = document.getElementById('bundleList');
+    if (!user) return;
+    try {
+      const res = await fetch('/api/bundles?userId=' + user.id);
+      const json = await res.json();
+      allBundles = (json.success && json.data) ? json.data : [];
+      renderBundles();
+    } catch (err) {
+      list.innerHTML = `<div class="empty-state"><h3>Lỗi tải dữ liệu cụm</h3></div>`;
+    }
+  }
+
+  function renderBundles() {
+    const list = document.getElementById('bundleList');
+    if (allBundles.length === 0) {
+      list.innerHTML = `<div class="empty-state"><div class="icon">🏢</div><h3>Chưa có cụm đặt sân nào</h3><p>Sử dụng chế độ đặt cụm tại trang Lịch để đặt nhiều sân cùng lúc.</p></div>`;
+      return;
+    }
+
+    list.innerHTML = allBundles.map(b => {
+      const statusCls = 'booking-card ' + b.status.toLowerCase();
+      return `
+        <div class="${statusCls}" onclick="openBundleDetail(${b.id})" style="cursor:pointer; border-left-width:8px;">
+          <div class="booking-main">
+            <div class="booking-court-name">🏢 ${b.bundleName} <span style="font-size:12px; font-weight:normal; color:var(--muted);">(${b.totalCourts} sân)</span></div>
+            <div class="booking-detail">
+              <span>📅 ${b.bookingDate}</span>
+              <span>⏱ ${b.startTime} - ${b.endTime}</span>
+              <span>Note: ${b.note || 'Không có'}</span>
+            </div>
+          </div>
+          <div class="booking-right">
+            <div class="booking-price">${b.totalPrice.toLocaleString('vi-VN')} đ</div>
+            <div class="booking-status status-${b.status}">${b.status === 'ACTIVE' ? 'Đang hoạt động' : (b.status === 'CANCELLED' ? 'Đã hủy' : 'Đã bán hết')}</div>
+          </div>
+        </div>
+      `;
+    }).join('');
   }
 
   function renderBookings() {
@@ -794,6 +848,99 @@
     } catch (err) {
       showToast('❌ Lỗi: ' + err.message, 'error');
     }
+  }
+
+  // ── Bundle Detail & Management ───────────────────────────────
+  async function openBundleDetail(id) {
+    const user = getCurrentUser();
+    try {
+      const res = await fetch(`/api/bundles/${id}`);
+      const json = await res.json();
+      if (!json.success) throw new Error(json.message);
+      const b = json.data;
+      currentBundleId = id;
+
+      document.getElementById('bmTitle').innerHTML = `🏢 Cụm: ${b.bundleName}`;
+      
+      let html = `
+        <div class="modal-row"><label>Mã Cụm</label><span>#${b.id}</span></div>
+        <div class="modal-row"><label>Ngày Đặt</label><span>${b.bookingDate}</span></div>
+        <div class="modal-row"><label>Khung Giờ</label><span>${b.startTime} - ${b.endTime}</span></div>
+        <div class="modal-row"><label>Tổng Tiền</label><span style="color:var(--green);font-size:16px;">${b.totalPrice.toLocaleString('vi-VN')} đ</span></div>
+        <div style="margin-top:16px;">
+          <h4 style="font-size:13px; margin-bottom:8px; color:var(--muted);">Danh sách sân trong cụm (${b.totalCourts}):</h4>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            ${b.bookings.map(item => `
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:10px; background:#f8fafc; border-radius:8px; border:1px solid #e2e8f0;">
+                <div>
+                  <div style="font-weight:700; font-size:14px;">🏸 ${item.courtName}</div>
+                  <div style="font-size:11px; color:var(--muted);">${item.status}</div>
+                </div>
+                <div>
+                  ${item.isPass ? 
+                    `<span style="color:#a16207; font-size:11px; font-weight:700;">Đang Pass (${item.passPrice.toLocaleString('vi-VN')} đ)</span>` : 
+                    (b.status === 'ACTIVE' ? `<button onclick="sellOneInBundle(${item.bookingId})" style="padding:4px 8px; font-size:11px; background:#fef08a; border:1px solid #fde047; border-radius:4px; cursor:pointer;">Bán lẻ sân này</button>` : '')
+                  }
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+      document.getElementById('bmBody').innerHTML = html;
+
+      let footerHtml = '';
+      if (b.status === 'ACTIVE') {
+        footerHtml += `<button class="modal-btn btn-pass-san" style="background:#16a34a; color:#fff;" onclick="sellAllInBundle()">Bán lại toàn cụm (-20%)</button>`;
+        footerHtml += `<button class="modal-btn btn-cancel-booking" onclick="cancelBundle()">🚫 Hủy toàn cụm</button>`;
+      } else {
+        footerHtml += `<div style="width:100%; text-align:center; padding:10px; background:#f1f5f9; border-radius:8px; font-size:13px; font-weight:700;">Trạng thái: ${b.status}</div>`;
+      }
+      document.getElementById('bmFooter').innerHTML = footerHtml;
+      document.getElementById('bookingModal').classList.add('open');
+
+    } catch (err) {
+      showToast('Lỗi: ' + err.message, 'error');
+    }
+  }
+
+  async function sellOneInBundle(bookingId) {
+    const user = getCurrentUser();
+    if (!confirm('Bạn muốn đăng bán lại sân này trong cụm?')) return;
+    try {
+      const res = await fetch(`/api/bundles/${currentBundleId}/sell-one?bookingId=${bookingId}&userId=${user.id}`, { method: 'POST' });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.message);
+      showToast('✅ Đã đăng bán sân lẻ thành công!', 'success');
+      openBundleDetail(currentBundleId);
+      fetchBundles();
+    } catch (err) { showToast('Lỗi: ' + err.message, 'error'); }
+  }
+
+  async function sellAllInBundle() {
+    const user = getCurrentUser();
+    if (!confirm('Bạn muốn đăng bán lại TOÀN BỘ các sân trong cụm này?')) return;
+    try {
+      const res = await fetch(`/api/bundles/${currentBundleId}/sell-all?userId=${user.id}`, { method: 'POST' });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.message);
+      showToast('✅ Đã đăng bán toàn bộ cụm thành công!', 'success');
+      openBundleDetail(currentBundleId);
+      fetchBundles();
+    } catch (err) { showToast('Lỗi: ' + err.message, 'error'); }
+  }
+
+  async function cancelBundle() {
+    const user = getCurrentUser();
+    if (!confirm('Bạn có chắc muốn HỦY toàn bộ cụm này? Tiền sẽ được hoàn lại vào ví (nếu đã thanh toán).')) return;
+    try {
+      const res = await fetch(`/api/bundles/${currentBundleId}?userId=${user.id}`, { method: 'DELETE' });
+      const json = await res.json();
+      if (!res.ok || !json.success) throw new Error(json.message);
+      showToast('✅ Đã hủy cụm thành công!', 'success');
+      closeModal();
+      fetchBundles();
+    } catch (err) { showToast('Lỗi: ' + err.message, 'error'); }
   }
 
   async function confirmResell() {

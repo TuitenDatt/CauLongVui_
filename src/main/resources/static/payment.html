@@ -174,6 +174,18 @@
         secondaryText: 'Xem gói hội viên'
       };
     }
+    if (flow === 'bundle' || flow === 'wallet-bundle') {
+      return {
+        icon: '🏢',
+        title: 'Đặt cụm sân thành công!',
+        sub: 'Cụm sân doanh nghiệp của bạn đã được xác nhận.',
+        badge: 'Thanh toán cụm sân',
+        primaryHref: '/my-bookings.html',
+        primaryText: 'Quản lý cụm sân của tôi',
+        secondaryHref: '/',
+        secondaryText: 'Về trang chủ'
+      };
+    }
     return {
       icon: '✅',
       title: 'Thanh toán thành công!',
