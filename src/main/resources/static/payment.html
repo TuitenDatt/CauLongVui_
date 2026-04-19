@@ -140,7 +140,7 @@
   function flowMeta() {
     if (flow === 'wallet-topup') {
       return {
-        icon: '💳',
+        icon: '',
         title: 'Nạp tiền thành công!',
         sub: 'Số dư ví đã được cập nhật.',
         badge: 'Ví điện tử nội bộ',
@@ -152,7 +152,7 @@
     }
     if (flow === 'wallet-booking') {
       return {
-        icon: '🏸',
+        icon: '',
         title: 'Thanh toán bằng ví thành công!',
         sub: 'Booking của bạn đã được xác nhận ngay lập tức.',
         badge: 'Thanh toán từ ví',
@@ -164,7 +164,7 @@
     }
     if (flow === 'membership') {
       return {
-        icon: '💎',
+        icon: '',
         title: 'Nâng cấp tài khoản thành công!',
         sub: 'Gói hội viên của bạn đã được kích hoạt.',
         badge: 'Thanh toán hội viên',
@@ -176,7 +176,7 @@
     }
     if (flow === 'bundle' || flow === 'wallet-bundle') {
       return {
-        icon: '🏢',
+        icon: '',
         title: 'Đặt cụm sân thành công!',
         sub: 'Cụm sân doanh nghiệp của bạn đã được xác nhận.',
         badge: 'Thanh toán cụm sân',
@@ -187,7 +187,7 @@
       };
     }
     return {
-      icon: '✅',
+      icon: '',
       title: 'Thanh toán thành công!',
       sub: 'Đặt sân của bạn đã được xác nhận.',
       badge: 'Thanh toán hoàn tất',
@@ -232,7 +232,7 @@
 
     document.getElementById('resultCard').innerHTML = `
       <div class="result-header failed">
-        <div class="result-icon">❌</div>
+        <div class="result-icon"></div>
         <div class="result-title">Thanh toán thất bại</div>
         <div class="result-sub">${message || 'Giao dịch không thành công'}</div>
       </div>

@@ -28,7 +28,7 @@ async function loadCourts() {
   } catch (err) {
     courtsGrid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
-        <div class="empty-icon">⚠️</div>
+        <div class="empty-icon"></div>
         <h3>Không thể tải danh sách sân</h3>
         <p>${err.message}</p>
       </div>`;
@@ -40,7 +40,7 @@ function renderCourts(courts) {
   if (!courts.length) {
     courtsGrid.innerHTML = `
       <div class="empty-state" style="grid-column:1/-1">
-        <div class="empty-icon">🏸</div>
+        <div class="empty-icon"></div>
         <h3>Không có sân nào</h3>
         <p>Chưa có sân nào được thêm vào hệ thống.</p>
       </div>`;
@@ -65,7 +65,7 @@ function renderCourts(courts) {
         <div class="card-badge">
            ${status.label}
         </div>
-        <div class="card-fav">💜</div>
+        <div class="card-fav"></div>
       </div>
       
       <div class="card-content">
@@ -73,12 +73,12 @@ function renderCourts(courts) {
         
         <div class="card-meta-inline">
           <div class="card-meta-item">
-            <span class="icon">⭐</span> 4.7
+            <span class="icon">Rating:</span> 4.7
           </div>
         </div>
         
         <div class="card-meta-item">
-          <span class="icon">📍</span> ${escapeHtml(court.description || 'Sân tiêu chuẩn tầng 1')}
+          <span class="icon">Vị trí:</span> ${escapeHtml(court.description || 'Sân tiêu chuẩn tầng 1')}
         </div>
         
         <div class="card-divider"></div>
@@ -111,9 +111,9 @@ function renderCourts(courts) {
 
 function courtStatus(status) {
   const map = {
-    'AVAILABLE':   { label: '🟢 Còn trống' },
-    'BOOKED':      { label: '🟡 Đã đặt' },
-    'MAINTENANCE': { label: '🔴 Bảo trì' }
+    'AVAILABLE':   { label: 'Còn trống' },
+    'BOOKED':      { label: 'Đã đặt' },
+    'MAINTENANCE': { label: 'Bảo trì' }
   };
   return map[status] || { label: status };
 }
@@ -191,13 +191,13 @@ bookingForm?.addEventListener('submit', async (e) => {
     });
     bookingModal.classList.remove('open');
     bookingForm.reset();
-    showToast(`✅ Đặt sân thành công! Tổng tiền: ${formatCurrency(result.totalPrice)}`, 'success', 6000);
+    showToast(`Đặt sân thành công! Tổng tiền: ${formatCurrency(result.totalPrice)}`, 'success', 6000);
     await loadCourts();
   } catch (err) {
     showToast(err.message || 'Đặt sân thất bại. Vui lòng thử lại.', 'error');
   } finally {
     submitBtn.disabled = false;
-    submitBtn.textContent = '📅 Xác nhận đặt sân';
+    submitBtn.textContent = 'Xác nhận đặt sân';
   }
 });
 

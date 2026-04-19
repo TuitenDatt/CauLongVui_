@@ -82,7 +82,7 @@
       if (!json.success || !json.data || json.data.length === 0) {
         list.innerHTML = `
           <div class="empty-state">
-            <div class="icon">🏸</div>
+            <div class="icon"></div>
             <p>Hiện không có ai đăng bán lại sân.</p>
           </div>`;
         return;
@@ -98,7 +98,7 @@
       if (passBookings.length === 0) {
         list.innerHTML = `
           <div class="empty-state">
-            <div class="icon">🏸</div>
+            <div class="icon"></div>
             <p>Hiện không có ai đăng bán lại sân.</p>
           </div>`;
         return;
@@ -108,7 +108,7 @@
         return `
           <div class="pass-card">
             <div class="pass-badge">Giảm 20%</div>
-            <div class="pass-court-name">🏸 ${b.courtName || 'Sân cầu lông'}</div>
+            <div class="pass-court-name">${b.courtName || 'Sân cầu lông'}</div>
             <div class="pass-detail">
               <span>Ngày: <strong>${b.bookingDate || '—'}</strong></span>
               <span>Giờ: <strong>${b.startTime || '—'} – ${b.endTime || '—'}</strong></span>

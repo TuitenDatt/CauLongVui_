@@ -182,13 +182,13 @@
       </div>
     </div>
     <div class="booking-list" id="bookingList">
-      <div class="empty-state"><div class="icon">⏳</div><h3>Đang tải dữ liệu...</h3></div>
+      <div class="empty-state"><h3>Đang tải dữ liệu...</h3></div>
     </div>
   </div>
 
   <div id="bundle-view" style="display:none;">
     <div class="booking-list" id="bundleList">
-      <div class="empty-state"><div class="icon">⏳</div><h3>Đang tải dữ liệu cụm...</h3></div>
+      <div class="empty-state"><h3>Đang tải dữ liệu cụm...</h3></div>
     </div>
   </div>
 </div>
@@ -212,7 +212,7 @@
 <div class="modal-backdrop" id="orderMenuModal">
   <div class="modal-box menu-modal-box">
     <div class="modal-header">
-      <h3 style="display:flex; align-items:center; gap:8px;">🛒 Menu Tại Sân</h3>
+      <h3 style="display:flex; align-items:center; gap:8px;">Menu Tại Sân</h3>
       <button class="modal-close" onclick="closeModalCustom('orderMenuModal')">✕</button>
     </div>
     <!-- Wrapper for standard view -->
@@ -223,10 +223,10 @@
       <!-- Right Content Area -->
       <div id="menuViewArea" style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
         <div class="menu-grid" id="menuGrid">
-          <div class="empty-state" style="grid-column: 1/-1;"><div class="icon">⏳</div><h3>Đang tải menu...</h3></div>
+          <div class="empty-state" style="grid-column: 1/-1;"><h3>Đang tải menu...</h3></div>
         </div>
         <div class="modal-footer" style="padding: 16px 24px; border-top: 1px solid var(--border); background: #fff;">
-          <button class="modal-btn" style="background:var(--green); color:#fff; font-weight:800; padding:14px; font-size:15px; width:100%; border-radius:12px;" onclick="toggleCartView(true)">🛒 Giỏ hàng & Thanh toán (<span id="menuCartBadge">0</span>)</button>
+          <button class="modal-btn" style="background:var(--green); color:#fff; font-weight:800; padding:14px; font-size:15px; width:100%; border-radius:12px;" onclick="toggleCartView(true)">Giỏ hàng & Thanh toán (<span id="menuCartBadge">0</span>)</button>
         </div>
       </div>
     </div>
@@ -234,17 +234,17 @@
     <!-- Giỏ hàng nội bộ -->
     <div class="menu-cart-view" id="menuCartView">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-        <h3 style="margin:0;">🛒 Giỏ hàng của bạn</h3>
+        <h3 style="margin:0;">Giỏ hàng của bạn</h3>
         <button onclick="clearMenuCart()" style="background:#fee2e2; border:none; color:var(--red); font-size:12px; font-weight:700; cursor:pointer; padding:6px 12px; border-radius:6px; transition:all 0.2s;">Xóa tất cả</button>
       </div>
       <div id="menuCartItems"></div>
       
       <div id="menuCartCccdSection" class="menu-cccd-wrap" style="display:none;">
-        <h4 style="color:#92400e; margin-bottom:8px;">📸 Xác minh thuê vợt</h4>
+        <h4 style="color:#92400e; margin-bottom:8px;">Xác minh thuê vợt</h4>
         <p style="font-size:13px; color:#b45309; margin-bottom:12px;">Vui lòng tải ảnh CCCD/CMND để làm minh chứng thuê vợt</p>
         <input type="hidden" id="menuCccdUrl">
         <input type="file" id="menuCccdInput" accept="image/*" style="display:none;" onchange="uploadMenuCccd()">
-        <button type="button" class="upload-btn" id="menuUploadBtn" onclick="document.getElementById('menuCccdInput').click()">📷 Chụp hoặc tải ảnh lên</button>
+        <button type="button" class="upload-btn" id="menuUploadBtn" onclick="document.getElementById('menuCccdInput').click()">Chụp hoặc tải ảnh lên</button>
         <img id="menuCccdPreview" src="" style="width:100%; height:120px; object-fit:cover; border-radius:8px; display:none; margin-top:8px;">
       </div>
 
@@ -260,8 +260,8 @@
         <span>Tổng cộng:</span><span id="menuCartTotal">0 đ</span>
       </div>
 
-      <button class="menu-checkout-btn" id="menuCheckoutBtn" onclick="checkoutMenuCart()">✅ Thanh toán & Giao tới Sân</button>
-      <button class="modal-btn" style="width:100%; margin-top:12px; background:#f1f5f9; color:var(--muted); border:none; padding:12px; border-radius:10px; font-weight:700; cursor:pointer;" onclick="toggleCartView(false)">🔙 Tiếp tục mua đồ</button>
+      <button class="menu-checkout-btn" id="menuCheckoutBtn" onclick="checkoutMenuCart()">Thanh toán & Giao tới Sân</button>
+      <button class="modal-btn" style="width:100%; margin-top:12px; background:#f1f5f9; color:var(--muted); border:none; padding:12px; border-radius:10px; font-weight:700; cursor:pointer;" onclick="toggleCartView(false)">Quay lại</button>
     </div>
   </div>
 </div>
@@ -296,7 +296,7 @@
     if (!user) {
       list.innerHTML = `
         <div class="empty-state">
-          <div class="icon">🔒</div>
+          <div class="icon"></div>
           <h3>Vui lòng đăng nhập</h3>
           <p>Bạn cần đăng nhập bằng tài khoản để có thể xem lịch sử đặt sân của mình.</p>
           <a href="/auth/login.html" class="btn-book-now">Đăng nhập ngay</a>
@@ -304,7 +304,7 @@
       return;
     }
 
-    list.innerHTML = `<div class="empty-state"><div class="icon">⏳</div><h3>Đang tải dữ liệu...</h3></div>`;
+    list.innerHTML = `<div class="empty-state"><h3>Đang tải dữ liệu...</h3></div>`;
 
     try {
       const res  = await fetch('/api/bookings?userId=' + user.id);
@@ -333,7 +333,7 @@
   function renderBundles() {
     const list = document.getElementById('bundleList');
     if (allBundles.length === 0) {
-      list.innerHTML = `<div class="empty-state"><div class="icon">🏢</div><h3>Chưa có cụm đặt sân nào</h3><p>Sử dụng chế độ đặt cụm tại trang Lịch để đặt nhiều sân cùng lúc.</p></div>`;
+      list.innerHTML = `<div class="empty-state"><h3>Chưa có cụm đặt sân nào</h3><p>Sử dụng chế độ đặt cụm tại trang Lịch để đặt nhiều sân cùng lúc.</p></div>`;
       return;
     }
 
@@ -342,7 +342,7 @@
       return `
         <div class="${statusCls}" onclick="openBundleDetail(${b.id})" style="cursor:pointer; border-left-width:8px;">
           <div class="booking-main">
-            <div class="booking-court-name">🏢 ${b.bundleName} <span style="font-size:12px; font-weight:normal; color:var(--muted);">(${b.totalCourts} sân)</span></div>
+            <div class="booking-court-name">${b.bundleName} <span style="font-size:12px; font-weight:normal; color:var(--muted);">(${b.totalCourts} sân)</span></div>
             <div class="booking-detail">
               <span>📅 ${b.bookingDate}</span>
               <span>⏱ ${b.startTime} - ${b.endTime}</span>
@@ -480,7 +480,7 @@
                 canCancel = diffMs > 60 * 60 * 1000; // > 1 hour
             }
             if (!canCancel) {
-                footerHtml = `<div style="width:100%; font-size:13px; color:#f59e0b; text-align:center; padding:8px; margin-bottom:4px; font-weight:700;">⚠️ Không thể hủy trong vòng 1 giờ trước giờ đánh</div>` + footerHtml;
+                footerHtml = `<div style="width:100%; font-size:13px; color:#f59e0b; text-align:center; padding:8px; margin-bottom:4px; font-weight:700;">Không thể hủy trong vòng 1 giờ trước giờ đánh</div>` + footerHtml;
                 footerHtml += `<button onclick="openOrderMenu()" class="modal-btn btn-order-items">Order Đồ Uống & Vợt</button>`;
             } else {
                 footerHtml += `<button onclick="openOrderMenu()" class="modal-btn btn-order-items">Order Đồ Uống & Vợt</button>`;
@@ -523,7 +523,7 @@
     toggleCartView(false); // Make sure menu is shown
     
     if (menuItems.length === 0) {
-      document.getElementById('menuGrid').innerHTML = `<div class="empty-state" style="grid-column: 1/-1;"><div class="icon">⏳</div><h3>Đang tải menu...</h3></div>`;
+      document.getElementById('menuGrid').innerHTML = `<div class="empty-state" style="grid-column: 1/-1;"><h3>Đang tải menu...</h3></div>`;;
       try {
         const [prodRes, rackRes] = await Promise.all([
           fetch('/api/products').then(r => r.json()),
@@ -576,7 +576,7 @@
       const isOut = stock <= 0;
       let imgHtml = item.imageUrl 
         ? `<img src="${item.imageUrl}" onerror="this.src='/favicon.png'"/>`
-        : (item._type === 'racket' ? '🏸' : '🛒');
+        : (item._type === 'racket' ? 'Vợt' : 'Sản phẩm');
 
       const priceStr = (item.price || 0).toLocaleString('vi-VN') + ' đ';
       
@@ -663,7 +663,7 @@
             <button onclick="changeMenuCartQty('cart', ${idx}, -1)">-</button>
             <span>${item.qty}</span>
             <button onclick="changeMenuCartQty('cart', ${idx}, 1)">+</button>
-            <button onclick="removeMenuCartItem('cart', ${idx})" style="background:none; border:none; color:var(--red); font-size:16px; margin-left:8px;" title="Xóa món">🗑️</button>
+            <button onclick="removeMenuCartItem('cart', ${idx})" style="background:none; border:none; color:var(--red); font-size:16px; margin-left:8px;" title="Xóa món">Xóa</button>
           </div>
         </div>`;
     });
@@ -677,7 +677,7 @@
             <button onclick="changeMenuCartQty('racket_cart', ${idx}, -1)">-</button>
             <span>${item.qty}</span>
             <button onclick="changeMenuCartQty('racket_cart', ${idx}, 1)">+</button>
-            <button onclick="removeMenuCartItem('racket_cart', ${idx})" style="background:none; border:none; color:var(--red); font-size:16px; margin-left:8px;" title="Xóa món">🗑️</button>
+            <button onclick="removeMenuCartItem('racket_cart', ${idx})" style="background:none; border:none; color:var(--red); font-size:16px; margin-left:8px;" title="Xóa món">Xóa</button>
           </div>
         </div>`;
     });
@@ -725,7 +725,7 @@
     const file = document.getElementById('menuCccdInput').files[0];
     if(!file) return;
     const btn = document.getElementById('menuUploadBtn');
-    btn.textContent = '⏳ Đang tải...'; btn.disabled = true;
+    btn.textContent = 'Đang tải...'; btn.disabled = true;
     try {
       const fd = new FormData(); fd.append('file', file);
       const res = await fetch('/api/upload', { method: 'POST', body: fd });
@@ -734,9 +734,9 @@
       document.getElementById('menuCccdUrl').value = json.data;
       document.getElementById('menuCccdPreview').src = json.data;
       document.getElementById('menuCccdPreview').style.display = 'block';
-      btn.textContent = '✅ Đã tải ảnh (Nhấn để thay đổi)';
+      btn.textContent = 'Đã tải ảnh (Nhấn để thay đổi)';
     } catch(e) {
-      showToast('Lỗi tải ảnh', 'error'); btn.textContent = '📷 Lỗi - Thử lại';
+      showToast('Lỗi tải ảnh', 'error'); btn.textContent = 'Lỗi - Thử lại';
     } finally { btn.disabled = false; }
   }
 

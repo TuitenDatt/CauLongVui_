@@ -82,7 +82,7 @@
   </div>
 
   <div class="keo-list" id="keoList">
-    <div class="empty-state"><div class="icon">⏳</div><h3>Đang tải kèo...</h3></div>
+    <div class="empty-state"><h3>Đang tải kèo...</h3></div>
   </div>
 </div>
 
@@ -110,7 +110,7 @@
       if (!json.success || !json.data || json.data.length === 0) {
         list.innerHTML = `
           <div class="empty-state">
-            <div class="icon">🤝</div>
+            <div class="icon"></div>
             <h3>Khụng có kèo nào</h3>
             <p>Hãy là người đầu tiên tạo kèo giao lưu!</p>
           </div>`;
@@ -132,16 +132,16 @@
             <div class="keo-title">${escapeHtml(k.title)}</div>
             
             <div class="keo-detail">
-              <span><i>🏸</i> <strong>Sân:</strong> ${escapeHtml(k.courtName)}</span>
-              <span><i>⏰</i> <strong>Thời gian:</strong> ${k.startTime} - ${k.endTime} (${dateStr})</span>
-              <span><i>🔥</i> <strong>Trình độ:</strong> ${escapeHtml(k.level)}</span>
-              <span><i>💰</i> <strong>Chi phí:</strong> ${costStr}/người</span>
-              <span><i>👥</i> <strong>Cần tìm:</strong> ${k.requiredPlayers} người</span>
-              <span><i>📞</i> <strong>Liên hệ:</strong> ${escapeHtml(k.phoneContact)}</span>
+              <span><strong>Sân:</strong> ${escapeHtml(k.courtName)}</span>
+              <span><strong>Thời gian:</strong> ${k.startTime} - ${k.endTime} (${dateStr})</span>
+              <span><strong>Trình độ:</strong> ${escapeHtml(k.level)}</span>
+              <span><strong>Chi phí:</strong> ${costStr}/người</span>
+              <span><strong>Cần tìm:</strong> ${k.requiredPlayers} người</span>
+              <span><strong>Liên hệ:</strong> ${escapeHtml(k.phoneContact)}</span>
             </div>
             
             <div class="keo-footer">
-              <div class="keo-author">🧑 ${escapeHtml(k.authorName)}</div>
+              <div class="keo-author">Người tạo: ${escapeHtml(k.authorName)}</div>
               ${k.status === 'OPEN' 
                 ? `<div style="display:flex; gap:8px;">
                      <button onclick="joinKeo(${k.id})" class="btn-join" style="background:var(--green);color:#fff;">Tham gia (${k.joinedPlayers||0}/${k.requiredPlayers})</button>
@@ -154,7 +154,7 @@
         `;
       }).join('');
     } catch (err) {
-      list.innerHTML = `<div class="empty-state"><div class="icon">😵</div><h3>Lỗi tải dữ liệu</h3><p>${err.message}</p></div>`;
+      list.innerHTML = `<div class="empty-state"><h3>Lỗi tải dữ liệu</h3><p>${err.message}</p></div>`;
     }
   }
 

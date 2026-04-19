@@ -66,18 +66,18 @@
 <div id="header-placeholder"></div>
 
 <div class="cart-page">
-  <div class="page-title">🎾 Giỏ Thuê Vợt</div>
+  <div class="page-title">Giỏ Thuê Vợt</div>
   <div class="page-sub">Vui lòng cung cấp hình ảnh CCCD/CMND để hoàn tất thủ tục thuê vợt.</div>
 
   <div class="layout" id="mainLayout" style="display:none;">
     <div class="left-col">
       <div class="card">
-        <h2>📦 Danh sách vợt đã chọn</h2>
+        <h2>Danh sách vợt đã chọn</h2>
         <div id="cartItems"></div>
       </div>
       
       <div class="card">
-        <h2>👤 Thông tin người thuê</h2>
+        <h2>Thông tin người thuê</h2>
         <div class="form-group">
           <label>Họ và tên <span style="color:red">*</span></label>
           <input type="text" id="cName" placeholder="Nhập họ tên...">
@@ -89,17 +89,17 @@
         <div class="form-group" id="courtSelectWrap">
           <label>Sân đang chơi <span style="font-weight:normal;color:var(--muted)">(nếu có)</span></label>
           <div style="font-size:13px; color:var(--muted); padding:10px; background:#f8f9fa; border-radius:10px; border:1px solid var(--border); text-align:center;">
-            ⏳ Đang kiểm tra lịch đặt sân của bạn...
+            Đang kiểm tra lịch đặt sân của bạn...
           </div>
         </div>
         
         <div class="req-box">
-          <h3>📸 Yêu cầu xác minh</h3>
+          <h3>Yêu cầu xác minh</h3>
           <p>Để tránh thất lạc dụng cụ, vui lòng chụp rõ nét mặt trước CCCD hoặc CMND của bạn.</p>
           <input type="hidden" id="cccdImgUrl">
           <input type="file" id="cccdInput" accept="image/*" style="display:none;" onchange="uploadCccd()">
           <button type="button" class="upload-btn" id="uploadBtn" onclick="document.getElementById('cccdInput').click()">
-            📷 Nhấn để chụp hoặc tải ảnh lên
+            Nhấn để chụp hoặc tải ảnh lên
           </button>
           <img id="cccdPreview" class="cccd-preview" src="" alt="CCCDPreview">
         </div>
@@ -108,31 +108,31 @@
     
     <div class="right-col">
       <div class="card">
-        <h2>🧾 Tóm tắt đơn thuê</h2>
+        <h2>Tóm tắt đơn thuê</h2>
         <div class="summary-row"><span>Số lượng vợt:</span> <span id="sQty">0</span></div>
         <div class="summary-row total"><span>Tổng tiền:</span> <span id="sTotal">0 đ</span></div>
         
-        <h3 style="font-size: 14px; font-weight: 800; margin-top: 24px; margin-bottom: 8px;">💳 Phương thức thanh toán</h3>
+        <h3 style="font-size: 14px; font-weight: 800; margin-top: 24px; margin-bottom: 8px;">Phương thức thanh toán</h3>
         <div class="payment-options">
           <label class="po selected" id="optCash" onclick="selectPay('CASH')">
             <input type="radio" name="pay" value="CASH" checked>
-            <div class="po-icon">💵</div>
+            <div class="po-icon"></div>
             <div class="po-label">Tiền mặt</div>
           </label>
           <label class="po" id="optMomo" onclick="selectPay('MOMO')">
             <input type="radio" name="pay" value="MOMO">
-            <div class="po-icon">💜</div>
+            <div class="po-icon"></div>
             <div class="po-label">Ví MoMo</div>
           </label>
         </div>
         
-        <button class="btn-submit" id="submitBtn" onclick="submitOrder()">✅ Xác nhận thuê vợt</button>
+        <button class="btn-submit" id="submitBtn" onclick="submitOrder()">Xác nhận thuê vợt</button>
       </div>
     </div>
   </div>
   
   <div id="emptyCart" style="display:none; text-align:center; padding: 60px 0;">
-    <div style="font-size: 64px; margin-bottom: 16px;">🎾</div>
+    <div style="font-size: 64px; margin-bottom: 16px;"></div>
     <h3 style="font-size: 20px; font-weight: 800;">Giỏ thuê vợt trống</h3>
     <p style="color: var(--muted); margin-bottom: 24px;">Bạn chưa chọn vợt nào để thuê.</p>
     <a href="/rackets.html" style="padding: 12px 24px; background: var(--green); color: #fff; text-decoration: none; border-radius: 10px; font-weight: 700;">Xem danh sách vợt</a>
@@ -224,10 +224,10 @@ function selectPay(method) {
   const btn = document.getElementById('submitBtn');
   if(method === 'MOMO') {
     btn.style.background = '#ae2070';
-    btn.innerHTML = '💜 Thanh toán bằng MoMo';
+    btn.innerHTML = 'Thanh toán bằng MoMo';
   } else {
     btn.style.background = 'var(--green)';
-    btn.innerHTML = '✅ Xác nhận thuê vợt';
+    btn.innerHTML = 'Xác nhận thuê vợt';
   }
 }
 
@@ -241,7 +241,7 @@ function renderCart() {
     
     const imgHtml = item.imageUrl 
       ? `<img class="r-thumb" src="${item.imageUrl}" alt="${item.name}">`
-      : `<div class="r-thumb">🎾</div>`;
+      : `<div class="r-thumb">Vợt</div>`;
       
     return `
       <div class="r-item">
@@ -292,7 +292,7 @@ async function uploadCccd() {
   if(!file) return;
   
   const btn = document.getElementById('uploadBtn');
-  btn.textContent = '⏳ Đang tải ảnh lên...';
+  btn.textContent = 'Đang tải ảnh lên...';
   btn.disabled = true;
   
   try {
@@ -306,11 +306,11 @@ async function uploadCccd() {
     document.getElementById('cccdPreview').src = json.data;
     document.getElementById('cccdPreview').style.display = 'block';
     
-    btn.textContent = '✅ Đã tải ảnh xong (Nhấn để đổi)';
+    btn.textContent = 'Đã tải ảnh xong (Nhấn để đổi)';
     showToast('Tải ảnh CCCD thành công!', 'success');
   } catch(e) {
     showToast('Lỗi tải ảnh: ' + e.message, 'error');
-    btn.textContent = '📷 Lỗi - Thử lại';
+    btn.textContent = 'Lỗi - Thử lại';
   } finally {
     btn.disabled = false;
   }
@@ -336,7 +336,7 @@ async function submitOrder() {
   
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
-  btn.textContent = '⏳ Đang xử lý...';
+  btn.textContent = 'Đang xử lý...';
   
   try {
     const response = await fetchAPI('/v1/racket-rentals', {
@@ -360,7 +360,7 @@ async function submitOrder() {
   } catch (err) {
     showToast('Lỗi: ' + err.message, 'error');
     btn.disabled = false;
-    btn.innerHTML = selPay === 'MOMO' ? '💜 Thanh toán bằng MoMo' : '✅ Xác nhận thuê vợt';
+    btn.innerHTML = selPay === 'MOMO' ? 'Thanh toán bằng MoMo' : 'Xác nhận thuê vợt';
   }
 }
 

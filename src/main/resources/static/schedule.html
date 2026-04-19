@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,117 +9,339 @@
   <link rel="icon" type="image/png" href="/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="/css/momo-booking.css">
   <style>
     .week-bar {
-      display: flex; gap: 8px; padding: 12px 16px;
-      background: #fff; border-bottom: 1px solid #f0f0f0;
-      overflow-x: auto; scrollbar-width: none;
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #fff;
+      border-bottom: 1px solid #f0f0f0;
+      overflow-x: auto;
+      scrollbar-width: none;
     }
-    .week-bar::-webkit-scrollbar { display: none; }
+
+    .week-bar::-webkit-scrollbar {
+      display: none;
+    }
+
     .day-btn {
-      flex-shrink: 0; display: flex; flex-direction: column;
-      align-items: center; padding: 8px 14px; border-radius: 14px;
-      border: 1.5px solid #e5e7eb; background: #fff; cursor: pointer;
-      font-family: inherit; transition: all 0.18s; min-width: 56px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 14px;
+      border-radius: 14px;
+      border: 1.5px solid #e5e7eb;
+      background: #fff;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.18s;
+      min-width: 56px;
     }
-    .day-btn:hover { border-color: #16a34a; background: #f0fdf4; }
-    .day-btn .day-name { font-size: 11px; color: #9ca3af; font-weight: 700; letter-spacing: 0.04em; }
-    .day-btn .day-num  { font-size: 20px; font-weight: 900; color: #1a2e1a; line-height: 1.2; }
-    .day-btn.today     { border-color: #16a34a; background: #f0fdf4; }
-    .day-btn.today .day-name { color: #16a34a; }
-    .day-btn.selected  { border-color: #16a34a; background: #16a34a; box-shadow: 0 4px 12px rgba(22,163,74,0.3); }
-    .day-btn.selected .day-name, .day-btn.selected .day-num { color: #fff; }
+
+    .day-btn:hover {
+      border-color: #16a34a;
+      background: #f0fdf4;
+    }
+
+    .day-btn .day-name {
+      font-size: 11px;
+      color: #9ca3af;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .day-btn .day-num {
+      font-size: 20px;
+      font-weight: 900;
+      color: #1a2e1a;
+      line-height: 1.2;
+    }
+
+    .day-btn.today {
+      border-color: #16a34a;
+      background: #f0fdf4;
+    }
+
+    .day-btn.today .day-name {
+      color: #16a34a;
+    }
+
+    .day-btn.selected {
+      border-color: #16a34a;
+      background: #16a34a;
+      box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+    }
+
+    .day-btn.selected .day-name,
+    .day-btn.selected .day-num {
+      color: #fff;
+    }
 
     .date-picker-bar {
-      background: #fff; padding: 10px 16px;
-      display: flex; align-items: center; gap: 12px;
-      border-bottom: 1px solid #f0f0f0; font-size: 14px;
+      background: #fff;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
     }
-    .date-picker-bar label { font-weight: 700; color: #374151; white-space: nowrap; font-size: 13px; }
+
+    .date-picker-bar label {
+      font-weight: 700;
+      color: #374151;
+      white-space: nowrap;
+      font-size: 13px;
+    }
+
     .date-picker-bar input[type=date] {
-      border: 1.5px solid #e5e7eb; border-radius: 10px;
-      padding: 7px 12px; font-size: 14px; font-family: inherit;
-      outline: none; cursor: pointer; color: #1a2e1a; background: #f9fafb;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 7px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+      color: #1a2e1a;
+      background: #f9fafb;
       transition: border-color 0.2s;
     }
-    .date-picker-bar input[type=date]:focus { border-color: #16a34a; background: #f0fdf4; }
-    #dateLabel { color: #16a34a; font-weight: 800; font-size: 14px; }
+
+    .date-picker-bar input[type=date]:focus {
+      border-color: #16a34a;
+      background: #f0fdf4;
+    }
+
+    #dateLabel {
+      color: #16a34a;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
     .court-filter-hint {
-      font-size: 12px; color: #6b7280; margin-left: auto; white-space: nowrap;
-      background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 20px;
-      padding: 4px 12px; font-weight: 600;
+      font-size: 12px;
+      color: #6b7280;
+      margin-left: auto;
+      white-space: nowrap;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-weight: 600;
     }
 
     .status-bar {
-      display: flex; gap: 20px; padding: 9px 16px;
-      background: #fff; border-bottom: 1px solid #f0f0f0;
-      align-items: center; font-size: 12px; flex-wrap: wrap;
+      display: flex;
+      gap: 20px;
+      padding: 9px 16px;
+      background: #fff;
+      border-bottom: 1px solid #f0f0f0;
+      align-items: center;
+      font-size: 12px;
+      flex-wrap: wrap;
     }
-    .status-dot { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: middle; }
-    .status-bar > div { color: #374151; font-weight: 600; display: flex; align-items: center; }
-    .s-empty   { background: white; border: 1.5px solid #d1d5db; }
-    .s-booked  { background: #f87171; }
-    .s-held    { background: #fde68a; border: 1px solid #fbbf24; }
-    .s-selected{ background: #16a34a; }
+
+    .status-dot {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    .status-bar>div {
+      color: #374151;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+    }
+
+    .s-empty {
+      background: white;
+      border: 1.5px solid #d1d5db;
+    }
+
+    .s-booked {
+      background: #f87171;
+    }
+
+    .s-held {
+      background: #fde68a;
+      border: 1px solid #fbbf24;
+    }
+
+    .s-selected {
+      background: #16a34a;
+    }
 
     .selection-hint {
-      font-size: 12px; color: #92400e; padding: 7px 16px;
-      background: #fffbeb; border-bottom: 1px solid #fde68a;
-      display: none; font-weight: 600;
+      font-size: 12px;
+      color: #92400e;
+      padding: 7px 16px;
+      background: #fffbeb;
+      border-bottom: 1px solid #fde68a;
+      display: none;
+      font-weight: 600;
     }
-    .selection-hint.visible { display: flex; align-items: center; gap: 6px; }
 
-    .schedule-container { overflow-x: auto; background: #fafafa; padding-bottom: 100px; }
-    .schedule-table { border-collapse: collapse; min-width: 1200px; width: 100%; }
-    .schedule-table th, .schedule-table td {
-      border: 1px solid #f0f0f0; text-align: center;
-      padding: 0; height: 38px; min-width: 44px; cursor: pointer;
+    .selection-hint.visible {
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
+
+    .schedule-container {
+      overflow-x: auto;
+      background: #fafafa;
+      padding-bottom: 100px;
+    }
+
+    .schedule-table {
+      border-collapse: collapse;
+      min-width: 1200px;
+      width: 100%;
+    }
+
+    .schedule-table th,
+    .schedule-table td {
+      border: 1px solid #f0f0f0;
+      text-align: center;
+      padding: 0;
+      height: 38px;
+      min-width: 44px;
+      cursor: pointer;
+    }
+
     .schedule-table thead tr th {
-      background: #f8fafc; font-size: 11px; font-weight: 700;
-      color: #94a3b8; letter-spacing: 0.04em; border-bottom: 2px solid #e2e8f0;
+      background: #f8fafc;
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      letter-spacing: 0.04em;
+      border-bottom: 2px solid #e2e8f0;
     }
+
     .court-name {
-      background: #f8fafc !important; font-size: 12px; font-weight: 800;
-      position: sticky; left: 0; z-index: 10;
+      background: #f8fafc !important;
+      font-size: 12px;
+      font-weight: 800;
+      position: sticky;
+      left: 0;
+      z-index: 10;
       border-right: 2px solid #e2e8f0 !important;
-      padding: 6px 10px !important; min-width: 90px; text-align: left !important;
+      padding: 6px 10px !important;
+      min-width: 90px;
+      text-align: left !important;
     }
-    .slot.empty   { background: #fff; transition: background 0.1s; }
-    .slot.empty:hover { background: #dcfce7 !important; cursor: pointer; }
-    .slot.booked  { background: #fee2e2 !important; cursor: not-allowed; }
-    .slot.selected{ background: #16a34a !important; color: white; }
-    .slot.held    { background: #fef3c7 !important; cursor: not-allowed; }
-    .slot.held.by-me { background: #bbf7d0 !important; cursor: pointer; }
-    .slot.past    { background: #f8fafc !important; cursor: not-allowed; opacity: 0.45; }
-    tr.court-active td.empty:not(.selected) { background: #f0fdf4 !important; }
-    tr.court-active td.court-name { background: #dcfce7 !important; border-left: 3px solid #16a34a !important; }
+
+    .slot.empty {
+      background: #fff;
+      transition: background 0.1s;
+    }
+
+    .slot.empty:hover {
+      background: #dcfce7 !important;
+      cursor: pointer;
+    }
+
+    .slot.booked {
+      background: #fee2e2 !important;
+      cursor: not-allowed;
+    }
+
+    .slot.selected {
+      background: #16a34a !important;
+      color: white;
+    }
+
+    .slot.held {
+      background: #fef3c7 !important;
+      cursor: not-allowed;
+    }
+
+    .slot.held.by-me {
+      background: #bbf7d0 !important;
+      cursor: pointer;
+    }
+
+    .slot.past {
+      background: #f8fafc !important;
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    tr.court-active td.empty:not(.selected) {
+      background: #f0fdf4 !important;
+    }
+
+    tr.court-active td.court-name {
+      background: #dcfce7 !important;
+      border-left: 3px solid #16a34a !important;
+    }
 
     .bottom-bar {
-      position: fixed; bottom: 0; left: 0; width: 100%;
-      background: #fff; border-top: 1px solid #e5e7eb;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #fff;
+      border-top: 1px solid #e5e7eb;
       padding: 14px 20px 18px;
-      box-shadow: 0 -6px 24px rgba(0,0,0,0.07);
+      box-shadow: 0 -6px 24px rgba(0, 0, 0, 0.07);
       z-index: 200;
     }
+
     .summary {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 12px; padding: 10px 16px;
-      background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding: 10px 16px;
+      background: #f0fdf4;
+      border: 1.5px solid #bbf7d0;
+      border-radius: 12px;
     }
-    .summary span { font-size: 14px; font-weight: 700; color: #14532d; }
-    .summary span:last-child { color: #16a34a; font-size: 17px; font-weight: 900; }
+
+    .summary span {
+      font-size: 14px;
+      font-weight: 700;
+      color: #14532d;
+    }
+
+    .summary span:last-child {
+      color: #16a34a;
+      font-size: 17px;
+      font-weight: 900;
+    }
+
     .btn-next {
-      background: #16a34a; color: white; border: none; padding: 15px; width: 100%;
-      font-size: 15px; font-weight: 800; cursor: pointer; border-radius: 12px;
-      font-family: inherit; transition: all 0.2s; letter-spacing: 0.05em;
-      box-shadow: 0 4px 16px rgba(22,163,74,0.3);
+      background: #16a34a;
+      color: white;
+      border: none;
+      padding: 15px;
+      width: 100%;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      border-radius: 12px;
+      font-family: inherit;
+      transition: all 0.2s;
+      letter-spacing: 0.05em;
+      box-shadow: 0 4px 16px rgba(22, 163, 74, 0.3);
     }
-    .btn-next:hover { background: #14532d; transform: translateY(-1px); }
+
+    .btn-next:hover {
+      background: #14532d;
+      transform: translateY(-1px);
+    }
   </style>
 </head>
+
 <body>
 
   <!-- Header -->
@@ -133,7 +356,7 @@
 
   <!-- Date picker -->
   <div class="date-picker-bar">
-    <label>📅 Ngày:</label>
+    <label>Ngày:</label>
     <input type="date" id="datePicker">
     <span id="dateLabel"></span>
     <span class="court-filter-hint" id="courtCountLabel"></span>
@@ -141,7 +364,7 @@
 
   <!-- Selection hint -->
   <div class="selection-hint" id="selHint">
-    ⚠️ Vui lòng chọn các khung giờ <b>liên tiếp nhau</b> trên cùng một sân.
+    Vui lòng chọn các khung giờ <b>liên tiếp nhau</b> trên cùng một sân.
   </div>
 
   <!-- Status legend -->
@@ -167,19 +390,24 @@
   <!-- Bottom bar -->
   <div class="bottom-bar">
     <div class="summary">
-      <span id="total-hours">&#x23f1; T&#x1ed5ng gi&#x1edd;: 0h00</span>
+      <span id="total-hours">Tổng giờ: 0h00</span>
       <span id="total-price">0 &#x111;</span>
     </div>
     <!-- Bundle mode: hien thi so san da chon -->
-    <div id="bundle-bar" style="display:none;margin-bottom:8px;padding:8px 12px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;font-size:13px;">
-      <span style="font-weight:700;color:#16a34a;">&#x1f3d8; Ch&#x1ebf; &#x111;&#x1ed9; c&#x1ee5;m:</span>
+    <div id="bundle-bar"
+      style="display:none;margin-bottom:8px;padding:8px 12px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;font-size:13px;">
+      <span style="font-weight:700;color:#16a34a;">Chế độ cụm:</span>
       <span id="bundle-count" style="color:#14532d;font-weight:800;">0 s&#xE2;n</span>
       <span id="bundle-courts-list" style="color:#6b7280;font-size:12px;"></span>
-      <button onclick="clearBundleSelection()" style="float:right;background:none;border:none;color:#dc2626;font-weight:700;cursor:pointer;font-size:13px;">X&#xf3;a h&#x1ebf;t</button>
+      <button onclick="clearBundleSelection()"
+        style="float:right;background:none;border:none;color:#dc2626;font-weight:700;cursor:pointer;font-size:13px;">X&#xf3;a
+        h&#x1ebf;t</button>
     </div>
     <div style="display:flex;gap:8px;">
-      <button id="btn-bundle-mode" class="btn-next" style="flex:0 0 auto;width:auto;padding:15px 18px;background:#f0fdf4;color:#16a34a;border:2px solid #16a34a;font-size:13px;" onclick="toggleBundleMode()">
-        &#x1f3d8; &#x110;&#x1eb7;t c&#x1ee5;m
+      <button id="btn-bundle-mode" class="btn-next"
+        style="flex:0 0 auto;width:auto;padding:15px 18px;background:#f0fdf4;color:#16a34a;border:2px solid #16a34a;font-size:13px;"
+        onclick="toggleBundleMode()">
+        Đặt nhiều sân
       </button>
       <button class="btn-next" style="flex:1;" onclick="goToNext()">Ti&#x1ebf;p Theo &#x2192;</button>
     </div>
@@ -188,30 +416,31 @@
   <script>
     // ── Constants ──────────────────────────────────────────────
     const times = [
-      "5:00","5:30","6:00","6:30","7:00","7:30","8:00","8:30",
-      "9:00","9:30","10:00","10:30","11:00","11:30","12:00","12:30",
-      "13:00","13:30","14:00","14:30","15:00","15:30","16:00","16:30",
-      "17:00","17:30","18:00","18:30","19:00","19:30","20:00","20:30",
-      "21:00","21:30"
+      "5:00", "5:30", "6:00", "6:30", "7:00", "7:30", "8:00", "8:30",
+      "9:00", "9:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30",
+      "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30",
+      "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30",
+      "21:00", "21:30"
     ];
 
     // Preserve courtId from URL param if user came from a specific court
-    const params    = new URLSearchParams(window.location.search);
-    const filterCourtId = params.get('courtId') || null; // null = show all
+    const params = new URLSearchParams(window.location.search);
+    const originalFilterCourtId = params.get('courtId') || null; // original URL param
+    let filterCourtId = originalFilterCourtId; // mutable — cleared in bundle mode
 
     let allCourts = [];   // loaded from API
-    let bookedMap  = {};  // { courtId: [{startTime, endTime}] }
-    let heldSlots     = []; // { courtId, startMin, endMin, isByMe, holdId }
+    let bookedMap = {};  // { courtId: [{startTime, endTime}] }
+    let heldSlots = []; // { courtId, startMin, endMin, isByMe, holdId }
     let selectedCell = null; // { courtId, idxArr }
 
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
-    const myUserId    = currentUser ? currentUser.id : 999; // Mock ID if not logged in
+    const myUserId = currentUser ? currentUser.id : 999; // Mock ID if not logged in
 
     // ── Date picker & 7-day bar ────────────────────────────────
     const dp = document.getElementById('datePicker');
     const today = new Date();
-    const todayLocalStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
-    dp.min   = todayLocalStr;
+    const todayLocalStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+    dp.min = todayLocalStr;
     dp.value = todayLocalStr;
     updateDateLabel();
     // Initial load
@@ -236,11 +465,11 @@
     function renderWeekBar() {
       const bar = document.getElementById('weekBar');
       bar.innerHTML = '';
-      const DAYS = ['CN','T2','T3','T4','T5','T6','T7'];
+      const DAYS = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
       for (let i = 0; i < 14; i++) {
         const d = new Date(today);
         d.setDate(today.getDate() + i);
-        const iso = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+        const iso = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
         const btn = document.createElement('button');
         btn.className = 'day-btn' + (i === 0 ? ' today' : '');
         btn.dataset.iso = iso;
@@ -281,7 +510,7 @@
     function idxToTime(i) {
       const total = 5 * 60 + i * 30;
       const hh = Math.floor(total / 60), mm = total % 60;
-      return String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0');
+      return String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0');
     }
 
     function isBooked(courtId, slotTime) {
@@ -310,7 +539,7 @@
 
     // ── Load all courts ────────────────────────────────────────
     async function loadCourts() {
-      const res  = await fetch('/api/courts');
+      const res = await fetch('/api/courts');
       const json = await res.json();
       if (!json.success) throw new Error(json.message);
 
@@ -329,7 +558,7 @@
       bookedMap = {};
       await Promise.all(allCourts.map(async court => {
         try {
-          const res  = await fetch(`/api/bookings/slots?courtId=${court.id}&date=${date}`);
+          const res = await fetch(`/api/bookings/slots?courtId=${court.id}&date=${date}`);
           const json = await res.json();
           bookedMap[court.id] = (json.success && json.data) ? json.data : [];
         } catch (e) {
@@ -376,12 +605,12 @@
             if (myHold) {
               td.classList.add('selected', 'by-me');
             }
-            td.dataset.courtId  = court.id;
+            td.dataset.courtId = court.id;
             td.dataset.courtName = court.name;
-            td.dataset.price    = court.pricePerHour;
-            td.dataset.time     = t;
-            td.dataset.idx      = idx;
-            td.onclick = function() { handleSlotClick(this); };
+            td.dataset.price = court.pricePerHour;
+            td.dataset.time = t;
+            td.dataset.idx = idx;
+            td.onclick = function () { handleSlotClick(this); };
           }
           tr.appendChild(td);
         });
@@ -396,65 +625,127 @@
       await buildGrid();
     }
 
-    // ── Single-court selection state ──────────────────────────
-    let selCourtId      = null;
-    let selectedIndices = [];
+    // ══════════════════════════════════════════════════════════════
+    // SELECTION STATE
+    // ══════════════════════════════════════════════════════════════
+    let selCourtId = null;   // court whose time range is being set
+    let selectedIndices = [];     // sorted array of slot indices (shared by all bundle courts)
 
-    // ── Bundle (multi-court) selection state ───────────────────
-    let bundleMode = false;     // khi bật: có thể chọn nhiều sân
-    // bundleCourts: Map<courtId, {courtName, pricePerHour, minIdx, maxIdx}>
+    // Bundle mode
+    let bundleMode = false;
+    // bundleCourts: Map<courtId_string, {courtName, pricePerHour}>
+    // All bundle courts share the SAME selectedIndices time range
     let bundleCourts = new Map();
 
-    function toggleBundleMode() {
+    // ══════════════════════════════════════════════════════════════
+    // BUNDLE MODE TOGGLE
+    // ══════════════════════════════════════════════════════════════
+    async function toggleBundleMode() {
       bundleMode = !bundleMode;
       const btn = document.getElementById('btn-bundle-mode');
       const bar = document.getElementById('bundle-bar');
+
       if (bundleMode) {
-        btn.style.background = '#16a34a'; btn.style.color = '#fff';
-        btn.textContent = '✅ Đặt cụm';
+        btn.style.background = '#16a34a';
+        btn.style.color = '#fff';
+        btn.textContent = ' Cụm BẬT';
         bar.style.display = 'block';
-        showScheduleToast('Chế độ cụm: chọn nhiều sân cùng khung giờ', 'info');
-        
-        // Nếu đã chọn sẵn 1 sân -> tự động đưa vào danh sách cụm
-        if (selCourtId && selectedIndices.length > 0) {
-          const min = Math.min(...selectedIndices), max = Math.max(...selectedIndices);
-          const cell = document.querySelector(`.slot[data-court-id="${selCourtId}"][data-idx="${min}"]`);
-          bundleCourts.set(selCourtId, {
-            courtName: cell ? cell.dataset.courtName : 'Sân',
-            pricePerHour: cell ? parseFloat(cell.dataset.price) : 0,
-            minIdx: min, maxIdx: max
+
+        // Nếu đã chọn giờ trên 1 sân → lưu vào bundle trước khi reload
+        const savedCourtId = selCourtId;
+        const savedIndices = [...selectedIndices];
+
+        // Tải TẤT CẢ sân (bỏ filter theo courtId)
+        filterCourtId = null;
+        await loadCourtsAndGrid();
+
+        // Khôi phục lại selection sau khi grid rebuild
+        if (savedCourtId && savedIndices.length > 0) {
+          selCourtId = savedCourtId;
+          selectedIndices = savedIndices;
+          const c0 = document.querySelector(`.slot[data-court-id="${savedCourtId}"][data-idx="${savedIndices[0]}"]`);
+          bundleCourts.set(String(savedCourtId), {
+            courtName: c0 ? c0.dataset.courtName : 'Sân',
+            pricePerHour: c0 ? parseFloat(c0.dataset.price) : 0
           });
           updateBundleBar();
+          renderAllHighlights();
+          calcTotal();
         }
+
+        showScheduleToast('Chế độ cụm BẬT — Click sân khác để thêm vào cụm cùng khung giờ', 'info');
       } else {
-        btn.style.background = '#f0fdf4'; btn.style.color = '#16a34a';
-        btn.textContent = '🏛 Đặt cụm';
+        btn.style.background = '#f0fdf4';
+        btn.style.color = '#16a34a';
+        btn.textContent = 'Đặt nhiều sân';
+
+        // Khôi phục filter gốc và reload
+        filterCourtId = originalFilterCourtId;
+        bundleCourts.clear();
+        selCourtId = null;
+        selectedIndices = [];
+        await loadCourtsAndGrid();
         bar.style.display = bundleCourts.size > 0 ? 'block' : 'none';
       }
+      renderAllHighlights();
+      calcTotal();
     }
 
     function clearBundleSelection() {
       bundleCourts.clear();
-      selCourtId = null; selectedIndices = [];
-      document.querySelectorAll('.slot.selected').forEach(c => c.classList.remove('selected'));
-      document.querySelectorAll('tr.court-active').forEach(r => r.classList.remove('court-active'));
+      selCourtId = null;
+      selectedIndices = [];
       document.getElementById('bundle-bar').style.display = 'none';
+      renderAllHighlights();
       calcTotal();
     }
 
     function updateBundleBar() {
       const bar = document.getElementById('bundle-bar');
       const count = document.getElementById('bundle-count');
-      const list  = document.getElementById('bundle-courts-list');
-      if (bundleCourts.size === 0) { bar.style.display = 'none'; return; }
+      const list = document.getElementById('bundle-courts-list');
+      if (bundleCourts.size === 0) {
+        if (!bundleMode) bar.style.display = 'none';
+        if (count) count.textContent = '0 sân';
+        if (list) list.textContent = '';
+        return;
+      }
       bar.style.display = 'block';
-      count.textContent = bundleCourts.size + ' sân';
-      const names = [...bundleCourts.values()].map(v => v.courtName).join(', ');
-      list.textContent = ' — ' + names;
+      if (count) count.textContent = bundleCourts.size + ' sân';
+      if (list) list.textContent = ' — ' + [...bundleCourts.values()].map(v => v.courtName).join(', ');
     }
 
+    // ══════════════════════════════════════════════════════════════
+    // RENDER — single source of truth for all highlights
+    // ══════════════════════════════════════════════════════════════
+    function renderAllHighlights() {
+      document.querySelectorAll('.slot.selected').forEach(c => c.classList.remove('selected'));
+      document.querySelectorAll('tr.court-active').forEach(r => r.classList.remove('court-active'));
+      if (selectedIndices.length === 0) return;
+
+      if (bundleMode && bundleCourts.size > 0) {
+        bundleCourts.forEach((_v, cid) => {
+          selectedIndices.forEach(i => {
+            const c = document.querySelector(`.slot[data-court-id="${cid}"][data-idx="${i}"]`);
+            if (c) c.classList.add('selected');
+          });
+          const anyCell = document.querySelector(`.slot[data-court-id="${cid}"]`);
+          if (anyCell && anyCell.closest('tr')) anyCell.closest('tr').classList.add('court-active');
+        });
+      } else if (selCourtId) {
+        selectedIndices.forEach(i => {
+          const c = document.querySelector(`.slot[data-court-id="${selCourtId}"][data-idx="${i}"]`);
+          if (c) c.classList.add('selected');
+        });
+        const anyCell = document.querySelector(`.slot[data-court-id="${selCourtId}"]`);
+        if (anyCell && anyCell.closest('tr')) anyCell.closest('tr').classList.add('court-active');
+      }
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // HELPERS
+    // ══════════════════════════════════════════════════════════════
     function isPastSlot(slotTimeStr) {
-      // Only block past slots on today's date
       const selectedDate = dp.value;
       const todayStr = new Date().toISOString().split('T')[0];
       if (selectedDate !== todayStr) return false;
@@ -465,377 +756,308 @@
       return slotDate <= now;
     }
 
-    async function handleSlotClick(cell) {
-      const courtId   = cell.dataset.courtId;
-      const courtName = cell.dataset.courtName;
-      const idx       = parseInt(cell.dataset.idx);
-      const dateStr   = dp.value;
-
-      if (cell.classList.contains('booked')) { showScheduleToast('Giờ này đã có người đặt!', 'warning'); return; }
-      if (isPastSlot(cell.dataset.time)) { showScheduleToast('Không thể chọn khung giờ đã qua!', 'warning'); return; }
-
-      // ── Bundle mode: mỗi click vào 1 sân bổ sung/xóa sân đó khỏi bundle ──
-      if (bundleMode) {
-        // Nếu click vào sân đang "active" (đang điều chỉnh khung giờ) hoặc chưa có sân nào trong cụm
-        // -> cho phép điều chỉnh khung giờ như bình thường (rơi xuống logic bên dưới)
-        if (selCourtId === courtId || bundleCourts.size === 0) {
-          // tiếp tục xử lý logic chọn giờ bên dưới...
-        } else {
-          // Nếu click vào sân KHÁC sân đang active -> thêm/bớt sân đó vào cụm với CÙNG khung giờ
-          if (bundleCourts.has(courtId)) {
-            bundleCourts.delete(courtId);
-            document.querySelectorAll(`.slot[data-court-id="${courtId}"].selected`).forEach(c => c.classList.remove('selected'));
-          } else {
-            if (selectedIndices.length === 0) {
-              // Nếu chưa chọn giờ mà đã click sân khác -> chọn slot đó làm gốc
-              selCourtId = courtId; selectedIndices = [idx]; highlightCourtRow(courtId);
-            }
-            const min = Math.min(...selectedIndices), max = Math.max(...selectedIndices);
-            bundleCourts.set(courtId, {
-              courtName, pricePerHour: parseFloat(cell.dataset.price),
-              minIdx: min, maxIdx: max
-            });
-            // Highlight các slot tương ứng trên sân mới
-            for (let i = min; i <= max; i++) {
-              const c = document.querySelector(`.slot[data-court-id="${courtId}"][data-idx="${i}"]`);
-              if (c) c.classList.add('selected');
-            }
-          }
-          updateBundleBar(); calcTotal(); return;
-        }
-      }
-
-
-      // If already selected, and it's my hold, release it
-      if (cell.classList.contains('selected') && cell.classList.contains('by-me')) {
-        const holdId = localStorage.getItem('bk_holdId');
-        if (holdId) {
-          await requestRelease(holdId);
-          localStorage.removeItem('bk_holdId');
-        }
-        cell.classList.remove('selected', 'held', 'by-me');
-        // Remove from selectedIndices
-        selectedIndices = selectedIndices.filter(i => i !== idx);
-        if (selectedIndices.length === 0) {
-          selCourtId = null;
-          document.querySelectorAll('tr.court-active').forEach(r => r.classList.remove('court-active'));
-        }
-        renderSelection();
-        calcTotal();
-        return;
-      }
-
-      // If click sang sân khác, clear và chọn lại từ đầu (đây là sân mới)
-      if (selCourtId !== null && selCourtId !== courtId) {
-        clearSelection();
-        document.querySelectorAll('tr.court-active').forEach(r => r.classList.remove('court-active'));
-      }
-
-      if (selCourtId === null) {
-        selCourtId = courtId;
-        selectedIndices = [idx];
-        highlightCourtRow(courtId);
-      } else {
-        // Nếu đã click rồi
-        if (selectedIndices.includes(idx)) {
-           // Bỏ chọn (nhưng chỉ cho bỏ ở 2 đầu để giữ tính liên tục)
-           const minIdx = Math.min(...selectedIndices);
-           const maxIdx = Math.max(...selectedIndices);
-           if (idx === minIdx || idx === maxIdx) {
-               selectedIndices = selectedIndices.filter(i => i !== idx);
-               if (selectedIndices.length === 0) {
-                   selCourtId = null;
-                   document.querySelectorAll('tr.court-active').forEach(r => r.classList.remove('court-active'));
-               }
-           } else {
-               showScheduleToast('Vui lòng bỏ chọn từ các ô ngoài cùng để giữ liên tục đoạn giữa!', 'warning');
-               return;
-           }
-        } else {
-           // Chọn thêm ô mới. Ô này PHẢI liền kề.
-           const minIdx = Math.min(...selectedIndices);
-           const maxIdx = Math.max(...selectedIndices);
-           if (idx === minIdx - 1 || idx === maxIdx + 1) {
-               selectedIndices.push(idx);
-               selectedIndices.sort((a,b) => a - b);
-           } else {
-               showScheduleToast('Lưu ý: Chỉ được phép chọn các khung giờ LIÊN TỤC NHAU trên cùng 1 đơn!', 'warning');
-               // GIỮ NGUYÊN các ô đỏ cũ, không xóa!
-               return;
-           }
-        }
-      }
-
-      renderSelection();
-      
-      // Nếu đang ở chế độ cụm -> đồng bộ khung giờ mới cho TẤT CẢ các sân trong cụm
-      if (bundleMode && selectedIndices.length > 0) {
-        const min = Math.min(...selectedIndices), max = Math.max(...selectedIndices);
-        // Cập nhật sân active trong bundleCourts (nếu chưa có thì thêm)
-        const cell = document.querySelector(`.slot[data-court-id="${selCourtId}"][data-idx="${min}"]`);
-        bundleCourts.set(selCourtId, {
-          courtName: cell ? cell.dataset.courtName : 'Sân',
-          pricePerHour: cell ? parseFloat(cell.dataset.price) : 0,
-          minIdx: min, maxIdx: max
-        });
-        // Cập nhật tất cả các sân khác trong cụm theo khung giờ này
-        bundleCourts.forEach((v, cid) => {
-          v.minIdx = min; v.maxIdx = max;
-        });
-        // Re-render highlight cho toàn bộ sân trong cụm
-        document.querySelectorAll('.slot.selected').forEach(c => c.classList.remove('selected'));
-        bundleCourts.forEach((v, cid) => {
-          for (let i = min; i <= max; i++) {
-            const c = document.querySelector(`.slot[data-court-id="${cid}"][data-idx="${i}"]`);
-            if (c) c.classList.add('selected');
-          }
-        });
-        updateBundleBar();
-      }
-
-      calcTotal();
-
-      // Request hold for the new selection
-      if (selectedIndices.length > 0) {
-        const minIdx = Math.min(...selectedIndices);
-        const maxIdx = Math.max(...selectedIndices);
-        const startTime = idxToTime(minIdx);
-        const endTime = idxToTime(maxIdx + 1);
-
-        // Release previous hold if exists to avoid ghost holds on server
-        const oldHoldId = localStorage.getItem('bk_holdId');
-        if (oldHoldId) {
-          requestRelease(oldHoldId);
-        }
-
-        const result = await requestHold(parseInt(selCourtId), dateStr, startTime, endTime);
-        if (result.success) {
-          localStorage.setItem('bk_holdId', result.holdId);
-          showScheduleToast('Đã giữ sân thành công trong 5 phút!', 'info');
-        } else {
-          showScheduleToast(result.message, 'warning');
-          clearSelection(); // Clear selection if hold fails
-        }
-      } else {
-        // If selection is empty, release any existing hold
-        const holdId = localStorage.getItem('bk_holdId');
-        if (holdId) {
-          await requestRelease(holdId);
-          localStorage.removeItem('bk_holdId');
-        }
-      }
-    }
-
     function highlightCourtRow(courtId) {
       document.querySelectorAll('tr.court-active').forEach(r => r.classList.remove('court-active'));
       const anyCell = document.querySelector(`.slot[data-court-id="${courtId}"]`);
-      if (anyCell && anyCell.closest('tr')) {
-        anyCell.closest('tr').classList.add('court-active');
-      }
-    }
-
-    function renderSelection() {
-      document.querySelectorAll('.slot.selected').forEach(c => c.classList.remove('selected'));
-      if (selCourtId === null || selectedIndices.length === 0) return;
-      selectedIndices.forEach(idx => {
-        const cell = document.querySelector(`.slot[data-court-id="${selCourtId}"][data-idx="${idx}"]`);
-        if (cell) cell.classList.add('selected');
-      });
+      if (anyCell && anyCell.closest('tr')) anyCell.closest('tr').classList.add('court-active');
     }
 
     async function clearSelection() {
       const holdId = localStorage.getItem('bk_holdId');
-      if (holdId) {
-        await requestRelease(holdId);
-        localStorage.removeItem('bk_holdId');
-      }
+      if (holdId) { await requestRelease(holdId); localStorage.removeItem('bk_holdId'); }
       selCourtId = null;
       selectedIndices = [];
-      document.querySelectorAll('.slot.selected').forEach(c => c.classList.remove('selected'));
+      renderAllHighlights();
       calcTotal();
     }
 
-    // ── Calculate total ────────────────────────────────────────
-    function calcTotal() {
-      // BUNDLE MODE
-      if (typeof bundleCourts !== 'undefined' && bundleCourts.size > 0) {
-        let totalPrice = 0;
-        let timeStr = '0h00';
-        bundleCourts.forEach(v => {
-          const count = v.maxIdx - v.minIdx + 1;
-          const minutes = count * 30;
-          const h = Math.floor(minutes / 60), mm = minutes % 60;
-          timeStr = h + 'h' + (mm > 0 ? mm : '00');
-          totalPrice += Math.round((count * 0.5) * v.pricePerHour);
-        });
-        document.getElementById('total-hours').textContent = '⏱ ' + bundleCourts.size + ' sân × ' + timeStr;
-        document.getElementById('total-price').textContent = totalPrice.toLocaleString('vi-VN') + ' đ';
+    // ══════════════════════════════════════════════════════════════
+    // SLOT CLICK — handles both single-court & bundle
+    // ══════════════════════════════════════════════════════════════
+    async function handleSlotClick(cell) {
+      const courtId = String(cell.dataset.courtId);
+      const courtName = cell.dataset.courtName;
+      const price = parseFloat(cell.dataset.price);
+      const idx = parseInt(cell.dataset.idx);
 
-        const first = [...bundleCourts.values()][0];
-        const [y, mo, d2] = dp.value.split('-');
-        localStorage.setItem('bk_bundle_mode',    '1');
-        localStorage.setItem('bk_bundle_courts',  JSON.stringify([...bundleCourts.entries()].map(([id, v]) => ({courtId: id, ...v}))));
-        localStorage.setItem('bk_price',          totalPrice);
-        localStorage.setItem('bk_time',           timeStr);
-        localStorage.setItem('bk_dateRaw',        dp.value);
-        localStorage.setItem('bk_date',           d2 + '/' + mo + '/' + y);
-        localStorage.setItem('bk_startTime',      idxToTime(first.minIdx));
-        localStorage.setItem('bk_endTime',        idxToTime(first.maxIdx + 1));
+      if (cell.classList.contains('booked')) { showScheduleToast('Giờ này đã có người đặt!', 'warning'); return; }
+      if (isPastSlot(cell.dataset.time)) { showScheduleToast('Không thể chọn khung giờ đã qua!', 'warning'); return; }
+
+      // ── BUNDLE MODE ────────────────────────────────────────────
+      if (bundleMode) {
+        const inBundle = bundleCourts.has(courtId);
+
+        // Case A — chưa có khung giờ nào → bắt đầu chọn giờ
+        if (selectedIndices.length === 0) {
+          selCourtId = courtId;
+          selectedIndices = [idx];
+          bundleCourts.set(courtId, { courtName, pricePerHour: price });
+          updateBundleBar(); renderAllHighlights(); calcTotal();
+          showScheduleToast('Click thêm ô giờ liền kề để kéo dài, hoặc click sân khác để thêm vào cụm', 'info');
+          return;
+        }
+
+        const minIdx = Math.min(...selectedIndices);
+        const maxIdx = Math.max(...selectedIndices);
+
+        // Case B — click vào SÂN KHÁC (không phải sân đang kéo giờ)
+        //          chỉ thêm/xóa sân, không thay đổi khung giờ
+        if (courtId !== selCourtId) {
+          if (inBundle) {
+            bundleCourts.delete(courtId);
+            showScheduleToast(`Đã bỏ ${courtName} khỏi cụm`, 'warning');
+          } else {
+            bundleCourts.set(courtId, { courtName, pricePerHour: price });
+            showScheduleToast(`Đã thêm ${courtName} vào cụm`, 'info');
+          }
+          updateBundleBar(); renderAllHighlights(); calcTotal();
+          return;
+        }
+
+        // Case C — click vào CHÍNH SÂN đang active (selCourtId) → điều chỉnh khung giờ
+        //          toàn bộ bundle sẽ tự đồng bộ vì dùng chung selectedIndices
+        if (selectedIndices.includes(idx)) {
+          // Toggle endpoint off
+          if (idx === minIdx || idx === maxIdx) {
+            selectedIndices = selectedIndices.filter(i => i !== idx);
+            if (selectedIndices.length === 0) {
+              // Xóa hết → reset
+              bundleCourts.clear();
+              selCourtId = null;
+              updateBundleBar(); renderAllHighlights(); calcTotal();
+              return;
+            }
+          } else {
+            showScheduleToast('Chỉ bỏ chọn từ ô đầu hoặc cuối để giữ liên tục', 'warning');
+            return;
+          }
+        } else {
+          // Extend range — phải liền kề
+          if (idx === minIdx - 1 || idx === maxIdx + 1) {
+            selectedIndices.push(idx);
+            selectedIndices.sort((a, b) => a - b);
+          } else {
+            showScheduleToast('Chỉ được chọn khung giờ LIÊN TIẾP!', 'warning');
+            return;
+          }
+        }
+
+        renderAllHighlights(); calcTotal();
         return;
       }
 
-      // SINGLE COURT MODE
+      // ── SINGLE-COURT MODE ──────────────────────────────────────
+
+      // Click sân khác → reset
+      if (selCourtId !== null && selCourtId !== courtId) {
+        const holdId = localStorage.getItem('bk_holdId');
+        if (holdId) { requestRelease(holdId); localStorage.removeItem('bk_holdId'); }
+        selCourtId = null;
+        selectedIndices = [];
+      }
+
+      // Bắt đầu chọn sân mới
+      if (selCourtId === null) {
+        selCourtId = courtId;
+        selectedIndices = [idx];
+        highlightCourtRow(courtId);
+        renderAllHighlights(); calcTotal();
+      } else {
+        const minIdx = Math.min(...selectedIndices);
+        const maxIdx = Math.max(...selectedIndices);
+        if (selectedIndices.includes(idx)) {
+          if (idx === minIdx || idx === maxIdx) {
+            selectedIndices = selectedIndices.filter(i => i !== idx);
+            if (selectedIndices.length === 0) {
+              selCourtId = null;
+              document.querySelectorAll('tr.court-active').forEach(r => r.classList.remove('court-active'));
+            }
+          } else {
+            showScheduleToast('Vui lòng bỏ chọn từ ô đầu hoặc cuối!', 'warning');
+            return;
+          }
+        } else {
+          if (idx === minIdx - 1 || idx === maxIdx + 1) {
+            selectedIndices.push(idx);
+            selectedIndices.sort((a, b) => a - b);
+          } else {
+            showScheduleToast('Chỉ được chọn các khung giờ LIÊN TIẾP!', 'warning');
+            return;
+          }
+        }
+        renderAllHighlights(); calcTotal();
+      }
+
+      // Hold the time slot (single-court only)
+      if (selectedIndices.length > 0 && selCourtId) {
+        const startTime = idxToTime(Math.min(...selectedIndices));
+        const endTime = idxToTime(Math.max(...selectedIndices) + 1);
+        const oldHoldId = localStorage.getItem('bk_holdId');
+        if (oldHoldId) requestRelease(oldHoldId);
+        try {
+          const result = await requestHold(parseInt(selCourtId), dp.value, startTime, endTime);
+          if (result && result.success) {
+            localStorage.setItem('bk_holdId', result.holdId);
+          } else if (result && !result.success) {
+            showScheduleToast(result.message || 'Không thể giữ sân', 'warning');
+          }
+        } catch (e) { }
+      } else {
+        const holdId = localStorage.getItem('bk_holdId');
+        if (holdId) { await requestRelease(holdId); localStorage.removeItem('bk_holdId'); }
+      }
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    // CALCULATE TOTAL
+    // ══════════════════════════════════════════════════════════════
+    function calcTotal() {
+      const [y, mo, d2] = dp.value.split('-');
+      const dateDisplay = d2 + '/' + mo + '/' + y;
+
+      if (bundleMode && bundleCourts.size > 0 && selectedIndices.length > 0) {
+        const count = selectedIndices.length;
+        const minutes = count * 30;
+        const hh = Math.floor(minutes / 60), mm = minutes % 60;
+        const timeStr = hh + 'h' + (mm > 0 ? String(mm).padStart(2, '0') : '00');
+
+        let totalPrice = 0;
+        bundleCourts.forEach(v => { totalPrice += Math.round(count * 0.5 * v.pricePerHour); });
+
+        document.getElementById('total-hours').textContent = bundleCourts.size + ' sân × ' + timeStr;
+        document.getElementById('total-price').textContent = totalPrice.toLocaleString('vi-VN') + ' đ';
+
+        const startTime = idxToTime(Math.min(...selectedIndices));
+        const endTime = idxToTime(Math.max(...selectedIndices) + 1);
+
+        localStorage.setItem('bk_bundle_mode', '1');
+        localStorage.setItem('bk_bundle_courts', JSON.stringify(
+          [...bundleCourts.entries()].map(([id, v]) => ({
+            courtId: id, ...v,
+            minIdx: Math.min(...selectedIndices),
+            maxIdx: Math.max(...selectedIndices)
+          }))
+        ));
+        localStorage.setItem('bk_price', totalPrice);
+        localStorage.setItem('bk_time', timeStr);
+        localStorage.setItem('bk_dateRaw', dp.value);
+        localStorage.setItem('bk_date', dateDisplay);
+        localStorage.setItem('bk_startTime', startTime);
+        localStorage.setItem('bk_endTime', endTime);
+        return;
+      }
+
+      // Single-court
       localStorage.removeItem('bk_bundle_mode');
       localStorage.removeItem('bk_bundle_courts');
 
-      if (selCourtId === null || selectedIndices.length === 0) {
-        document.getElementById('total-hours').textContent = '⏱ Tổng giờ: 0h00';
+      if (!selCourtId || selectedIndices.length === 0) {
+        document.getElementById('total-hours').textContent = 'Tổng giờ: 0h00';
         document.getElementById('total-price').textContent = '0 đ';
         localStorage.removeItem('bk_price');
         return;
       }
 
       const count = selectedIndices.length;
-      const m  = count * 30;
-      const h  = Math.floor(m / 60);
-      const mm = m % 60;
-      const timeStr = h + 'h' + (mm > 0 ? mm : '00');
-
+      const minutes = count * 30;
+      const hh = Math.floor(minutes / 60), mm = minutes % 60;
+      const timeStr = hh + 'h' + (mm > 0 ? String(mm).padStart(2, '0') : '00');
       const minIdx = Math.min(...selectedIndices);
       const maxIdx = Math.max(...selectedIndices);
-
-      // Get price from court cell
       const firstCell = document.querySelector(`.slot[data-court-id="${selCourtId}"][data-idx="${minIdx}"]`);
-      const priceHour  = firstCell ? parseFloat(firstCell.dataset.price) : 0;
-      const total      = Math.round((count * 0.5) * priceHour);
-      const courtName  = firstCell ? firstCell.dataset.courtName : '';
+      const priceHour = firstCell ? parseFloat(firstCell.dataset.price) : 0;
+      const total = Math.round(count * 0.5 * priceHour);
+      const courtName = firstCell ? firstCell.dataset.courtName : '';
 
-      document.getElementById('total-hours').textContent = '⏱ Tổng giờ: ' + timeStr;
+      document.getElementById('total-hours').textContent = 'Tổng giờ: ' + timeStr;
       document.getElementById('total-price').textContent = total.toLocaleString('vi-VN') + ' đ';
 
-      const [y, mo, d2] = dp.value.split('-');
-      localStorage.setItem('bk_courtId',      selCourtId);
-      localStorage.setItem('bk_courtName',    courtName);
+      localStorage.setItem('bk_courtId', selCourtId);
+      localStorage.setItem('bk_courtName', courtName);
       localStorage.setItem('bk_pricePerHour', priceHour);
-      localStorage.setItem('bk_price',        total);
-      localStorage.setItem('bk_time',         timeStr);
-      localStorage.setItem('bk_dateRaw',      dp.value);
-      localStorage.setItem('bk_date',         d2 + '/' + mo + '/' + y);
-      localStorage.setItem('bk_startTime',    idxToTime(minIdx));
-      localStorage.setItem('bk_endTime',      idxToTime(maxIdx + 1));
+      localStorage.setItem('bk_price', total);
+      localStorage.setItem('bk_time', timeStr);
+      localStorage.setItem('bk_dateRaw', dp.value);
+      localStorage.setItem('bk_date', dateDisplay);
+      localStorage.setItem('bk_startTime', idxToTime(minIdx));
+      localStorage.setItem('bk_endTime', idxToTime(maxIdx + 1));
     }
 
     function goToNext() {
-      if (typeof bundleCourts !== 'undefined' && bundleCourts.size > 0) {
+      if (bundleMode && bundleCourts.size > 0) {
+        if (selectedIndices.length === 0) { alert('Vui lòng chọn khung giờ!'); return; }
         window.location.href = 'bundle-booking.html';
         return;
       }
-      if (!localStorage.getItem('bk_price')) {
-        alert('Vui lòng chọn sân và khung giờ!');
-        return;
-      }
+      if (!localStorage.getItem('bk_price')) { alert('Vui lòng chọn sân và khung giờ!'); return; }
       window.location.href = 'booking-info.html';
     }
 
-    function formatCurrency(n) {
-      return new Intl.NumberFormat('vi-VN').format(n) + ' đ';
-    }
+    function formatCurrency(n) { return new Intl.NumberFormat('vi-VN').format(n) + ' đ'; }
 
     function showScheduleToast(msg, type) {
-      // Remove old toast
       const old = document.getElementById('schedToast');
       if (old) old.remove();
       const t = document.createElement('div');
       t.id = 'schedToast';
-      t.style.cssText = `position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
-        background:${type==='warning'?'#f39c12':'#2d8a4e'};color:#fff;
-        padding:10px 20px;border-radius:20px;font-size:13px;font-weight:700;
-        z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);`;
+      t.style.cssText = `position:fixed;bottom:145px;left:50%;transform:translateX(-50%);
+        background:${type === 'warning' ? '#f39c12' : '#2d8a4e'};color:#fff;
+        padding:10px 22px;border-radius:20px;font-size:13px;font-weight:700;
+        z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);max-width:92%;text-align:center;`;
       t.textContent = msg;
       document.body.appendChild(t);
-      setTimeout(() => t.remove(), 2500);
+      setTimeout(() => t.remove(), 3000);
     }
 
-    // ── Real-time Court Holding (Native SSE & REST) ────────────────
+    // ══════════════════════════════════════════════════════════════
+    // REAL-TIME (SSE + Hold API)
+    // ══════════════════════════════════════════════════════════════
     let eventSource = null;
 
     function initAvailabilityStream() {
       if (eventSource) eventSource.close();
-
       console.log('Connecting to availability stream via SSE...');
       eventSource = new EventSource('/api/bookings/availability/stream');
-
       eventSource.onmessage = (event) => {
-        if (!event.data) return; // keep-alive comments
-        try {
-          const state = JSON.parse(event.data);
-          updateSlotInUI(state);
-        } catch (e) {
-          // ignore parsing error for keep-alive comments
-        }
+        if (!event.data) return;
+        try { updateSlotInUI(JSON.parse(event.data)); } catch (e) { }
       };
-
-      eventSource.onerror = (err) => {
-        console.warn('SSE connection lost. Reconnecting in 5s...', err);
+      eventSource.onerror = () => {
         eventSource.close();
         setTimeout(initAvailabilityStream, 5000);
       };
     }
 
     async function requestHold(courtId, date, startTime, endTime) {
-      const response = await fetch('/api/bookings/hold', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          courtId,
-          bookingDate: date,
-          startTime,
-          endTime,
-          userId: myUserId
-        })
-      });
-      return await response.json();
+      try {
+        const res = await fetch('/api/bookings/hold', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ courtId, bookingDate: date, startTime, endTime, userId: myUserId })
+        });
+        return await res.json();
+      } catch (e) { return { success: false, message: 'Lỗi kết nối' }; }
     }
 
     async function requestRelease(holdId) {
-      await fetch(`/api/bookings/release/${holdId}`, { method: 'POST' });
+      try { await fetch(`/api/bookings/release/${holdId}`, { method: 'POST' }); } catch (e) { }
     }
 
     function updateSlotInUI(update) {
-      // update: { courtId, bookingDate, startTime, endTime, status, heldByUserId, holdId }
-      console.log('Slot update received:', update);
-
       if (update.bookingDate !== dp.value) return;
-
       const start = toMin(update.startTime);
-      const end   = toMin(update.endTime);
-
+      const end = toMin(update.endTime);
       if (update.status === 'HELD') {
         const isByMe = String(update.heldByUserId) === String(myUserId);
-        // Add to heldSlots if not already there
-        if (!heldSlots.find(h => h.holdId === update.holdId)) {
-          heldSlots.push({
-            courtId: update.courtId,
-            startMin: start,
-            endMin: end,
-            isByMe: isByMe,
-            holdId: update.holdId
-          });
-        }
-      } else if (update.status === 'AVAILABLE' || update.status === 'BOOKED') {
-        // Remove from heldSlots
-        heldSlots = heldSlots.filter(h =>
-          !(String(h.courtId) === String(update.courtId) && h.startMin === start)
-        );
-        if (update.status === 'BOOKED') {
-           // Reload booked map to be sure
-           loadAllBookedSlots(dp.value).then(() => buildGrid());
-           return;
-        }
+        if (!heldSlots.find(h => h.holdId === update.holdId))
+          heldSlots.push({ courtId: update.courtId, startMin: start, endMin: end, isByMe, holdId: update.holdId });
+      } else {
+        heldSlots = heldSlots.filter(h => !(String(h.courtId) === String(update.courtId) && h.startMin === start));
+        if (update.status === 'BOOKED') { loadAllBookedSlots(dp.value).then(() => buildGrid()); return; }
       }
-
-      buildGrid(); // Re-render grid to reflect holds
+      buildGrid();
     }
   </script>
 </body>
+
 </html>

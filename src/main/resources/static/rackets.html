@@ -110,7 +110,7 @@ function renderRackets(rackets) {
     const imgHtml = r.imageUrl 
       ? `<img class="racket-img" src="${r.imageUrl}" alt="${r.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
       : '';
-    const placeholder = `<div class="racket-img-placeholder" style="${r.imageUrl?'display:none':''}">🎾</div>`;
+    const placeholder = `<div class="racket-img-placeholder" style="${r.imageUrl?'display:none':''}">Vợt</div>`;
     
     return `
       <div class="racket-card">

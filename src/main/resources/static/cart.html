@@ -553,7 +553,7 @@
 
     <!-- Empty state -->
     <div id="emptyCart" class="empty-cart" style="display:none;">
-      <div class="icon">🛒</div>
+      <div class="icon"></div>
       <h3>Giỏ hàng trống</h3>
       <p>Bạn chưa thêm sản phẩm nào vào giỏ hàng.</p>
       <a href="/products.html" class="quick-action-btn qa-shop" style="margin-top:20px;display:inline-flex;">
@@ -592,7 +592,7 @@
 
         <!-- Chọn sân giao hàng -->
         <div class="section-divider">
-          <h3>🏸 Giao đến sân đang chơi</h3>
+          <h3>Giao đến sân đang chơi</h3>
           <div id="courtSelectWrap">
             <div class="no-court-msg">Đang kiểm tra sân của bạn...</div>
           </div>
@@ -645,9 +645,9 @@
        Category icons
     ───────────────────────────────────────────── */
     const ICONS = {
-      'Vợt': '🏸', 'Cầu': '🪶', 'Cầu lông': '🪶', 'Giày': '👟',
-      'Túi': '🎒', 'Quần áo': '👕', 'Phụ kiện': '🔧',
-      'Nước uống': '🧋', 'Đồ ăn': '🍜',
+      'Vợt': '', 'Cầu': '', 'Cầu lông': '', 'Giày': '',
+      'Túi': '', 'Quần áo': '', 'Phụ kiện': '',
+      'Nước uống': '', 'Đồ ăn': '',
     };
 
     /* ─────────────────────────────────────────────
@@ -734,7 +734,7 @@
         <button onclick="changeQty(${idx}, +1)">+</button>
       </div>
       <div class="ci-subtotal">${fmt(item.price * item.qty)}</div>
-      <button class="btn-remove" onclick="removeItem(${idx})">🗑️</button>
+      <button class="btn-remove" onclick="removeItem(${idx})">Xóa</button>
     </div>`;
       }).join('');
     }
@@ -789,7 +789,7 @@
           (b.status === 'CONFIRMED' || b.status === 'PENDING') && b.bookingDate === today
         );
         if (!active.length) {
-          wrap.innerHTML = `<div class="no-court-msg">🏸 Bạn không có sân đang chơi hôm nay.<br>Nhân viên sẽ liên hệ khi nhận đơn.</div>`;
+          wrap.innerHTML = `<div class="no-court-msg">Bạn không có sân đang chơi hôm nay.<br>Nhân viên sẽ liên hệ khi nhận đơn.</div>`;
           return;
         }
         wrap.innerHTML = `

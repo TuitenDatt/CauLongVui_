@@ -57,11 +57,11 @@ const toastContainer = (() => {
 })();
 
 function showToast(message, type = 'success', duration = 4000) {
-  const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+  const icons = { success: '[Thành công]', error: '[Lỗi]', warning: '[Cảnh báo]', info: '[Thông tin]' };
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;
   toast.innerHTML = `
-    <span class="toast-icon">${icons[type] || '💬'}</span>
+    <span class="toast-icon">${icons[type] || '[Thông báo]'}</span>
     <span class="toast-msg">${message}</span>`;
   toastContainer.appendChild(toast);
   setTimeout(() => {
@@ -74,9 +74,9 @@ function showToast(message, type = 'success', duration = 4000) {
 
 function courtStatusBadge(status) {
   const map = {
-    AVAILABLE:   { cls: 'badge-success', label: '🟢 Còn trống' },
-    BOOKED:      { cls: 'badge-warning', label: '🟡 Đã đặt' },
-    MAINTENANCE: { cls: 'badge-danger',  label: '🔴 Bảo trì' },
+    AVAILABLE:   { cls: 'badge-success', label: 'Còn trống' },
+    BOOKED:      { cls: 'badge-warning', label: 'Đã đặt' },
+    MAINTENANCE: { cls: 'badge-danger',  label: 'Bảo trì' },
   };
   const s = map[status] || { cls: 'badge-muted', label: status };
   return `<span class="badge ${s.cls}">${s.label}</span>`;
@@ -206,9 +206,9 @@ function initHeaderEvents() {
               <div class="dropdown-name">${user.fullName}</div>
               <div class="dropdown-role">${roleLabel(user.role)}</div>
             </div>
-            <a href="/profile.html" class="dropdown-item">👤 Tài khoản của tôi</a>
-            <a href="/admin/admin.html" class="dropdown-item">⚙️ Quản trị hệ thống</a>
-            <a href="/auth/login.html" class="dropdown-item dropdown-logout" onclick="handleLogout();return false;">🚪 Đăng xuất</a>
+            <a href="/profile.html" class="dropdown-item">Tài khoản của tôi</a>
+            <a href="/admin/admin.html" class="dropdown-item">Quản trị hệ thống</a>
+            <a href="/auth/login.html" class="dropdown-item dropdown-logout" onclick="handleLogout();return false;">Đăng xuất</a>
           </div>
         </div>
       `;
@@ -219,7 +219,7 @@ function initHeaderEvents() {
           <strong id="navWalletBalance">${formatWalletBalance(user.walletBalance)}</strong>
         </a>
         <a href="/cart.html" class="nav-cart-btn" id="navCartBtn" title="Giỏ hàng">
-          🛒
+          Giỏ hàng
           <span class="cart-badge" id="cartBadge" style="${cartCount > 0 ? '' : 'display:none'}"> ${cartCount}</span>
         </a>
         <div class="nav-user-menu" id="navUserMenu">
@@ -234,21 +234,21 @@ function initHeaderEvents() {
               <div class="dropdown-name">${user.fullName}</div>
               <div class="dropdown-role">
                 ${roleLabel(user.role)}
-                ${user.membershipTier && user.membershipTier !== 'NORMAL' ? `<span class="badge-vip">⭐ ${user.membershipTier}</span>` : ''}
+                ${user.membershipTier && user.membershipTier !== 'NORMAL' ? `<span class="badge-vip">${user.membershipTier}</span>` : ''}
               </div>
             </div>
-            <a href="/profile.html" class="dropdown-item">👤 Tài khoản của tôi</a>
-            <a href="/profile.html#wallet-section" class="dropdown-item">💳 Ví của tôi</a>
-            <a href="/membership.html" class="dropdown-item" style="color:var(--green);font-weight:700;">💎 Nâng cấp tài khoản</a>
-            <a href="/my-bookings.html" class="dropdown-item">🏸 Sân đã đặt</a>
-            <a href="/cart.html" class="dropdown-item">🛒 Giỏ hàng của tôi</a>
-            <a href="/my-orders.html" class="dropdown-item">📋 Mặt hàng đã đặt</a>
-            <a href="/my-racket-rentals.html" class="dropdown-item">🎾 Vợt đã thuê</a>
-            ${user.role === 'STAFF' ? '<a href="/admin/court-management.html" class="dropdown-item">📋 Quản lý sân</a>' : ''}
-            <a href="/auth/login.html" class="dropdown-item dropdown-logout" onclick="handleLogout();return false;">🚪 Đăng xuất</a>
+            <a href="/profile.html" class="dropdown-item">Tài khoản của tôi</a>
+            <a href="/profile.html#wallet-section" class="dropdown-item">Ví của tôi</a>
+            <a href="/membership.html" class="dropdown-item" style="color:var(--green);font-weight:700;">Nâng cấp tài khoản</a>
+            <a href="/my-bookings.html" class="dropdown-item">Sân đã đặt</a>
+            <a href="/cart.html" class="dropdown-item">Giỏ hàng của tôi</a>
+            <a href="/my-orders.html" class="dropdown-item">Mặt hàng đã đặt</a>
+            <a href="/my-racket-rentals.html" class="dropdown-item">Vợt đã thuê</a>
+            ${user.role === 'STAFF' ? '<a href="/admin/court-management.html" class="dropdown-item">Quản lý sân</a>' : ''}
+            <a href="/auth/login.html" class="dropdown-item dropdown-logout" onclick="handleLogout();return false;">Đăng xuất</a>
           </div>
         </div>
-        ${user.role === 'STAFF' ? `<a href="/admin/court-management.html" class="btn-manage">⚙️ Quản lý</a>` : ''}
+        ${user.role === 'STAFF' ? `<a href="/admin/court-management.html" class="btn-manage">Quản lý</a>` : ''}
         <a href="/courts.html" class="btn-nav-cta">Đặt sân ngay</a>
       `;
     }

@@ -9,22 +9,13 @@ const categoryFilter  = document.getElementById('filter-category');
 let allProducts = [];
 
 const categoryIcons = {
-  'Vợt': '🏸', 'Cầu': '🪶', 'Cầu lông': '🪶', 'Giày': '👟',
-  'Túi': '🎒', 'Quần áo': '👕', 'Phụ kiện': '🔧',
-  'Nước uống': '🧋', 'Đồ ăn': '🍜',
+  'Vợt': '', 'Cầu': '', 'Cầu lông': '', 'Giày': '',
+  'Túi': '', 'Quần áo': '', 'Phụ kiện': '',
+  'Nước uống': '', 'Đồ ăn': '',
 };
 
 function getIcon(category, name) {
-  if (category && categoryIcons[category]) return categoryIcons[category];
-  const n = (name || '').toLowerCase();
-  if (n.includes('vợt'))                       return '🏸';
-  if (n.includes('cầu'))                       return '🪶';
-  if (n.includes('giày') || n.includes('dép')) return '👟';
-  if (n.includes('túi'))                       return '🎒';
-  if (n.includes('áo') || n.includes('quần')) return '👕';
-  if (n.includes('trà') || n.includes('nước')) return '🧋';
-  if (n.includes('mì') || n.includes('xúc xích') || n.includes('trứng')) return '🍜';
-  return '🛒';
+  return '';
 }
 
 // ─────────────────────────────────────────────────
@@ -85,8 +76,8 @@ function renderProducts(products) {
            ${isAdmin ? 'Admin' : stockLabel(p.stockQuantity)}
         </div>
         ${isAdmin 
-          ? `<div class="card-fav" onclick="openShopEditModal(${p.id})" title="Sửa sản phẩm" style="font-size:16px;">✏️</div>` 
-          : `<div class="card-fav" onclick="openDetailModal(${p.id})" title="Xem chi tiết" style="font-size:16px;">👁️</div>`
+          ? `<div class="card-fav" onclick="openShopEditModal(${p.id})" title="Sửa sản phẩm" style="font-size:16px;">Sửa</div>` 
+          : `<div class="card-fav" onclick="openDetailModal(${p.id})" title="Xem chi tiết" style="font-size:16px;">Xem</div>`
         }
       </div>
       
@@ -122,7 +113,7 @@ function renderProducts(products) {
         
         ${isAdmin ? `
         <div style="display:flex; gap:8px; margin-top:12px;">
-           <button class="btn btn-danger-sm btn-sm" style="flex:1; border-radius:8px;" onclick="openShopDeleteConfirm(${p.id}, '${safeName}')">🗑️ Xóa sản phẩm</button>
+           <button class="btn btn-danger-sm btn-sm" style="flex:1; border-radius:8px;" onclick="openShopDeleteConfirm(${p.id}, '${safeName}')">Xóa sản phẩm</button>
         </div>
         ` : ''}
       </div>

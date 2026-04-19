@@ -19,35 +19,33 @@
 
 <!-- ── PAGE HERO ── -->
 <div class="page-hero">
-  <h1>🏸 Danh sách Sân Cầu Lông</h1>
+  <h1>Danh sách Sân Cầu Lông</h1>
   <p>Chọn sân và đặt lịch trực tuyến. Hệ thống tự động kiểm tra slot trống và tính giá.</p>
 </div>
 
 <!-- ── FILTER BAR ── -->
 <div class="filter-bar">
   <div class="filter-group">
-    <label>🔍 Tìm tên sân</label>
+    <label>Tìm tên sân</label>
     <input id="search-input" type="text" class="form-control" placeholder="Nhập tên sân..." autocomplete="off" />
   </div>
   
   <div class="filter-group">
-    <label>📅 Ngày đặt</label>
+    <label>Ngày đặt</label>
     <input id="search-date" type="date" class="form-control" />
   </div>
 
   <div class="filter-group">
-    <label>📊 Trạng thái</label>
+    <label>Trạng thái</label>
     <select id="filter-status" class="form-control">
       <option value="">Tất cả trạng thái</option>
-      <option value="AVAILABLE">🟢 Còn trống</option>
-      <option value="BOOKED">🟡 Đã đặt</option>
-      <option value="MAINTENANCE">🔴 Bảo trì</option>
+      <option value="AVAILABLE">Còn trống</option>
+      <option value="BOOKED">Đã đặt</option>
+      <option value="MAINTENANCE">Bảo trì</option>
     </select>
   </div>
 
-  <button class="btn-search-main" onclick="applyFilters()">
-    <span class="icon">🔍</span> Tìm sân
-  </button>
+  <button class="btn-search-main" onclick="applyFilters()">Tìm sân</button>
 </div>
 
 <!-- ── COURTS GRID ── -->

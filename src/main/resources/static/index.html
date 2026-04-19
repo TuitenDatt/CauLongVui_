@@ -451,7 +451,7 @@
             alt="Sân cầu lông"
           />
           <div class="hero-badge">
-            <div class="badge-icon">🏸</div>
+            <div class="badge-icon"></div>
             <div class="badge-text">
               <strong>Đặt trong 60 giây</strong>
               <span>Xác nhận tức thì</span>
@@ -470,17 +470,17 @@
   <div class="search-bar-section">
     <div class="search-bar-inner">
       <div class="search-field">
-        <label>🔍 Tìm tên sân</label>
+        <label>Tìm tên sân</label>
         <input type="text" id="searchName" placeholder="Nhập tên sân..." />
       </div>
       <div class="search-divider"></div>
       <div class="search-field">
-        <label>📅 Ngày đặt</label>
+        <label>Ngày đặt</label>
         <input type="date" id="searchDate" />
       </div>
       <div class="search-divider"></div>
       <div class="search-field">
-        <label>📊 Trạng thái</label>
+        <label>Trạng thái</label>
         <select id="searchStatus">
           <option value="">Tất cả trạng thái</option>
           <option value="AVAILABLE">Còn trống</option>
@@ -532,22 +532,22 @@
       </div>
       <div class="features-grid reveal reveal-delay-1">
         <div class="feature-card">
-          <div class="feature-icon">⚡</div>
+          <div class="feature-icon"></div>
           <div class="feature-title">Đặt sân tức thì</div>
           <div class="feature-desc">Xác nhận ngay lập tức, không cần chờ gọi điện hay nhắn tin qua lại.</div>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">🔄</div>
+          <div class="feature-icon"></div>
           <div class="feature-title">Cập nhật thời gian thực</div>
           <div class="feature-desc">Trạng thái sân được cập nhật liên tục, luôn chính xác nhất.</div>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">💳</div>
+          <div class="feature-icon"></div>
           <div class="feature-title">Giá cả minh bạch</div>
           <div class="feature-desc">Giá niêm yết rõ ràng, không phát sinh phí ẩn ngoài giờ đặt.</div>
         </div>
         <div class="feature-card">
-          <div class="feature-icon">🛒</div>
+          <div class="feature-icon"></div>
           <div class="feature-title">Cửa hàng dụng cụ</div>
           <div class="feature-desc">Vợt, cầu, giày từ các thương hiệu Yonex, Victor, Li-Ning. Hàng chính hãng 100%.</div>
         </div>
@@ -623,7 +623,7 @@
       if (!courts.length) {
         grid.innerHTML = `
           <div class="empty-state" style="grid-column:1/-1">
-            <div class="empty-icon">🏸</div>
+            <div class="empty-icon"></div>
             <h3>Không có sân nào</h3>
             <p>Chưa có sân nào được thêm vào hệ thống hoặc không khớp bộ lọc.</p>
           </div>`;
@@ -641,17 +641,17 @@
               <span class="court-status ${st.cls}">
                 <span class="status-dot"></span>${st.label}
               </span>
-              <button class="court-fav" title="Yêu thích">🤍</button>
+              <button class="court-fav" title="Yêu thích">Like</button>
             </div>
             <div class="court-info">
               <div class="court-top">
                 <h3 class="court-name" title="${escapeHtml(court.name)}">${escapeHtml(court.name)}</h3>
                 <div class="court-meta">
-                  <span class="court-meta-item">⭐ 4.7</span>
-                  <span class="court-meta-item">🏟 Sân cầu lông</span>
+                  <span class="court-meta-item">Rating: 4.7</span>
+                  <span class="court-meta-item">Sân cầu lông</span>
                 </div>
               </div>
-              <p class="court-address">📍 ${escapeHtml(court.description || 'TP. Hồ Chí Minh')}</p>
+              <p class="court-address">Vị trí: ${escapeHtml(court.description || 'TP. Hồ Chí Minh')}</p>
               <div class="court-divider"></div>
               <div class="court-owner">
                 <div class="owner-avatar">${initials}</div>
@@ -676,7 +676,7 @@
       // Fav toggle
       document.querySelectorAll('.court-fav').forEach(btn => {
         btn.addEventListener('click', () => {
-          btn.textContent = btn.textContent === '🤍' ? '❤️' : '🤍';
+          btn.textContent = btn.textContent === 'Like' ? 'Liked' : 'Like';
         });
       });
     }
@@ -720,7 +720,7 @@
       } catch (err) {
         grid.innerHTML = `
           <div class="empty-state" style="grid-column:1/-1">
-            <div class="empty-icon">⚠️</div>
+            <div class="empty-icon"></div>
             <h3>Không thể tải danh sách sân</h3>
             <p>${err.message}</p>
           </div>`;

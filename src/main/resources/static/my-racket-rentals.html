@@ -99,7 +99,7 @@
 <div id="header-placeholder"></div>
 
 <div class="orders-page">
-  <div class="page-title">🎾 Vợt đã thuê</div>
+  <div class="page-title">Vợt đã thuê</div>
   <div class="page-sub">Lịch sử thuê vợt của bạn, nhân viên sẽ kiểm tra dựa trên thông tin này.</div>
 
   <!-- Toolbar -->
@@ -154,14 +154,14 @@ async function fetchAndRenderOrders() {
       toolbar.style.display = 'none';
       list.innerHTML = `
         <div class="empty-state">
-          <div class="icon">🎾</div>
+          <div class="icon"></div>
           <h3>Chưa có dữ liệu thuê vợt</h3>
           <p>Bạn chưa thuê cây vợt nào trong hệ thống, hoặc lịch sử của bạn đã được xóa.</p>
           <a href="/rackets.html"
              style="display:inline-flex;align-items:center;gap:8px;background:var(--green);
                     color:#fff;padding:12px 24px;border-radius:12px;text-decoration:none;
                     font-weight:700;font-size:14px;">
-            🎾 Xem danh sách vợt
+            Xem danh sách vợt
           </a>
         </div>`;
       return;
@@ -178,8 +178,8 @@ async function fetchAndRenderOrders() {
 
       const itemsHtml = (order.items || []).map(item => {
         const thumbHtml = item.imageUrl 
-            ? `<div class="oi-thumb" style="padding:0;"><img src="${esc(item.imageUrl)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.outerHTML='<div class=\\'oi-thumb\\'>🎾</div>'" /></div>`
-            : `<div class="oi-thumb">🎾</div>`;
+            ? `<div class="oi-thumb" style="padding:0;"><img src="${esc(item.imageUrl)}" style="width:100%;height:100%;object-fit:cover;" onerror="this.outerHTML='<div class=\\'oi-thumb\\'></div>'" /></div>`
+            : `<div class="oi-thumb"></div>`;
         return `
           <div class="order-item">
             ${thumbHtml}

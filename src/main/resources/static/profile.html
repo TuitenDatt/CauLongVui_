@@ -925,7 +925,7 @@ function renderBookings(bookings) {
   if (!bookings || bookings.length === 0) {
     container.innerHTML = `
       <div class="empty-bk">
-        <div class="ei">🏸</div>
+        <div class="ei"></div>
         <h3>Chưa có lịch đặt sân nào</h3>
         <a href="/courts.html" style="margin-top:10px;">Tìm sân ngay</a>
       </div>`;
@@ -974,12 +974,12 @@ function renderBookings(bookings) {
         </div>
         <div class="bk-card-body">
           <div>
-            <div class="bk-court-name">🏸 ${escHtml(b.courtName || 'Sân cầu lông')}</div>
+            <div class="bk-court-name">${escHtml(b.courtName || 'Sân cầu lông')}</div>
             <div class="bk-meta">
-              <span>📅 ${displayDate}</span>
-              <span>🕐 ${startFmt} – ${endFmt}</span>
-              <span>👤 ${escHtml((b.customerName || '—').split(' ').slice(-2).join(' '))}</span>
-              <span>📞 ${escHtml(b.customerPhone || '—')}</span>
+              <span>Ngày: ${displayDate}</span>
+              <span>Giờ: ${startFmt} – ${endFmt}</span>
+              <span>Tên: ${escHtml((b.customerName || '—').split(' ').slice(-2).join(' '))}</span>
+              <span>SĐT: ${escHtml(b.customerPhone || '—')}</span>
             </div>
           </div>
           <div class="bk-footer">
@@ -1020,7 +1020,7 @@ async function loadBookings(phone) {
   } catch (err) {
     container.innerHTML = `
       <div class="empty-bk">
-        <div class="ei">⚠️</div>
+        <div class="ei"></div>
         <h3>Không thể tải lịch đặt</h3>
         <p>${escHtml(err.message)}</p>
       </div>`;
@@ -1066,7 +1066,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       document.getElementById('bookingHistory').innerHTML = `
         <div class="empty-bk">
-          <div class="ei">📞</div>
+          <div class="ei"></div>
           <h3>Chưa có số điện thoại</h3>
           <p>Tài khoản của bạn chưa có số điện thoại. Vui lòng cập nhật để xem lịch đặt sân.</p>
           <a href="/my-bookings.html">🔍 Tìm theo số điện thoại</a>
@@ -1127,7 +1127,7 @@ async function saveProfile() {
 
   const btn = document.getElementById('btnSave');
   btn.disabled = true;
-  btn.textContent = '⏳ Đang lưu...';
+  btn.textContent = 'Đang lưu...';
 
   const payload = { id: user.id, fullName, phone };
   if (newPwd) { payload.currentPassword = currentPwd; payload.newPassword = newPwd; }
@@ -1152,13 +1152,13 @@ async function saveProfile() {
     // Refresh UI
     refreshProfileUI(updated);
     closeEditModal();
-    showToast('✅ Cập nhật thông tin thành công!', 'success');
+    showToast('Cập nhật thông tin thành công!', 'success');
 
   } catch (err) {
     showErr('Lỗi kết nối. Vui lòng thử lại.');
   } finally {
     btn.disabled = false;
-    btn.textContent = '💾 Lưu thay đổi';
+    btn.textContent = 'Lưu thay đổi';
   }
 }
 
@@ -1237,9 +1237,9 @@ function openBookingDetail(id) {
               canCancel = diffMs > 60 * 60 * 1000; // > 1 hour
           }
           if (canCancel) {
-              buttonsHtml += `<button class="modal-btn btn-cancel-booking" onclick="cancelBookingFromProfile()">🚫 Hủy Đặt Sân</button>`;
+              buttonsHtml += `<button class="modal-btn btn-cancel-booking" onclick="cancelBookingFromProfile()">Hủy Đặt Sân</button>`;
           } else {
-              footerHtml += `<div style="width:100%; font-size:13px; color:#f59e0b; text-align:center; padding:8px; margin-bottom:4px; font-weight:700;">⚠️ Không thể hủy trong vòng 1 giờ trước giờ đánh</div>`;
+              footerHtml += `<div style="width:100%; font-size:13px; color:#f59e0b; text-align:center; padding:8px; margin-bottom:4px; font-weight:700;">Không thể hủy trong vòng 1 giờ trước giờ đánh</div>`;
           }
       }
       footerHtml += buttonsHtml;
@@ -1270,13 +1270,13 @@ async function cancelBookingFromProfile() {
     const json = await res.json();
     if (!res.ok || !json.success) throw new Error(json.message || 'Hủy thất bại');
     
-    showToast('✅ Đã hủy đặt sân. Nếu booking đã thanh toán, tiền đã được hoàn về ví.', 'success');
+    showToast('Đã hủy đặt sân. Nếu booking đã thanh toán, tiền đã được hoàn về ví.', 'success');
     closeBookingModal();
     // Refresh bookings
     const user = getCurrentUser();
     if (user && user.phone) loadBookings(user.phone);
   } catch (err) {
-    showToast('❌ Lỗi: ' + err.message, 'error');
+    showToast('Lỗi: ' + err.message, 'error');
   }
 }
 </script>
